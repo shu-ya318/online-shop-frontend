@@ -4,7 +4,7 @@ import type {
   CurrentUserResponse,
   UpdateUserPasswordRequest,
   UpdateUserProfileRequest,
-} from './types'
+} from './interface'
 
 export const getCurrentUser = async (): Promise<CurrentUserResponse> => {
   const response = await axiosInstance.get('/members/me')

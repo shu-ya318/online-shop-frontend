@@ -4,8 +4,8 @@ import { jwtDecode } from 'jwt-decode'
 import { register as apiRegister, login as apiLogin, logout as apiLogout } from '@/api/auth/index'
 import { getCurrentUser } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/service/tokenService'
-import type { RegisterRequest, LoginRequest } from '@/api/auth/types'
-import type { CurrentUserResponse } from '@/api/user/types'
+import type { RegisterRequest, LoginRequest } from '@/api/auth/interface'
+import type { CurrentUserResponse } from '@/api/user/interface'
 
 export const useAuthStore = defineStore('auth', () => {
   // States

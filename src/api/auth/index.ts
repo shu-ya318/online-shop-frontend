@@ -1,6 +1,6 @@
 import { axiosInstance } from '../axios/instance'
 import axios, { AxiosError } from 'axios'
-import type { RegisterRequest, LoginRequest, LoginResponse } from './types'
+import type { RegisterRequest, LoginRequest, LoginResponse } from './interface'
 
 export const isEmailExist = async (email: string): Promise<boolean> => {
   try {
