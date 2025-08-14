@@ -7,12 +7,12 @@ export interface CurrentUserResponse {
   phone: string
 }
 
-export interface UpdateUserProfileRequest {
+export interface UserProfileUpdateRequest {
   name: string
   address: string
   phone: string
 }
 
-export interface UpdateUserPasswordRequest {
+export interface UserPasswordUpdateRequest {
   newPassword: string
 }

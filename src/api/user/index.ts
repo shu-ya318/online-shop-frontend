@@ -2,8 +2,8 @@ import { axiosInstance } from '../axios/instance'
 
 import type {
   CurrentUserResponse,
-  UpdateUserPasswordRequest,
-  UpdateUserProfileRequest,
+  UserPasswordUpdateRequest,
+  UserProfileUpdateRequest,
 } from './interface'
 
 export const getCurrentUser = async (): Promise<CurrentUserResponse> => {
@@ -12,12 +12,12 @@ export const getCurrentUser = async (): Promise<CurrentUserResponse> => {
 }
 
 export const updateUserProfile = async (
-  payload: UpdateUserProfileRequest,
+  payload: UserProfileUpdateRequest,
 ): Promise<CurrentUserResponse> => {
   const response = await axiosInstance.put<CurrentUserResponse>('/members/me/profile', payload)
   return response.data
 }
 
-export const updateUserPassword = async (payload: UpdateUserPasswordRequest): Promise<void> => {
+export const updateUserPassword = async (payload: UserPasswordUpdateRequest): Promise<void> => {
   await axiosInstance.put('/members/me/password', payload)
 }
