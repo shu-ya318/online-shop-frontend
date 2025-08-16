@@ -3,7 +3,7 @@ import backgroundImage from '@/assets/images/backgroundImage.png'
 </script>
 
 <template>
-  <v-img width="100vw" cover :src="backgroundImage">
+  <v-img width="100vw" height="100vh" cover :src="backgroundImage">
     <v-container fluid class="d-flex justify-center align-center pa-7">
       <router-view />
     </v-container>
