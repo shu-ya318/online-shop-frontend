@@ -42,8 +42,7 @@ export const axiosInstance = axios.create({
         if (hasUnsafeIntegers(data)) {
           try {
             return JSONbigString.parse(data)
-          } catch (error) {
-            console.warn('Parse response with JSONbig failed:', error)
+          } catch {
             return JSON.parse(data)
           }
         } else {

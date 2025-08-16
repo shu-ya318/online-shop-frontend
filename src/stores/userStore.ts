@@ -1,13 +1,19 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { jwtDecode } from 'jwt-decode'
-import { register as apiRegister, login as apiLogin, logout as apiLogout } from '@/api/auth/index'
-import { getCurrentUser } from '@/api/user'
-import { getToken, setToken, removeToken } from '@/service/tokenService'
-import type { RegisterRequest, LoginRequest } from '@/api/auth/interface'
-import type { CurrentUserResponse } from '@/api/user/interface'
 
-export const useAuthStore = defineStore('auth', () => {
+import {
+  register as apiRegister,
+  login as apiLogin,
+  // logout as apiLogout,
+  // getCurrentUser,
+} from '@/api/user'
+
+import { getToken, setToken, removeToken } from '@/service/tokenService'
+
+import type { RegisterRequest, LoginRequest, CurrentUserResponse } from '@/api/user/interface'
+
+export const useUserStore = defineStore('user', () => {
   // States
   const isAuthLoading = ref<boolean>(false)
   const isAuthenticated = ref<boolean>(false)
@@ -92,45 +98,44 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const logout = async (): Promise<void> => {
-    isAuthLoading.value = true
+  // const logout = async (): Promise<void> => {
+  //   isAuthLoading.value = true
 
-    try {
-      await apiLogout()
-    } catch (e) {
-      error.value = toErrorMessage(e, 'logout failed')
-    } finally {
-      clearAuth()
-      isAuthLoading.value = false
-    }
-  }
+  //   try {
+  //     await apiLogout()
+  //   } catch (e) {
+  //     error.value = toErrorMessage(e, 'logout failed')
+  //   } finally {
+  //     clearAuth()
+  //     isAuthLoading.value = false
+  //   }
+  // }
 
-  const fetchCurrentUser = async (): Promise<void> => {
-    try {
-      const response = await getCurrentUser()
-      user.value = response
-    } catch (e) {
-      error.value = toErrorMessage(e, 'fetch current user failed')
-      throw e
-    }
-  }
+  // const fetchCurrentUser = async (): Promise<void> => {
+  //    try {
+  //     const response = await getCurrentUser()
+  //     user.value = response
+  //   } catch (e) {
+  //     error.value = toErrorMessage(e, 'fetch current user failed')
+  //     throw e
+  //   }
+  // }
 
   // Auth
-  const setAuth = async (): Promise<void> => {
-    if (!isTokenValid()) {
-      clearAuth()
-      return
-    }
+  // const setAuth = async (): Promise<void> => {
+  //   if (!isTokenValid()) {
+  //     clearAuth()
+  //     return
+  //   }
 
-    try {
-      await fetchCurrentUser()
-      isAuthenticated.value = true
-    } catch (e) {
-      console.error('Failed to set auth:', e)
-      clearAuth()
-      throw e
-    }
-  }
+  //   try {
+  //     await fetchCurrentUser()
+  //     isAuthenticated.value = true
+  //   } catch (e) {
+  //     clearAuth()
+  //     throw e
+  //   }
+  // }
 
   const clearAuth = (): void => {
     isAuthenticated.value = false
@@ -153,9 +158,9 @@ export const useAuthStore = defineStore('auth', () => {
     // Actions
     register,
     login,
-    logout,
-    fetchCurrentUser,
-    setAuth,
+    // logout,
+    // fetchCurrentUser,
+    // setAuth,
     clearAuth,
   }
 })

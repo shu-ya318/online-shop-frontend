@@ -1,9 +1,36 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '@/stores/authStore'
+import { useUserStore } from '@/stores/userStore'
 import type { RouteLocationNormalized, NavigationGuardNext, RouteRecordRaw } from 'vue-router'
 
 // Define routes
 const routes: RouteRecordRaw[] = [
+  {
+    path: '/',
+    name: 'home',
+    meta: { title: 'Home', requiresAuth: false },
+    redirect: { name: 'login' }, // TODO: change to home
+  },
+  // Auth
+  {
+    path: '/auth',
+    name: 'auth',
+    meta: { title: 'Authentication', requiresAuth: false },
+    component: () => import('../layouts/AuthLayout.vue'),
+    children: [
+      {
+        path: 'register',
+        name: 'register',
+        meta: { title: 'Register', requiresAuth: false },
+        component: () => import('../views/auth/RegisterView.vue'),
+      },
+      {
+        path: 'login',
+        name: 'login',
+        meta: { title: 'Login', requiresAuth: false },
+        component: () => import('../views/auth/LoginView.vue'),
+      },
+    ],
+  },
   //Error
   {
     path: '/error/:code?',
@@ -36,8 +63,12 @@ const router = createRouter({
 
 // Navigation Guards
 router.beforeEach(
-  async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    const authStore = useAuthStore()
+  async (
+    to: RouteLocationNormalized,
+    _from: RouteLocationNormalized,
+    next: NavigationGuardNext,
+  ) => {
+    const authStore = useUserStore()
 
     // When the route does not require authentication
     if (to.meta?.requiresAuth === false) {
@@ -52,18 +83,20 @@ router.beforeEach(
     }
 
     /*
-    When the token is valid
+    When the token is valid and user is trying to access auth pages,
+    redirect them away from auth pages (for now, redirect to home which goes to login)
+    TODO: Create a proper dashboard/home page for authenticated users
     */
     if (tokenIsValid && isAuthRoute) {
-      return next({ name: 'home' })
+      // For now, allow access to auth pages even with valid token
+      // Later, you should redirect to a proper dashboard
+      return next()
     }
 
     if (!authStore.isAuthenticated) {
       try {
-        await authStore.setAuth()
-      } catch (error) {
-        console.error('Authentication check failed:', error)
-
+        // await authStore.setAuth()
+      } catch {
         authStore.clearAuth()
         return next({ name: 'login' })
       }
