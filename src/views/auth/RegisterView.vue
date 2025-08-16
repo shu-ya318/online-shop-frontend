@@ -4,7 +4,6 @@ import { useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { z } from 'zod'
-import axios from 'axios'
 
 import { useNotification } from '@/composables/useNotification'
 
@@ -62,7 +61,7 @@ const router = useRouter()
 
 const { showSnackbar, snackbarColor, resultMessage, showSuccess, showError } = useNotification()
 
-const { handleSubmit, defineField, errors, isSubmitting, setFieldError } = useForm<defaultValues>({
+const { handleSubmit, defineField, errors, isSubmitting } = useForm<defaultValues>({
   initialValues: {
     name: '',
     email: '',
@@ -92,17 +91,11 @@ const onSubmit = handleSubmit(async (values) => {
 
     router.push({ name: 'login' })
     showSuccess('Registration successful, please check your email for activation!')
-  } catch (error) {
-    if (!axios.isAxiosError(error) || !error.response) {
-      showError('An unexpected error occurred. Please try again!')
-      return
-    }
-
-    const errorMessage = error.response.data?.message || ''
-    if (errorMessage.includes('Email already exists')) {
-      setFieldError('email', 'This email has been registered!')
+  } catch (error: unknown) {
+    if (error instanceof Error && error.name === 'BadRequestError' && error.message) {
+      showError(error.message)
     } else {
-      setFieldError('email', 'Cannot verify email status, please try again later!')
+      showError('An unexpected error occurred. Please try again!')
     }
   }
 })
