@@ -1,11 +1,10 @@
 import { ref } from 'vue'
 
+const showSnackbar = ref<boolean>(false)
+const snackbarColor = ref<'success' | 'error'>()
+const resultMessage = ref<string>('')
+
 export const useNotification = () => {
-  const showSnackbar = ref<boolean>(false)
-
-  const snackbarColor = ref<'success' | 'error'>()
-  const resultMessage = ref<string>('')
-
   const _showResult = (message: string, color: 'success' | 'error') => {
     resultMessage.value = message
     snackbarColor.value = color

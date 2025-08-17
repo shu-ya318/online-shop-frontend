@@ -49,9 +49,9 @@ const onSubmit = handleSubmit(async (values) => {
     await authStore.login(values)
 
     router.push({ name: 'home' })
-    showSuccess('Login success')
+    showSuccess('Login success!')
   } catch {
-    showError('Login failed, please try again')
+    showError('Login failed, please try again!')
   }
 })
 </script>

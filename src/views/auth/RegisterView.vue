@@ -1,16 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { z } from 'zod'
 
-import { useNotification } from '@/composables/useNotification'
-
 import AuthFormCard from '@/components/features/auth/AuthFormCard.vue'
 import FormInput from '@/components/common/baseUiElements/FormInput.vue'
 
-import { register } from '@/api/user'
+import { useUserStore } from '@/stores/userStore'
 
 interface defaultValues {
   name: string
@@ -57,9 +54,7 @@ const registerFormSchema = z
     }
   })
 
-const router = useRouter()
-
-const { showSnackbar, snackbarColor, resultMessage, showSuccess, showError } = useNotification()
+const authStore = useUserStore()
 
 const { handleSubmit, defineField, errors, isSubmitting } = useForm<defaultValues>({
   initialValues: {
@@ -82,22 +77,11 @@ const [address] = defineField('address')
 const [password] = defineField('password')
 const [confirmPassword] = defineField('confirmPassword')
 
-const showPassword = ref<boolean>(false)
-const showConfirmPassword = ref<boolean>(false)
+const showPassword = ref(false)
+const showConfirmPassword = ref(false)
 
 const onSubmit = handleSubmit(async (values) => {
-  try {
-    await register(values)
-
-    router.push({ name: 'login' })
-    showSuccess('Registration successful, please check your email for activation!')
-  } catch (error: unknown) {
-    if (error instanceof Error && error.name === 'BadRequestError' && error.message) {
-      showError(error.message)
-    } else {
-      showError('An unexpected error occurred. Please try again!')
-    }
-  }
+  await authStore.register(values)
 })
 </script>
 
@@ -166,10 +150,6 @@ const onSubmit = handleSubmit(async (values) => {
       </router-link>
     </template>
   </auth-form-card>
-  <!-- Snackbar -->
-  <v-snackbar timeout="3000" location="top" :color="snackbarColor" v-model="showSnackbar">
-    {{ resultMessage }}
-  </v-snackbar>
 </template>
 
 <style scoped></style>

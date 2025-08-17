@@ -1,12 +1,10 @@
 import { axiosInstance } from '../axios/instance'
 
-import type {
-  // CurrentUserResponse,
-  // UserPasswordUpdateRequest,
-  // UserProfileUpdateRequest,
-  RegisterRequest,
-  LoginRequest,
-  LoginResponse,
+import {
+  type RegisterRequest,
+  type LoginRequest,
+  type LoginResponse,
+  type CurrentUserResponse,
 } from './interface'
 
 export const register = async (payload: RegisterRequest): Promise<void> => {
@@ -19,14 +17,15 @@ export const login = async (payload: LoginRequest): Promise<LoginResponse> => {
   return response.data
 }
 
-// export const logout = async (): Promise<void> => {
-//   await axiosInstance.post('/user/logout')
-// }
+export const getCurrentUser = async (): Promise<CurrentUserResponse> => {
+  const response = await axiosInstance.get('/user/me')
+  return response.data
+}
 
-// export const getCurrentUser = async (): Promise<CurrentUserResponse> => {
-//   const response = await axiosInstance.get('/user/me')
-//   return response.data
-// }
+export const logout = async (): Promise<void> => {
+  const response = await axiosInstance.post('/user/logout')
+  return response.data
+}
 
 // export const updateUserProfile = async (
 //   payload: UserProfileUpdateRequest,

@@ -1,49 +1,34 @@
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { defineStore } from 'pinia'
 import { jwtDecode } from 'jwt-decode'
+
+import { useNotification } from '@/composables/useNotification'
 
 import {
   register as apiRegister,
   login as apiLogin,
-  // logout as apiLogout,
-  // getCurrentUser,
+  logout as apiLogout,
+  getCurrentUser,
 } from '@/api/user'
-
 import { getToken, setToken, removeToken } from '@/service/tokenService'
 
 import type { RegisterRequest, LoginRequest, CurrentUserResponse } from '@/api/user/interface'
 
 export const useUserStore = defineStore('user', () => {
+  const router = useRouter()
+
+  const { showSuccess, showError } = useNotification()
+
   // States
-  const isAuthLoading = ref<boolean>(false)
-  const isAuthenticated = ref<boolean>(false)
-  const user = ref<CurrentUserResponse | null>(null)
-  const error = ref<string | null>(null)
+  const isAuthenticated = ref(false)
+  const currentUser = ref<CurrentUserResponse | null>(null)
 
   // Getters
   const authStatus = computed(() => ({
-    isAuthLoading: isAuthLoading.value,
     isAuthenticated: isAuthenticated.value,
-    user: user.value,
-    error: error.value,
+    currentUser: currentUser.value,
   }))
-
-  // Utilities
-  const toErrorMessage = (e: unknown, fallback: string): string => {
-    if (
-      e &&
-      typeof e === 'object' &&
-      'message' in (e as Record<string, unknown>) &&
-      typeof (e as Record<string, unknown>).message === 'string'
-    ) {
-      return ((e as Record<string, unknown>).message as string) || fallback
-    }
-    try {
-      return String(e) || fallback
-    } catch {
-      return fallback
-    }
-  }
 
   const isTokenValid = (): boolean => {
     const token = getToken()
@@ -60,27 +45,22 @@ export const useUserStore = defineStore('user', () => {
   }
 
   // Actions
-
-  // User
-  const register = async (credentials: RegisterRequest): Promise<boolean> => {
-    isAuthLoading.value = true
-    error.value = null
-
+  const register = async (credentials: RegisterRequest): Promise<void> => {
     try {
       await apiRegister(credentials)
-      return true
-    } catch (e) {
-      error.value = toErrorMessage(e, 'register failed')
-      return false
-    } finally {
-      isAuthLoading.value = false
+
+      router.push({ name: 'login' })
+      showSuccess('Registration successful, please check your email for activation!')
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'BadRequestError' && error.message) {
+        showError(error.message)
+      } else {
+        showError('An unexpected error occurred. Please try again!')
+      }
     }
   }
 
   const login = async (credentials: LoginRequest): Promise<boolean> => {
-    isAuthLoading.value = true
-    error.value = null
-
     try {
       const response = await apiLogin(credentials)
       if (response.token) {
@@ -91,66 +71,57 @@ export const useUserStore = defineStore('user', () => {
 
       return false
     } catch (e) {
-      error.value = toErrorMessage(e, 'login failed')
+      console.error(e)
       return false
-    } finally {
-      isAuthLoading.value = false
     }
   }
 
-  // const logout = async (): Promise<void> => {
-  //   isAuthLoading.value = true
+  const logout = async (): Promise<void> => {
+    try {
+      await apiLogout()
+    } catch (e) {
+      console.error(e)
+    } finally {
+      clearAuth()
+    }
+  }
 
-  //   try {
-  //     await apiLogout()
-  //   } catch (e) {
-  //     error.value = toErrorMessage(e, 'logout failed')
-  //   } finally {
-  //     clearAuth()
-  //     isAuthLoading.value = false
-  //   }
-  // }
+  const fetchCurrentUser = async (): Promise<void> => {
+    try {
+      const response = await getCurrentUser()
+      currentUser.value = response
+    } catch (e) {
+      console.error(e)
+      throw e
+    }
+  }
 
-  // const fetchCurrentUser = async (): Promise<void> => {
-  //    try {
-  //     const response = await getCurrentUser()
-  //     user.value = response
-  //   } catch (e) {
-  //     error.value = toErrorMessage(e, 'fetch current user failed')
-  //     throw e
-  //   }
-  // }
+  const setAuth = async (): Promise<void> => {
+    if (!isTokenValid()) {
+      clearAuth()
+      return
+    }
 
-  // Auth
-  // const setAuth = async (): Promise<void> => {
-  //   if (!isTokenValid()) {
-  //     clearAuth()
-  //     return
-  //   }
-
-  //   try {
-  //     await fetchCurrentUser()
-  //     isAuthenticated.value = true
-  //   } catch (e) {
-  //     clearAuth()
-  //     throw e
-  //   }
-  // }
+    try {
+      await fetchCurrentUser()
+      isAuthenticated.value = true
+    } catch (e) {
+      clearAuth()
+      throw e
+    }
+  }
 
   const clearAuth = (): void => {
     isAuthenticated.value = false
-    user.value = null
-    error.value = null
+    currentUser.value = null
 
     removeToken()
   }
 
   return {
     // States
-    isAuthLoading,
     isAuthenticated,
-    user,
-    error,
+    currentUser,
     // Getters
     authStatus,
     // Utilities
@@ -158,9 +129,9 @@ export const useUserStore = defineStore('user', () => {
     // Actions
     register,
     login,
-    // logout,
-    // fetchCurrentUser,
-    // setAuth,
+    logout,
+    fetchCurrentUser,
+    setAuth,
     clearAuth,
   }
 })
