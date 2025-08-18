@@ -1,4 +1,4 @@
-import { axiosInstance } from '../axios/instance'
+import api from '../axios/instance'
 
 import {
   type RegisterRequest,
@@ -7,24 +7,24 @@ import {
   type CurrentUserResponse,
 } from './interface'
 
-export const register = async (payload: RegisterRequest): Promise<void> => {
-  const response = await axiosInstance.post('/public/user/register', payload)
-  return response.data
+export const register = async (payload: RegisterRequest): Promise<boolean> => {
+  const response = await api.post('/public/user/register', payload)
+  const success = response.status >= 200 && response.status < 300
+  return success
 }
 
 export const login = async (payload: LoginRequest): Promise<LoginResponse> => {
-  const response = await axiosInstance.post('/public/user/login', payload)
+  const response = await api.post<LoginResponse>('/public/user/login', payload)
   return response.data
 }
 
 export const getCurrentUser = async (): Promise<CurrentUserResponse> => {
-  const response = await axiosInstance.get('/user/me')
+  const response = await api.get<CurrentUserResponse>('/user/me')
   return response.data
 }
 
 export const logout = async (): Promise<void> => {
-  const response = await axiosInstance.post('/user/logout')
-  return response.data
+  await api.post('/user/logout')
 }
 
 // export const updateUserProfile = async (

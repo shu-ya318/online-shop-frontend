@@ -18,7 +18,7 @@ import type { RegisterRequest, LoginRequest, CurrentUserResponse } from '@/api/u
 export const useUserStore = defineStore('user', () => {
   const router = useRouter()
 
-  const { showSuccess, showError } = useNotification()
+  const { showSuccess } = useNotification()
 
   // States
   const isAuthenticated = ref(false)
@@ -46,54 +46,32 @@ export const useUserStore = defineStore('user', () => {
 
   // Actions
   const register = async (credentials: RegisterRequest): Promise<void> => {
-    try {
-      await apiRegister(credentials)
-
+    const success = await apiRegister(credentials)
+    if (success) {
       router.push({ name: 'login' })
-      showSuccess('Registration successful, please check your email for activation!')
-    } catch (error: unknown) {
-      if (error instanceof Error && error.name === 'BadRequestError' && error.message) {
-        showError(error.message)
-      } else {
-        showError('An unexpected error occurred. Please try again!')
-      }
+      showSuccess('Registration successful!')
     }
   }
 
-  const login = async (credentials: LoginRequest): Promise<boolean> => {
-    try {
-      const response = await apiLogin(credentials)
-      if (response.token) {
-        setToken(response.token)
-        await setAuth()
-        return true
-      }
-
-      return false
-    } catch (e) {
-      console.error(e)
-      return false
+  const login = async (credentials: LoginRequest): Promise<void> => {
+    const response = await apiLogin(credentials)
+    if (response.token) {
+      setToken(response.token)
+      // await setAuth()
     }
+
+    router.push({ name: 'home' })
+    showSuccess('Login success!')
   }
 
   const logout = async (): Promise<void> => {
-    try {
-      await apiLogout()
-    } catch (e) {
-      console.error(e)
-    } finally {
-      clearAuth()
-    }
+    await apiLogout()
+    clearAuth()
   }
 
   const fetchCurrentUser = async (): Promise<void> => {
-    try {
-      const response = await getCurrentUser()
-      currentUser.value = response
-    } catch (e) {
-      console.error(e)
-      throw e
-    }
+    const response = await getCurrentUser()
+    currentUser.value = response
   }
 
   const setAuth = async (): Promise<void> => {
@@ -102,13 +80,8 @@ export const useUserStore = defineStore('user', () => {
       return
     }
 
-    try {
-      await fetchCurrentUser()
-      isAuthenticated.value = true
-    } catch (e) {
-      clearAuth()
-      throw e
-    }
+    await fetchCurrentUser()
+    isAuthenticated.value = true
   }
 
   const clearAuth = (): void => {
