@@ -19,7 +19,7 @@ interface defaultValues {
   address: string
 }
 
-const registerFormSchema = z
+const formSchema = z
   .object({
     name: z.string().min(1, { message: 'Name is required' }),
     email: z
@@ -66,7 +66,7 @@ const { handleSubmit, defineField, errors, isSubmitting } = useForm<defaultValue
     phoneNumber: '',
     address: '',
   },
-  validationSchema: toTypedSchema(registerFormSchema),
+  validationSchema: toTypedSchema(formSchema),
 })
 
 const [name] = defineField('name')

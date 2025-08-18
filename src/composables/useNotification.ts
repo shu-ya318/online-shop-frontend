@@ -1,8 +1,8 @@
 import { ref } from 'vue'
 
-const showSnackbar = ref<boolean>(false)
+const showSnackbar = ref(false)
 const snackbarColor = ref<'success' | 'error'>()
-const resultMessage = ref<string>('')
+const resultMessage = ref('')
 
 export const useNotification = () => {
   const _showResult = (message: string, color: 'success' | 'error') => {
