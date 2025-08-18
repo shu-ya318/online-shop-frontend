@@ -33,12 +33,12 @@ const { handleSubmit, defineField, errors, isSubmitting } = useForm<defaultValue
 const [email] = defineField('email')
 const [password] = defineField('password')
 
-const authStore = useUserStore()
+const { login } = useUserStore()
 
 const showPassword = ref(false)
 
 const onSubmit = handleSubmit(async (values) => {
-  await authStore.login(values)
+  await login(values)
 })
 </script>
 

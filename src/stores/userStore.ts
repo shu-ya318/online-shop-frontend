@@ -11,100 +11,107 @@ import {
   logout as apiLogout,
   getCurrentUser,
 } from '@/api/user'
-import { getToken, setToken, removeToken } from '@/service/tokenService'
 
 import type { RegisterRequest, LoginRequest, CurrentUserResponse } from '@/api/user/interface'
 
-export const useUserStore = defineStore('user', () => {
-  const router = useRouter()
+export const useUserStore = defineStore(
+  'user',
+  () => {
+    const router = useRouter()
 
-  const { showSuccess } = useNotification()
+    const { showSuccess } = useNotification()
 
-  // States
-  const isAuthenticated = ref(false)
-  const currentUser = ref<CurrentUserResponse | null>(null)
-
-  // Getters
-  const authStatus = computed(() => ({
-    isAuthenticated: isAuthenticated.value,
-    currentUser: currentUser.value,
-  }))
-
-  const isTokenValid = (): boolean => {
-    const token = getToken()
-
-    if (!token) return false
-
-    try {
-      const decodedToken = jwtDecode<{ exp: number }>(token)
-      const currentTime = Math.floor(Date.now() / 1000)
-      return decodedToken.exp > currentTime
-    } catch {
-      return false
-    }
-  }
-
-  // Actions
-  const register = async (credentials: RegisterRequest): Promise<void> => {
-    const success = await apiRegister(credentials)
-    if (success) {
-      router.push({ name: 'login' })
-      showSuccess('Registration successful!')
-    }
-  }
-
-  const login = async (credentials: LoginRequest): Promise<void> => {
-    const response = await apiLogin(credentials)
-    if (response.token) {
-      setToken(response.token)
-      // await setAuth()
-    }
-
-    router.push({ name: 'home' })
-    showSuccess('Login success!')
-  }
-
-  const logout = async (): Promise<void> => {
-    await apiLogout()
-    clearAuth()
-  }
-
-  const fetchCurrentUser = async (): Promise<void> => {
-    const response = await getCurrentUser()
-    currentUser.value = response
-  }
-
-  const setAuth = async (): Promise<void> => {
-    if (!isTokenValid()) {
-      clearAuth()
-      return
-    }
-
-    await fetchCurrentUser()
-    isAuthenticated.value = true
-  }
-
-  const clearAuth = (): void => {
-    isAuthenticated.value = false
-    currentUser.value = null
-
-    removeToken()
-  }
-
-  return {
     // States
-    isAuthenticated,
-    currentUser,
+    const isAuthenticated = ref(false)
+    const token = ref<string | null>(null)
+    const userInfo = ref<CurrentUserResponse | null>(null)
+
     // Getters
-    authStatus,
-    // Utilities
-    isTokenValid,
+    const authStatus = computed(() => ({
+      isAuthenticated: isAuthenticated.value,
+      token: token.value,
+      userInfo: userInfo.value,
+    }))
+
+    const isTokenValid = (): boolean => {
+      const token = authStatus.value.token
+
+      if (!token) return false
+
+      try {
+        const decodedToken = jwtDecode<{ exp: number }>(token)
+        const currentTime = Math.floor(Date.now() / 1000)
+
+        return decodedToken.exp > currentTime
+      } catch {
+        return false
+      }
+    }
+
     // Actions
-    register,
-    login,
-    logout,
-    fetchCurrentUser,
-    setAuth,
-    clearAuth,
-  }
-})
+    const setToken = (newToken: string): void => {
+      token.value = newToken
+      isAuthenticated.value = true
+    }
+
+    const removeToken = () => {
+      token.value = null
+      isAuthenticated.value = false
+    }
+
+    const register = async (credentials: RegisterRequest): Promise<void> => {
+      const success = await apiRegister(credentials)
+      if (success) {
+        router.push({ name: 'login' })
+        showSuccess('Registration successful!')
+      }
+    }
+
+    const fetchUser = async (): Promise<void> => {
+      const response = await getCurrentUser()
+      if (response) userInfo.value = response
+    }
+
+    const login = async (credentials: LoginRequest): Promise<void> => {
+      const response = await apiLogin(credentials)
+      if (response.token) {
+        setToken(response.token)
+        await fetchUser()
+        router.push({ name: 'home' })
+        showSuccess('Login successful!')
+      }
+    }
+
+    const logout = async (): Promise<void> => {
+      const success = await apiLogout()
+      if (success) {
+        removeToken()
+        userInfo.value = null
+        router.push({ name: 'home' })
+        showSuccess('Logout successful!')
+      }
+    }
+
+    return {
+      // States
+      isAuthenticated,
+      token,
+      userInfo,
+      // Getters
+      authStatus,
+      // Utilities
+      isTokenValid,
+      // Actions
+      register,
+      fetchUser,
+      login,
+      logout,
+    }
+  },
+  {
+    persist: {
+      storage: localStorage,
+      pick: ['token'],
+    },
+  },
+)

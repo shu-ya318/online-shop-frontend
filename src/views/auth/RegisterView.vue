@@ -54,7 +54,7 @@ const formSchema = z
     }
   })
 
-const authStore = useUserStore()
+const { register } = useUserStore()
 
 const { handleSubmit, defineField, errors, isSubmitting } = useForm<defaultValues>({
   initialValues: {
@@ -81,7 +81,7 @@ const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 
 const onSubmit = handleSubmit(async (values) => {
-  await authStore.register(values)
+  await register(values)
 })
 </script>
 

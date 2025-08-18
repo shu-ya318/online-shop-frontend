@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import { createVuetify } from 'vuetify'
 import 'vuetify/styles'
 import { vuetifyConfig } from './stylesheets/theme'
@@ -12,8 +13,10 @@ import '@mdi/font/css/materialdesignicons.css'
 import './assets/main.css'
 
 const app = createApp(App)
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
 
-app.use(createPinia())
+app.use(pinia)
 app.use(router)
 app.use(
   createVuetify({

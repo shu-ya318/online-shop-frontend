@@ -8,7 +8,7 @@ import JSONbig from 'json-bigint'
 
 import { useNotification } from '@/composables/useNotification'
 
-import { getToken } from '@/service/tokenService'
+import { useUserStore } from '@/stores/userStore'
 
 const { showError } = useNotification()
 
@@ -63,10 +63,9 @@ const service: AxiosInstance = axios.create({
 
 service.interceptors.request.use(
   (config) => {
-    const token = getToken()
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
+    const userStore = useUserStore()
+    const token = userStore.authStatus.token
+    if (token) config.headers.Authorization = `Bearer ${token}`
 
     return config
   },
@@ -80,9 +79,8 @@ service.interceptors.response.use(
   async (error) => {
     if (error instanceof AxiosError) {
       // Situation 1: The request was made and the server response
-      if (error.response) {
-        const errorMessage =
-          error.response.data?.error?.message || 'An unexpected error occurred. Please try again!'
+      if (error.response) {        const errorMessage =
+          error.response.data?.message || 'An unexpected error occurred. Please try again!'
         showError(errorMessage)
       } else if (error.request) {
         // Situation 2:When the request is made but no response from the server
