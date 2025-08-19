@@ -4,8 +4,8 @@ import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { z } from 'zod'
 
-import AuthFormCard from '@/components/features/auth/AuthFormCard.vue'
-import FormInput from '@/components/common/baseUiElements/FormInput.vue'
+import AuthFormCard from '@/components/auth/AuthFormCard.vue'
+import FormInput from '@/components/common/FormInput.vue'
 
 import { useUserStore } from '@/stores/userStore'
 
