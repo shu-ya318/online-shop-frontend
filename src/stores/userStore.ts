@@ -9,10 +9,10 @@ import {
   register as apiRegister,
   login as apiLogin,
   logout as apiLogout,
-  getCurrentUser,
+  getUser,
 } from '@/api/user'
 
-import type { RegisterRequest, LoginRequest, CurrentUserResponse } from '@/api/user/interface'
+import type { RegisterRequest, LoginRequest, UserResponse } from '@/api/user/interface'
 
 export const useUserStore = defineStore(
   'user',
@@ -24,7 +24,7 @@ export const useUserStore = defineStore(
     // States
     const isAuthenticated = ref(false)
     const token = ref<string | null>(null)
-    const userInfo = ref<CurrentUserResponse | null>(null)
+    const userInfo = ref<UserResponse | null>(null)
 
     // Getters
     const authStatus = computed(() => ({
@@ -68,7 +68,7 @@ export const useUserStore = defineStore(
     }
 
     const fetchUser = async (): Promise<void> => {
-      const response = await getCurrentUser()
+      const response = await getUser()
       if (response) userInfo.value = response
     }
 

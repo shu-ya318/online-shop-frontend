@@ -16,21 +16,23 @@ export interface LoginResponse {
   token: string
 }
 
-export interface CurrentUserResponse {
-  id: string
+export interface UserResponse {
   uuid: string
   email: string
   name: string
-  address: string
   phoneNumber: string
+  birth: string
+  address: string
 }
 
 export interface UserProfileUpdateRequest {
   name: string
-  address: string
   phoneNumber: string
+  birth: string
+  address: string
 }
 
 export interface UserPasswordUpdateRequest {
+  oldPassword: string
   newPassword: string
 }
