@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { defineStore } from 'pinia'
 import { jwtDecode } from 'jwt-decode'
@@ -26,20 +26,11 @@ export const useUserStore = defineStore(
     const token = ref<string | null>(null)
     const userInfo = ref<UserResponse | null>(null)
 
-    // Getters
-    const authStatus = computed(() => ({
-      isAuthenticated: isAuthenticated.value,
-      token: token.value,
-      userInfo: userInfo.value,
-    }))
-
-    const isTokenValid = (): boolean => {
-      const token = authStatus.value.token
-
-      if (!token) return false
+    const verifyToken = (): boolean => {
+      if (!token.value) return false
 
       try {
-        const decodedToken = jwtDecode<{ exp: number }>(token)
+        const decodedToken = jwtDecode<{ exp: number }>(token.value)
         const currentTime = Math.floor(Date.now() / 1000)
 
         return decodedToken.exp > currentTime
@@ -87,7 +78,6 @@ export const useUserStore = defineStore(
       if (success) {
         removeToken()
         userInfo.value = null
-        router.push({ name: 'home' })
         showSuccess('Logout successful!')
       }
     }
@@ -97,10 +87,8 @@ export const useUserStore = defineStore(
       isAuthenticated,
       token,
       userInfo,
-      // Getters
-      authStatus,
       // Utilities
-      isTokenValid,
+      verifyToken,
       // Actions
       register,
       fetchUser,

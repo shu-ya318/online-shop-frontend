@@ -64,7 +64,7 @@ const service: AxiosInstance = axios.create({
 service.interceptors.request.use(
   (config) => {
     const userStore = useUserStore()
-    const token = userStore.authStatus.token
+    const token = userStore.token
     if (token) config.headers.Authorization = `Bearer ${token}`
 
     return config
@@ -79,7 +79,8 @@ service.interceptors.response.use(
   async (error) => {
     if (error instanceof AxiosError) {
       // Situation 1: The request was made and the server response
-      if (error.response) {        const errorMessage =
+      if (error.response) {
+        const errorMessage =
           error.response.data?.message || 'An unexpected error occurred. Please try again!'
         showError(errorMessage)
       } else if (error.request) {

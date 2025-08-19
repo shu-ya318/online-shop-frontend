@@ -1,14 +1,34 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
+
+import DashboardLayout from '@/layouts/DashboardLayout.vue'
+import HomeView from '@/views/dashboard/HomeView.vue'
+
 import type { RouteLocationNormalized, NavigationGuardNext, RouteRecordRaw } from 'vue-router'
 
 // Define routes
 const routes: RouteRecordRaw[] = [
+  // Error
   {
-    path: '/',
-    name: 'home',
-    meta: { title: 'Home', requiresAuth: false },
-    redirect: { name: 'login' }, // TODO: change to home
+    path: '/error/:code?',
+    name: 'error',
+    meta: { title: 'Error', requiresAuth: false },
+    component: () => import('../layouts/ErrorLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'error-page',
+        meta: { title: 'Error', requiresAuth: false },
+        component: () => import('../views/ErrorView.vue'),
+      },
+    ],
+  },
+  // 404 Not Found
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    meta: { title: 'Not Found', requiresAuth: false },
+    redirect: '/error/404',
   },
   // Auth
   {
@@ -31,27 +51,27 @@ const routes: RouteRecordRaw[] = [
       },
     ],
   },
-  //Error
+  // Dashboard
   {
-    path: '/error/:code?',
-    name: 'error',
-    meta: { title: 'Error', requiresAuth: false },
-    component: () => import('../layouts/ErrorLayout.vue'),
+    path: '/',
+    name: 'dashboard',
+    meta: { title: 'Dashboard', requiresAuth: false },
+    component: DashboardLayout,
+    redirect: '/home',
     children: [
       {
-        path: '',
-        name: 'error-page',
-        meta: { title: 'Error', requiresAuth: false },
-        component: () => import('../views/ErrorView.vue'),
+        path: 'home',
+        name: 'home',
+        meta: { title: 'Dashboard', requiresAuth: false },
+        component: HomeView,
+      },
+      {
+        path: 'user',
+        name: 'user',
+        meta: { title: 'User Management', requiresAuth: true },
+        component: () => import('../views/dashboard/UserView.vue'),
       },
     ],
-  },
-  // 404 Not Found Route
-  {
-    path: '/:pathMatch(.*)*',
-    name: 'not-found',
-    meta: { title: 'Not Found', requiresAuth: false },
-    redirect: '/error/404',
   },
 ]
 
@@ -68,38 +88,31 @@ router.beforeEach(
     _from: RouteLocationNormalized,
     next: NavigationGuardNext,
   ) => {
-    const authStore = useUserStore()
+    const { isAuthenticated, verifyToken, logout } = useUserStore()
 
     // When the route does not require authentication
     if (to.meta?.requiresAuth === false) {
       return next()
     }
 
-    const tokenIsValid = authStore.isTokenValid()
+    /*
+    When the route requires authentication
+    */
+    const isTokenValid = verifyToken()
     const isAuthRoute = to.path.startsWith('/auth')
 
-    if (!tokenIsValid) {
+    if (!isTokenValid) {
       return next({ name: 'login' })
     }
 
     /*
-    When the token is valid and user is trying to access auth pages,
-    redirect them away from auth pages (for now, redirect to home which goes to login)
-    TODO: Create a proper dashboard/home page for authenticated users
+    When the token is valid
     */
-    if (tokenIsValid && isAuthRoute) {
-      // For now, allow access to auth pages even with valid token
-      // Later, you should redirect to a proper dashboard
-      return next()
-    }
-
-    if (!authStore.isAuthenticated) {
-      try {
-        // await authStore.setAuth()
-      } catch {
-        authStore.clearAuth()
-        return next({ name: 'login' })
-      }
+    if (isTokenValid && isAuthRoute) {
+      return next({ name: 'home' })
+    } else if (!isAuthenticated) {
+      logout()
+      return next({ name: 'home' })
     }
 
     next()
