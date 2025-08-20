@@ -6,11 +6,7 @@ import axios, {
 } from 'axios'
 import JSONbig from 'json-bigint'
 
-import { useNotification } from '@/composables/useNotification'
-
 import { useUserStore } from '@/stores/userStore'
-
-const { showError } = useNotification()
 
 const JSONbigString = JSONbig({
   storeAsString: true,
@@ -78,29 +74,18 @@ service.interceptors.response.use(
   (response: AxiosResponse) => response,
   // Failed
   async (error) => {
+    let errorMessage = 'An unknown error occurred. Please try again!'
+
     if (error instanceof AxiosError) {
-      // Situation 1: The request was made and the server response
       if (error.response) {
-        const errorMessage =
+        errorMessage =
           error.response.data?.message || 'An unexpected error occurred. Please try again!'
-        showError(errorMessage)
-      } else if (error.request) {
-        // Situation 2:When the request is made but no response from the server
-        showError('Network error, please check your network!')
+      } else {
+        errorMessage = 'Network error, please check your network!'
       }
-    } else {
-      // Situation 3: Handle error not related to axios (e.g. SyntaxError)
-      showError('An unknown error occurred. Please try again!')
     }
 
-    return Promise.reject({
-      data: error.response?.data ?? null,
-      status: error.response?.status ?? 0,
-      statusText: error.response?.statusText ?? error.message,
-      headers: error.response?.headers ?? {},
-      config: error.config!,
-      request: error.request ?? null,
-    })
+    return Promise.reject(errorMessage)
   },
 )
 

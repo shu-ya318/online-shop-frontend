@@ -88,17 +88,11 @@ const showConfirmPassword = ref(false)
 
 const onSubmit = handleSubmit(async (values) => {
   try {
-    const payload = {
-      ...values,
-      uuid: crypto.randomUUID(),
-      phone: values.phoneNumber ?? '',
-      address: values.address ?? '',
-    }
-    await register(payload)
+    await register(values)
     router.push({ name: 'login' })
     showSuccess('Register success')
-  } catch {
-    showError('Register failed, please try again')
+  } catch (error) {
+    showError(error as string)
   }
 })
 </script>

@@ -48,8 +48,8 @@ const onSubmit = handleSubmit(async (values) => {
     await login(values)
     router.push({ name: 'home' })
     showSuccess('Login success')
-  } catch {
-    showError('Login failed, please try again')
+  } catch (error) {
+    showError(error as string)
   }
 })
 </script>
