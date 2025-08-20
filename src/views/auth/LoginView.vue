@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { z } from 'zod'
 
+import { useUserStore } from '@/stores/userStore'
+import { useNotification } from '@/composables/useNotification'
+
 import AuthFormCard from '@/components/auth/AuthFormCard.vue'
 import FormInput from '@/components/common/FormInput.vue'
-
-import { useUserStore } from '@/stores/userStore'
 
 interface defaultValues {
   email: string
@@ -33,12 +35,22 @@ const { handleSubmit, defineField, errors, isSubmitting } = useForm<defaultValue
 const [email] = defineField('email')
 const [password] = defineField('password')
 
+const router = useRouter()
+
 const { login } = useUserStore()
+
+const { showSnackbar, snackbarColor, resultMessage, showSuccess, showError } = useNotification()
 
 const showPassword = ref(false)
 
 const onSubmit = handleSubmit(async (values) => {
-  await login(values)
+  try {
+    await login(values)
+    router.push({ name: 'home' })
+    showSuccess('Login success')
+  } catch {
+    showError('Login failed, please try again')
+  }
 })
 </script>
 
@@ -58,6 +70,10 @@ const onSubmit = handleSubmit(async (values) => {
       </router-link>
     </template>
   </auth-form-card>
+  <!-- Snackbar -->
+  <v-snackbar v-model="showSnackbar" :color="snackbarColor" :timeout="3000" location="top">
+    {{ resultMessage }}
+  </v-snackbar>
 </template>
 
 <style scoped></style>

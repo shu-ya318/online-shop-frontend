@@ -65,6 +65,7 @@ service.interceptors.request.use(
   (config) => {
     const userStore = useUserStore()
     const token = userStore.token
+
     if (token) config.headers.Authorization = `Bearer ${token}`
 
     return config
@@ -92,8 +93,7 @@ service.interceptors.response.use(
       showError('An unknown error occurred. Please try again!')
     }
 
-    // Return a custom error object with the error description instead of reject
-    return Promise.resolve({
+    return Promise.reject({
       data: error.response?.data ?? null,
       status: error.response?.status ?? 0,
       statusText: error.response?.statusText ?? error.message,
