@@ -30,10 +30,10 @@ const sidebarItems = computed(() => [
 </script>
 
 <template>
-  <v-layout class="d-flex flex-column" height="100vh" width="100vw">
+  <v-layout class="d-flex flex-column" width="100vw">
     <AppHeader @toggle-sidebar="drawer = !drawer" />
     <AppSidebar v-model="drawer" :sidebar-items="sidebarItems" />
-    <v-main class="d-flex justify-center">
+    <v-main  class="d-flex justify-center">
       <router-view />
     </v-main>
     <AppFooter />
