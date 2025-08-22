@@ -36,6 +36,7 @@ const routes: RouteRecordRaw[] = [
     name: 'auth',
     meta: { title: 'Authentication', requiresAuth: false },
     component: () => import('../layouts/AuthLayout.vue'),
+    redirect: { name: 'login' },
     children: [
       {
         path: 'register',
@@ -57,7 +58,7 @@ const routes: RouteRecordRaw[] = [
     name: 'dashboard',
     meta: { title: 'Dashboard', requiresAuth: false },
     component: DashboardLayout,
-    redirect: '/home',
+    redirect: { name: 'home' },
     children: [
       {
         path: 'home',
@@ -88,27 +89,19 @@ router.beforeEach(
     _from: RouteLocationNormalized,
     next: NavigationGuardNext,
   ) => {
-    const { isInitialized, initializeAuth, isAuthenticated } = useUserStore()
+    const userStore = useUserStore()
 
-    if (!isInitialized) {
-      await initializeAuth()
+    if (!userStore.isInitialized) {
+      await userStore.initializeAuth()
     }
 
-    const requiresAuth = to.meta?.requiresAuth ?? false
-
-    if (!requiresAuth) {
-      return next()
-    }
-
-    if (!isAuthenticated) {
-      if (requiresAuth) {
+    if (!userStore.isAuthenticated) {
+      if (to.meta?.requiresAuth) {
         return next({ name: 'login' })
       }
 
       return next()
-    }
-
-    if (isAuthenticated) {
+    } else {
       if (to.path.startsWith('/auth')) {
         return next({ name: 'home' })
       }
