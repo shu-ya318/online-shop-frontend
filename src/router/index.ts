@@ -88,34 +88,33 @@ router.beforeEach(
     _from: RouteLocationNormalized,
     next: NavigationGuardNext,
   ) => {
-    const { isAuthenticated, verifyToken, logout } = useUserStore()
+    const { isInitialized, initializeAuth, isAuthenticated } = useUserStore()
 
-    // When the route does not require authentication
-    if (to.meta?.requiresAuth === false) {
+    if (!isInitialized) {
+      await initializeAuth()
+    }
+
+    const requiresAuth = to.meta?.requiresAuth ?? false
+
+    if (!requiresAuth) {
       return next()
     }
 
-    /*
-    When the route requires authentication
-    */
-    const isTokenValid = verifyToken()
-    const isAuthRoute = to.path.startsWith('/auth')
+    if (!isAuthenticated) {
+      if (requiresAuth) {
+        return next({ name: 'login' })
+      }
 
-    if (!isTokenValid) {
-      return next({ name: 'login' })
+      return next()
     }
 
-    /*
-    When the token is valid
-    */
-    if (isTokenValid && isAuthRoute) {
-      return next({ name: 'home' })
-    } else if (!isAuthenticated) {
-      logout()
-      return next({ name: 'home' })
-    }
+    if (isAuthenticated) {
+      if (to.path.startsWith('/auth')) {
+        return next({ name: 'home' })
+      }
 
-    next()
+      return next()
+    }
   },
 )
 
