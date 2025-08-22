@@ -11,7 +11,7 @@ import { useNotification } from '@/composables/useNotification'
 import AuthFormCard from '@/components/auth/AuthFormCard.vue'
 import FormInput from '@/components/common/FormInput.vue'
 
-interface defaultValues {
+interface RegisterForm {
   name: string
   email: string
   password: string
@@ -21,7 +21,7 @@ interface defaultValues {
   address: string
 }
 
-const formSchema = z
+const schema = z
   .object({
     name: z.string().min(1, { message: 'Name is required' }),
     email: z
@@ -58,7 +58,7 @@ const formSchema = z
 
 const { register } = useUserStore()
 
-const { handleSubmit, defineField, errors, isSubmitting } = useForm<defaultValues>({
+const { handleSubmit, defineField, errors, isSubmitting } = useForm<RegisterForm>({
   initialValues: {
     name: '',
     email: '',
@@ -68,7 +68,7 @@ const { handleSubmit, defineField, errors, isSubmitting } = useForm<defaultValue
     phoneNumber: '',
     address: '',
   },
-  validationSchema: toTypedSchema(formSchema),
+  validationSchema: toTypedSchema(schema),
 })
 
 const [name] = defineField('name')
@@ -89,8 +89,10 @@ const showConfirmPassword = ref(false)
 const onSubmit = handleSubmit(async (values) => {
   try {
     await register(values)
-    router.push({ name: 'login' })
-    showSuccess('Register success')
+    showSuccess('Register success!')
+    setTimeout(() => {
+      router.push({ name: 'login' })
+    }, 1500)
   } catch (error) {
     showError(error as string)
   }
@@ -99,26 +101,61 @@ const onSubmit = handleSubmit(async (values) => {
 
 <template>
   <!-- Form -->
-  <auth-form-card title="Register" button-text="Register" :loading="isSubmitting" @submit="onSubmit">
+  <auth-form-card
+    title="Register"
+    button-text="Register"
+    :loading="isSubmitting"
+    @submit="onSubmit"
+  >
     <!-- Inputs -->
-    <form-input label="Name" placeholder="Please enter your name" v-model="name"
-      :error-messages="errors.name"></form-input>
-    <form-input label="Email" placeholder="Please enter a valid email address" v-model="email"
-      :error-messages="errors.email"></form-input>
-    <form-input label="Birth" placeholder="Please enter your birth date (yyyy-MM-dd)" v-model="birth"
-      :error-messages="errors.birth"></form-input>
-    <form-input label="Password" placeholder="Please enter 8-20 characters" :type="showPassword ? 'text' : 'password'"
-      :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'" v-model="password" :error-messages="errors.password"
-      @click:append-inner="showPassword = !showPassword"></form-input>
-    <form-input label="Confirm Password" placeholder="Please enter the password again"
+    <form-input
+      label="Name"
+      placeholder="Please enter your name"
+      v-model="name"
+      :error-messages="errors.name"
+    ></form-input>
+    <form-input
+      label="Email"
+      placeholder="Please enter a valid email address"
+      v-model="email"
+      :error-messages="errors.email"
+    ></form-input>
+    <form-input
+      label="Birth"
+      placeholder="Please enter your birth date (yyyy-MM-dd)"
+      v-model="birth"
+      :error-messages="errors.birth"
+    ></form-input>
+    <form-input
+      label="Password"
+      placeholder="Please enter 8-20 characters"
+      :type="showPassword ? 'text' : 'password'"
+      :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+      v-model="password"
+      :error-messages="errors.password"
+      @click:append-inner="showPassword = !showPassword"
+    ></form-input>
+    <form-input
+      label="Confirm Password"
+      placeholder="Please enter the password again"
       :type="showConfirmPassword ? 'text' : 'password'"
-      :append-inner-icon="showConfirmPassword ? 'mdi-eye-off' : 'mdi-eye'" v-model="confirmPassword"
+      :append-inner-icon="showConfirmPassword ? 'mdi-eye-off' : 'mdi-eye'"
+      v-model="confirmPassword"
       :error-messages="errors.confirmPassword"
-      @click:append-inner="showConfirmPassword = !showConfirmPassword"></form-input>
-    <form-input label="Phone Number" placeholder="Please enter 10 digits" v-model="phoneNumber"
-      :error-messages="errors.phoneNumber"></form-input>
-    <form-input label="Address" placeholder="Please enter your address" v-model="address"
-      :error-messages="errors.address"></form-input>
+      @click:append-inner="showConfirmPassword = !showConfirmPassword"
+    ></form-input>
+    <form-input
+      label="Phone Number"
+      placeholder="Please enter 10 digits"
+      v-model="phoneNumber"
+      :error-messages="errors.phoneNumber"
+    ></form-input>
+    <form-input
+      label="Address"
+      placeholder="Please enter your address"
+      v-model="address"
+      :error-messages="errors.address"
+    ></form-input>
     <!-- Redirect link -->
     <template #actions>
       <router-link class="text-decoration-none text-primary bg-transparent" :to="{ name: 'login' }">

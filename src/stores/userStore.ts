@@ -1,9 +1,6 @@
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { jwtDecode } from 'jwt-decode'
-
-import { useNotification } from '@/composables/useNotification'
 
 import {
   register as apiRegister,
@@ -17,14 +14,14 @@ import type { RegisterRequest, LoginRequest, UserResponse } from '@/api/user/int
 export const useUserStore = defineStore(
   'user',
   () => {
-    const router = useRouter()
-
-    const { showSuccess } = useNotification()
-
     // States
-    const isAuthenticated = ref(false)
     const token = ref<string | null>(null)
+    const isInitialized = ref(false)
     const userInfo = ref<UserResponse | null>(null)
+
+    const isAuthenticated = computed(() => {
+      return !!(token.value && userInfo.value)
+    })
 
     const verifyToken = (): boolean => {
       if (!token.value) return false
@@ -42,51 +39,74 @@ export const useUserStore = defineStore(
     // Actions
     const setToken = (newToken: string): void => {
       token.value = newToken
-      isAuthenticated.value = true
     }
 
     const removeToken = () => {
       token.value = null
-      isAuthenticated.value = false
     }
 
     const register = async (credentials: RegisterRequest): Promise<void> => {
-      const success = await apiRegister(credentials)
-      if (success) {
-        router.push({ name: 'login' })
-        showSuccess('Registration successful!')
+      try {
+        await apiRegister(credentials)
+      } catch (error) {
+        throw error
       }
     }
 
     const fetchUser = async (): Promise<void> => {
-      const response = await getUser()
-      if (response) userInfo.value = response
+      try {
+        const response = await getUser()
+        userInfo.value = response
+      } catch (error) {
+        userInfo.value = null
+        throw error
+      }
     }
 
     const login = async (credentials: LoginRequest): Promise<void> => {
-      const response = await apiLogin(credentials)
-      if (response.token) {
-        setToken(response.token)
-        await fetchUser()
-        router.push({ name: 'home' })
-        showSuccess('Login successful!')
+      try {
+        const response = await apiLogin(credentials)
+        if (response.token) {
+          setToken(response.token)
+          await fetchUser()
+        }
+      } catch (error) {
+        removeToken()
+        userInfo.value = null
+        throw error
       }
     }
 
     const logout = async (): Promise<void> => {
-      const success = await apiLogout()
-      if (success) {
+      try {
+        await apiLogout()
+      } finally {
         removeToken()
         userInfo.value = null
-        showSuccess('Logout successful!')
       }
+    }
+
+    const initializeAuth = async (): Promise<void> => {
+      if (isInitialized.value) return
+
+      const isTokenValid = verifyToken()
+      if (isTokenValid) {
+        try {
+          await fetchUser()
+        } catch {
+          logout()
+        }
+      }
+
+      isInitialized.value = true
     }
 
     return {
       // States
-      isAuthenticated,
+      isInitialized,
       token,
       userInfo,
+      isAuthenticated,
       // Utilities
       verifyToken,
       // Actions
@@ -94,6 +114,7 @@ export const useUserStore = defineStore(
       fetchUser,
       login,
       logout,
+      initializeAuth,
     }
   },
   {

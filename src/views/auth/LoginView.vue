@@ -11,12 +11,12 @@ import { useNotification } from '@/composables/useNotification'
 import AuthFormCard from '@/components/auth/AuthFormCard.vue'
 import FormInput from '@/components/common/FormInput.vue'
 
-interface defaultValues {
+interface LoginForm {
   email: string
   password: string
 }
 
-const formSchema = z.object({
+const schema = z.object({
   email: z.string().email({ message: 'Must be a valid email' }),
   password: z
     .string()
@@ -24,12 +24,12 @@ const formSchema = z.object({
     .max(20, { message: 'Password must be at most 20 characters' }),
 })
 
-const { handleSubmit, defineField, errors, isSubmitting } = useForm<defaultValues>({
+const { handleSubmit, defineField, errors, isSubmitting } = useForm<LoginForm>({
   initialValues: {
     email: '',
     password: '',
   },
-  validationSchema: toTypedSchema(formSchema),
+  validationSchema: toTypedSchema(schema),
 })
 
 const [email] = defineField('email')
@@ -46,8 +46,10 @@ const showPassword = ref(false)
 const onSubmit = handleSubmit(async (values) => {
   try {
     await login(values)
-    router.push({ name: 'home' })
-    showSuccess('Login success')
+    showSuccess('Login success!')
+    setTimeout(() => {
+      router.push({ name: 'home' })
+    }, 1500)
   } catch (error) {
     showError(error as string)
   }
@@ -59,12 +61,20 @@ const onSubmit = handleSubmit(async (values) => {
   <auth-form-card title="Login" button-text="Login" :loading="isSubmitting" @submit="onSubmit">
     <!-- Inputs -->
     <form-input label="Email" v-model="email" :error-messages="errors.email"></form-input>
-    <form-input label="Password" v-model="password" :type="showPassword ? 'text' : 'password'"
-      :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'" :error-messages="errors.password"
-      @click:append-inner="showPassword = !showPassword"></form-input>
+    <form-input
+      label="Password"
+      v-model="password"
+      :type="showPassword ? 'text' : 'password'"
+      :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+      :error-messages="errors.password"
+      @click:append-inner="showPassword = !showPassword"
+    ></form-input>
     <!-- Redirect link -->
     <template #actions>
-      <router-link class="text-decoration-none text-primary bg-transparent" :to="{ name: 'register' }">
+      <router-link
+        class="text-decoration-none text-primary bg-transparent"
+        :to="{ name: 'register' }"
+      >
         Don't have account?
         <span style="color: #000000; font-weight: bold">Register</span>
       </router-link>

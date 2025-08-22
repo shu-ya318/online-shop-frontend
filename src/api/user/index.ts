@@ -1,19 +1,16 @@
-import api from '../axios/instance'
+import api from '@/api/axios/instance'
 
-import {
-  type RegisterRequest,
-  type LoginRequest,
-  type LoginResponse,
-  type UserResponse,
-  type UserProfileUpdateRequest,
-  type UserPasswordUpdateRequest,
+import type {
+  RegisterRequest,
+  LoginRequest,
+  LoginResponse,
+  UserResponse,
+  UserProfileUpdateRequest,
+  UserPasswordUpdateRequest,
 } from './interface'
 
-export const register = async (payload: RegisterRequest): Promise<boolean> => {
-  const response = await api.post('/public/user/register', payload)
-  const success = response.status >= 200 && response.status < 300
-
-  return success
+export const register = async (payload: RegisterRequest): Promise<void> => {
+  await api.post<void>('/public/user/register', payload)
 }
 
 export const login = async (payload: LoginRequest): Promise<LoginResponse> => {
@@ -22,11 +19,8 @@ export const login = async (payload: LoginRequest): Promise<LoginResponse> => {
   return response.data
 }
 
-export const logout = async (): Promise<boolean> => {
-  const response = await api.post('/user/logout')
-  const success = response.status >= 200 && response.status < 300
-
-  return success
+export const logout = async (): Promise<void> => {
+  await api.post('/user/logout')
 }
 
 export const getUser = async (): Promise<UserResponse> => {
@@ -43,9 +37,6 @@ export const updateUserProfile = async (
   return response.data
 }
 
-export const updateUserPassword = async (payload: UserPasswordUpdateRequest): Promise<boolean> => {
-  const response = await api.put('/user/me/password', payload)
-  const success = response.status >= 200 && response.status < 300
-
-  return success
+export const updateUserPassword = async (payload: UserPasswordUpdateRequest): Promise<void> => {
+  await api.put('/user/me/password', payload)
 }
