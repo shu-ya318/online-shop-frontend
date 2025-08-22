@@ -49,7 +49,7 @@ const onSubmit = handleSubmit(async (values) => {
     showSuccess('Login success!')
     setTimeout(() => {
       router.push({ name: 'home' })
-    }, 1500)
+    }, 500)
   } catch (error) {
     showError(error as string)
   }

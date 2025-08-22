@@ -92,7 +92,7 @@ const onSubmit = handleSubmit(async (values) => {
     showSuccess('Register success!')
     setTimeout(() => {
       router.push({ name: 'login' })
-    }, 1500)
+    }, 500)
   } catch (error) {
     showError(error as string)
   }
