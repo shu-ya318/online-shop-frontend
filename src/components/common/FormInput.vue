@@ -1,27 +1,19 @@
 <script setup lang="ts">
-import type { PropType } from 'vue'
-
-defineProps({
-  label: {
-    type: String,
-  },
-  modelValue: {
-    type: String,
-    default: '',
-  },
-  errorMessages: {
-    type: [String, Array] as PropType<string | string[]>,
-    default: '',
-  },
-  type: {
-    type: String,
-    default: 'text',
-  },
-  placeholder: {
-    type: String,
-    default: '',
-  },
-})
+withDefaults(
+  defineProps<{
+    label?: string
+    modelValue?: string
+    errorMessages?: string | string[]
+    type?: string
+    placeholder?: string
+  }>(),
+  {
+    modelValue: '',
+    errorMessages: '',
+    type: 'text',
+    placeholder: '',
+  }
+)
 
 const emit = defineEmits(['update:modelValue'])
 const updateValue = (value: string) => {

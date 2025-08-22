@@ -1,20 +1,11 @@
 <script setup lang="ts">
 import { Form as VeeForm } from 'vee-validate'
 
-defineProps({
-  title: {
-    type: String,
-    required: true,
-  },
-  buttonText: {
-    type: String,
-    required: true,
-  },
-  loading: {
-    type: Boolean,
-    default: false,
-  },
-})
+defineProps<{
+  title: string
+  buttonText: string
+  loading?: boolean
+}>()
 
 defineEmits(['submit'])
 </script>
@@ -36,7 +27,7 @@ defineEmits(['submit'])
         </vee-form>
       </v-card-text>
       <!-- Action: redirect link -->
-      <v-card-actions class="d-flex justify-center pa-0" style="min-height: auto;">
+      <v-card-actions class="d-flex justify-center pa-0" style="min-height: auto">
         <slot name="actions"></slot>
       </v-card-actions>
     </v-container>

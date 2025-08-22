@@ -43,11 +43,11 @@ const categories = [
   },
 ]
 
-const isBestSellersLoading = ref(false)
-const isBestSellersError = ref(false)
+const isLoading = ref(true)
+const isError = ref(false)
 const bestSellers = ref<ProductDetailResponse[] | null>(null)
-const bestSellersPerPage = ref(12)
-const totalBestSellers = ref(0)
+const perPage = ref(12)
+const total = ref(0)
 
 const groupedBestSellers = computed(() => {
   const chunkSize = 3
@@ -60,23 +60,23 @@ const groupedBestSellers = computed(() => {
 })
 
 const fetchBestSellers = async () => {
-  isBestSellersLoading.value = true
-  isBestSellersError.value = false
+  isError.value = false
 
   try {
     const response = await getProducts({
       page: 0,
-      size: bestSellersPerPage.value,
+      size: perPage.value,
       sort: 'totalSold,desc',
       filter: '',
     })
-    bestSellers.value = response.content
-    totalBestSellers.value = response.totalElements
+    const { content, totalElements } = response
+    bestSellers.value = content
+    total.value = totalElements
   } catch (error) {
-    isBestSellersError.value = true
+    isError.value = true
     showError(error as string)
   } finally {
-    isBestSellersLoading.value = false
+    isLoading.value = false
   }
 }
 
@@ -100,11 +100,23 @@ const AddToCart = (uuid: string) => {
 
 <template>
   <v-layout class="d-flex flex-column">
+    <!-- Home Banner -->
     <home-banner @navigate="NavigateToProducts" />
-    <v-container width="70%" max-width="75rem"
-      class="d-flex flex-column justify-space-between align-center mt-16 mb-16 pa-0" style="gap: 5rem">
-      <best-seller-section :skeletons-count="count" :is-loading="isBestSellersLoading" :groups="groupedBestSellers"
-        :is-error="isBestSellersError" @add-to-cart="AddToCart" />
+    <v-container
+      width="70%"
+      max-width="75rem"
+      class="d-flex flex-column justify-space-between align-center mt-16 mb-16 pa-0"
+      style="gap: 5rem"
+    >
+      <!-- Best Sellers -->
+      <best-seller-section
+        :skeletons-count="count"
+        :is-loading="isLoading"
+        :groups="groupedBestSellers"
+        :is-error="isError"
+        @add-to-cart="AddToCart"
+      />
+      <!-- Categories -->
       <categories-section :items="categories" @navigate="NavigateToCategory" />
     </v-container>
     <!-- Snackbar -->

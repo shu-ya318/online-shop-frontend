@@ -1,15 +1,10 @@
 <script setup lang="ts">
-import type { PropType } from 'vue'
-
-defineProps({
+defineProps<{
   items: {
-    type: Array as PropType<{
-      name: string
-      image: string
-    }[]>,
-    required: true,
-  },
-})
+    name: string
+    image: string
+  }[]
+}>()
 
 defineEmits(['navigate'])
 </script>
