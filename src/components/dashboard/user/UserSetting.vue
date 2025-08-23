@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { z } from 'zod'
@@ -25,6 +25,7 @@ const emit = defineEmits<{
 }>()
 
 const updateProfileSchema = z.object({
+  email: z.string(),
   name: z.string().min(1, 'Name is required'),
   phoneNumber: z
     .string()
@@ -68,13 +69,14 @@ const {
   errors: profileErrors,
   defineField: defineProfileField,
   handleSubmit: handleProfileSubmit,
+  resetForm: resetProfileForm,
 } = useForm<ProfileUpdateDefaultValues>({
   initialValues: {
-    name: userStore.userInfo?.name ?? '--',
-    email: userStore.userInfo?.email ?? '--',
-    phoneNumber: userStore.userInfo?.phoneNumber ?? '--',
-    address: userStore.userInfo?.address ?? '--',
-    birth: userStore.userInfo?.birth ?? '--',
+    email: '',
+    name: '',
+    phoneNumber: '',
+    address: '',
+    birth: '',
   },
   validationSchema: toTypedSchema(updateProfileSchema),
 })
@@ -106,6 +108,24 @@ const [confirmPassword] = definePasswordField('confirmPassword')
 const showOldPassword = ref(false)
 const showNewPassword = ref(false)
 const showConfirmPassword = ref(false)
+
+watch(
+  () => userStore.userInfo,
+  (userInfo) => {
+    if (userInfo) {
+      resetProfileForm({
+        values: {
+          email: userInfo.email,
+          name: userInfo.name,
+          phoneNumber: userInfo.phoneNumber,
+          address: userInfo.address,
+          birth: userInfo.birth,
+        },
+      })
+    }
+  },
+  { deep: true, immediate: true }
+)
 
 const onProfileUpdate = handleProfileSubmit(async (values) => {
   emit('update-profile', values)
