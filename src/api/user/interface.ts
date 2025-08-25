@@ -13,7 +13,11 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  token: string
+  accessToken: string
+}
+
+export interface RefreshTokenResponse {
+  accessToken: string
 }
 
 export interface UserResponse {

@@ -18,7 +18,7 @@ defineEmits(['submit'])
       <!-- Form -->
       <v-card-text>
         <vee-form @submit="$emit('submit')">
-          <!-- Inputs -->
+          <!-- Inputs and buttons -->
           <slot></slot>
           <!-- Submit button -->
           <v-btn type="submit" color="success" :block="true" :loading="loading">

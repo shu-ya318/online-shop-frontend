@@ -17,7 +17,7 @@ interface LoginForm {
 }
 
 const schema = z.object({
-  email: z.string().email({ message: 'Must be a valid email' }),
+  email: z.string(), //z.string().email({ message: 'Must be a valid email' }),
   password: z
     .string()
     .min(8, { message: 'Password must be at least 8 characters' })
@@ -43,6 +43,8 @@ const { showSnackbar, snackbarColor, resultMessage, showSuccess, showError } = u
 
 const showPassword = ref(false)
 
+const loading = ref(false)
+
 const onSubmit = handleSubmit(async (values) => {
   try {
     await login(values)
@@ -54,27 +56,28 @@ const onSubmit = handleSubmit(async (values) => {
     showError(error as string)
   }
 })
+
+const loginWithGoogle = () => {
+  loading.value = true
+  window.location.href = `http://localhost:8081/oauth2/authorization/google`
+}
 </script>
 
 <template>
   <!-- Form -->
-  <auth-form-card title="Login" button-text="Login" :loading="isSubmitting" @submit="onSubmit">
+  <auth-form-card title="Login" button-text="Login with email" :loading="isSubmitting" @submit="onSubmit">
     <!-- Inputs -->
     <form-input label="Email" v-model="email" :error-messages="errors.email"></form-input>
-    <form-input
-      label="Password"
-      v-model="password"
-      :type="showPassword ? 'text' : 'password'"
-      :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
-      :error-messages="errors.password"
-      @click:append-inner="showPassword = !showPassword"
-    ></form-input>
+    <form-input label="Password" v-model="password" :type="showPassword ? 'text' : 'password'"
+      :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'" :error-messages="errors.password"
+      @click:append-inner="showPassword = !showPassword"></form-input>
+    <!-- Login with Google -->
+    <v-btn prepend-icon="mdi-google" color="accent" class="mb-4" :block="true" :loading="loading"
+      @click="loginWithGoogle">Login
+      with Google</v-btn>
     <!-- Redirect link -->
     <template #actions>
-      <router-link
-        class="text-decoration-none text-primary bg-transparent"
-        :to="{ name: 'register' }"
-      >
+      <router-link class="text-decoration-none text-primary bg-transparent" :to="{ name: 'register' }">
         Don't have account?
         <span style="color: #000000; font-weight: bold">Register</span>
       </router-link>

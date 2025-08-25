@@ -7,6 +7,7 @@ import type {
   UserResponse,
   UserProfileUpdateRequest,
   UserPasswordUpdateRequest,
+  RefreshTokenResponse,
 } from './interface'
 
 export const register = async (payload: RegisterRequest): Promise<void> => {
@@ -15,6 +16,12 @@ export const register = async (payload: RegisterRequest): Promise<void> => {
 
 export const login = async (payload: LoginRequest): Promise<LoginResponse> => {
   const response = await api.post<LoginResponse>('/public/user/login', payload)
+
+  return response.data
+}
+
+export const refreshToken = async (): Promise<RefreshTokenResponse> => {
+  const response = await api.post<RefreshTokenResponse>('/user/refresh-token')
 
   return response.data
 }

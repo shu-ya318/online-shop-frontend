@@ -66,8 +66,8 @@ export const useUserStore = defineStore(
     const login = async (credentials: LoginRequest): Promise<void> => {
       try {
         const response = await apiLogin(credentials)
-        if (response.token) {
-          setToken(response.token)
+        if (response.accessToken) {
+          setToken(response.accessToken)
           await fetchUser()
         }
       } catch (error) {

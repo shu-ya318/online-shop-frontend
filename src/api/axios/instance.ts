@@ -1,12 +1,11 @@
-import axios, {
-  type AxiosInstance,
-  type AxiosRequestConfig,
-  type AxiosResponse,
-  AxiosError,
-} from 'axios'
+import axios from 'axios'
 import JSONbig from 'json-bigint'
 
 import { useUserStore } from '@/stores/userStore'
+
+import { refreshToken } from '@/api/user'
+
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 
 const JSONbigString = JSONbig({
   storeAsString: true,
@@ -71,21 +70,40 @@ service.interceptors.request.use(
 
 service.interceptors.response.use(
   // Success
-  (response: AxiosResponse) => response,
+  (response) => response,
   // Failed
   async (error) => {
-    let errorMessage = 'An unknown error occurred. Please try again!'
+    // Automatically retry the request if it fails due to an expired tokenF
+    const originalRequest = error.config
 
-    if (error instanceof AxiosError) {
-      if (error.response) {
-        errorMessage =
-          error.response.data?.message || 'An unexpected error occurred. Please try again!'
-      } else {
-        errorMessage = 'Network error, please check your network!'
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true
+
+      const userStore = useUserStore()
+      try {
+        const response = await refreshToken()
+        userStore.token = response.accessToken
+        originalRequest.headers.Authorization = `Bearer ${response.accessToken}`
+
+        return service(originalRequest)
+      } catch (refreshError) {
+        userStore.logout()
+
+        return Promise.reject(refreshError)
       }
     }
 
-    return Promise.reject(errorMessage)
+    // If the request is being retried, wait for the new token to be available
+    let errorMessage = 'An unknown error occurred. Please try again!'
+
+    if (error.response) {
+      errorMessage =
+        error.response.data?.message || 'An unexpected error occurred. Please try again!'
+    } else {
+      errorMessage = 'Network error, please check your network!'
+    }
+
+    return Promise.reject(new Error(errorMessage))
   },
 )
 
