@@ -138,13 +138,8 @@ const onPasswordUpdate = handlePasswordSubmit(async (values) => {
 
 <template>
   <!-- Profile Setting Form -->
-  <user-form-card
-    class="mb-4"
-    title="Profile Setting"
-    button-text="Save Changes"
-    :loading="isProfileUpdating"
-    @submit="onProfileUpdate"
-  >
+  <user-form-card class="mb-4" title="Profile Setting" button-text="Save Changes" :loading="isProfileUpdating"
+    @submit="onProfileUpdate">
     <v-row>
       <!-- Email -->
       <v-col cols="12" style="padding-top: 0.25rem; padding-bottom: 0">
@@ -153,66 +148,51 @@ const onPasswordUpdate = handlePasswordSubmit(async (values) => {
       </v-col>
       <!-- Name -->
       <v-col cols="12" style="padding-top: 0.25rem; padding-bottom: 0">
-        <v-label class="text-caption text-primary">Name</v-label>
+        <v-label class="text-caption text-primary" :required="true">Name</v-label>
         <form-input v-model="name" :error-messages="profileErrors.name"></form-input>
       </v-col>
       <!-- Birth -->
       <v-col cols="12" style="padding-top: 0.25rem; padding-bottom: 0">
-        <v-label class="text-caption text-primary">Birth</v-label>
+        <v-label class="text-caption text-primary" :required="true">Birth</v-label>
         <form-input v-model="birth" :error-messages="profileErrors.birth"></form-input>
       </v-col>
       <!-- Phone Number -->
       <v-col cols="12" style="padding-top: 0.25rem; padding-bottom: 0">
-        <v-label class="text-caption text-primary">Phone Number</v-label>
+        <v-label class="text-caption text-primary" :required="true">Phone Number</v-label>
         <form-input v-model="phoneNumber" :error-messages="profileErrors.phoneNumber"></form-input>
       </v-col>
       <!-- Address -->
       <v-col cols="12" style="padding-bottom: 1.5rem">
-        <v-label class="text-caption text-primary">Address</v-label>
+        <v-label class="text-caption text-primary" :required="true">Address</v-label>
         <form-input v-model="address" :error-messages="profileErrors.address"></form-input>
       </v-col>
     </v-row>
   </user-form-card>
   <!-- Change Password Form -->
-  <user-form-card
-    title="Change Password"
-    button-text="Change Password"
-    :loading="isPasswordUpdating"
-    @submit="onPasswordUpdate"
-  >
+  <user-form-card title="Change Password" button-text="Change Password" :loading="isPasswordUpdating"
+    @submit="onPasswordUpdate">
     <v-row>
       <!-- Old Password -->
       <v-col cols="12" class="pt-2 pb-0">
-        <v-label class="text-caption text-primary">Old Password</v-label>
-        <form-input
-          v-model="oldPassword"
-          :type="showOldPassword ? 'text' : 'password'"
-          :append-inner-icon="showOldPassword ? 'mdi-eye' : 'mdi-eye-off'"
-          :error-messages="passwordErrors.oldPassword"
-          @click:append-inner="showOldPassword = !showOldPassword"
-        ></form-input>
+        <v-label class="text-caption text-primary" :required="true">Old Password</v-label>
+        <form-input v-model="oldPassword" :type="showOldPassword ? 'text' : 'password'"
+          :append-inner-icon="showOldPassword ? 'mdi-eye' : 'mdi-eye-off'" :error-messages="passwordErrors.oldPassword"
+          @click:append-inner="showOldPassword = !showOldPassword"></form-input>
       </v-col>
       <!-- New Password -->
       <v-col cols="12" class="pt-2 pb-0">
-        <v-label class="text-caption text-primary">New Password</v-label>
-        <form-input
-          v-model="newPassword"
-          :type="showNewPassword ? 'text' : 'password'"
-          :append-inner-icon="showNewPassword ? 'mdi-eye' : 'mdi-eye-off'"
-          :error-messages="passwordErrors.newPassword"
-          @click:append-inner="showNewPassword = !showNewPassword"
-        ></form-input>
+        <v-label class="text-caption text-primary" :required="true">New Password</v-label>
+        <form-input v-model="newPassword" :type="showNewPassword ? 'text' : 'password'"
+          :append-inner-icon="showNewPassword ? 'mdi-eye' : 'mdi-eye-off'" :error-messages="passwordErrors.newPassword"
+          @click:append-inner="showNewPassword = !showNewPassword"></form-input>
       </v-col>
       <!-- Confirm Password -->
       <v-col cols="12" class="pb-6">
-        <v-label class="text-caption text-primary">Confirm Password</v-label>
-        <form-input
-          v-model="confirmPassword"
-          :type="showConfirmPassword ? 'text' : 'password'"
+        <v-label class="text-caption text-primary" :required="true">Confirm Password</v-label>
+        <form-input v-model="confirmPassword" :type="showConfirmPassword ? 'text' : 'password'"
           :append-inner-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
           :error-messages="passwordErrors.confirmPassword"
-          @click:append-inner="showConfirmPassword = !showConfirmPassword"
-        ></form-input>
+          @click:append-inner="showConfirmPassword = !showConfirmPassword"></form-input>
       </v-col>
     </v-row>
   </user-form-card>

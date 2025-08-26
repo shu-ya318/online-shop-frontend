@@ -6,12 +6,14 @@ withDefaults(
     errorMessages?: string | string[]
     type?: string
     placeholder?: string
+    required?: boolean
   }>(),
   {
     modelValue: '',
     errorMessages: '',
     type: 'text',
     placeholder: '',
+    required: false,
   }
 )
 
@@ -24,5 +26,8 @@ const updateValue = (value: string) => {
 <template>
   <v-text-field variant="outlined" density="compact" class="mb-2" :label="label" :type="type" :placeholder="placeholder"
     v-bind="$attrs" :model-value="modelValue" :error-messages="errorMessages" @update:model-value="updateValue">
+    <template v-if="required && label" v-slot:label>
+      {{ label }} <span style="color: red;">*</span>
+    </template>
   </v-text-field>
 </template>

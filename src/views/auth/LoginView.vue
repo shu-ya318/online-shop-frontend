@@ -67,8 +67,8 @@ const loginWithGoogle = () => {
   <!-- Form -->
   <auth-form-card title="Login" button-text="Login with email" :loading="isSubmitting" @submit="onSubmit">
     <!-- Inputs -->
-    <form-input label="Email" v-model="email" :error-messages="errors.email"></form-input>
-    <form-input label="Password" v-model="password" :type="showPassword ? 'text' : 'password'"
+    <form-input label="Email" v-model="email" :required="true" :error-messages="errors.email"></form-input>
+    <form-input label="Password" v-model="password" :type="showPassword ? 'text' : 'password'" :required="true"
       :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'" :error-messages="errors.password"
       @click:append-inner="showPassword = !showPassword"></form-input>
     <!-- Login with Google -->
