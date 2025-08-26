@@ -1,3 +1,7 @@
+export interface ProductDetailRequest {
+  uuid: string
+}
+
 export interface ProductsRequest {
   page: number
   filter: string

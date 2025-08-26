@@ -72,6 +72,12 @@ const routes: RouteRecordRaw[] = [
         meta: { title: 'User Management', requiresAuth: true },
         component: () => import('../views/dashboard/UserView.vue'),
       },
+      {
+        path: 'products',
+        name: 'products',
+        meta: { title: 'Products', requiresAuth: false },
+        component: () => import('../views/dashboard/ProductsView.vue'),
+      },
     ],
   },
 ]
