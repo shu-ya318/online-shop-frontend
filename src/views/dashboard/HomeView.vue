@@ -63,18 +63,23 @@ const fetchBestSellers = async () => {
   isError.value = false
 
   try {
-    const response = await getProducts({
-      page: 0,
-      size: perPage.value,
-      sort: 'totalSold,desc',
-      filter: '',
-    })
-    const { content, totalElements } = response
-    bestSellers.value = content
-    total.value = totalElements
+    // const response = await getProducts({
+    //   page: 0,
+    //   size: perPage.value,
+    //   sort: 'totalSold,desc',
+    //   filter: '',
+    // })
+    // const { content, totalElements } = response
+    // bestSellers.value = content
+    // total.value = totalElements
+    console.log('待完成fetchBestSellers')
   } catch (error) {
     isError.value = true
-    showError(error as string)
+    if (error instanceof Error) {
+      showError(error.message)
+    } else {
+      showError(String(error))
+    }
   } finally {
     isLoading.value = false
   }

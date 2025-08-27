@@ -36,7 +36,11 @@ const UpdateProfile = async (values: ProfileUpdateDefaultValues) => {
     await updateUserProfile(values)
     showSuccess('User profile updated successfully')
   } catch (error) {
-    showError(error as string)
+    if (error instanceof Error) {
+      showError(error.message)
+    } else {
+      showError(String(error))
+    }
   } finally {
     isProfileUpdating.value = false
   }
@@ -46,10 +50,15 @@ const UpdatePassword = async (values: PasswordUpdateDefaultValues) => {
   isPasswordUpdating.value = true
 
   try {
-    await updateUserPassword(values)
-    showSuccess('Password changed successfully')
+    const response = await updateUserPassword(values)
+
+    showSuccess(response.message)
   } catch (error) {
-    showError(error as string)
+    if (error instanceof Error) {
+      showError(error.message)
+    } else {
+      showError(String(error))
+    }
   } finally {
     isPasswordUpdating.value = false
   }

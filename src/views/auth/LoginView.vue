@@ -53,7 +53,11 @@ const onSubmit = handleSubmit(async (values) => {
       router.push({ name: 'home' })
     }, 500)
   } catch (error) {
-    showError(error as string)
+    if (error instanceof Error) {
+      showError(error.message)
+    } else {
+      showError(String(error))
+    }
   }
 })
 
@@ -65,19 +69,44 @@ const loginWithGoogle = () => {
 
 <template>
   <!-- Form -->
-  <auth-form-card title="Login" button-text="Login with email" :loading="isSubmitting" @submit="onSubmit">
+  <auth-form-card
+    title="Login"
+    button-text="Login with email"
+    :loading="isSubmitting"
+    @submit="onSubmit"
+  >
     <!-- Inputs -->
-    <form-input label="Email" v-model="email" :required="true" :error-messages="errors.email"></form-input>
-    <form-input label="Password" v-model="password" :type="showPassword ? 'text' : 'password'" :required="true"
-      :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'" :error-messages="errors.password"
-      @click:append-inner="showPassword = !showPassword"></form-input>
+    <form-input
+      label="Email"
+      v-model="email"
+      :required="true"
+      :error-messages="errors.email"
+    ></form-input>
+    <form-input
+      label="Password"
+      v-model="password"
+      :type="showPassword ? 'text' : 'password'"
+      :required="true"
+      :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+      :error-messages="errors.password"
+      @click:append-inner="showPassword = !showPassword"
+    ></form-input>
     <!-- Login with Google -->
-    <v-btn prepend-icon="mdi-google" color="accent" class="mb-4" :block="true" :loading="loading"
-      @click="loginWithGoogle">Login
-      with Google</v-btn>
+    <v-btn
+      prepend-icon="mdi-google"
+      color="accent"
+      class="mb-4"
+      :block="true"
+      :loading="loading"
+      @click="loginWithGoogle"
+      >Login with Google</v-btn
+    >
     <!-- Redirect link -->
     <template #actions>
-      <router-link class="text-decoration-none text-primary bg-transparent" :to="{ name: 'register' }">
+      <router-link
+        class="text-decoration-none text-primary bg-transparent"
+        :to="{ name: 'register' }"
+      >
         Don't have account?
         <span style="color: #000000; font-weight: bold">Register</span>
       </router-link>

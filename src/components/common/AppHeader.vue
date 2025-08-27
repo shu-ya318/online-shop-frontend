@@ -17,13 +17,17 @@ const { logout, userInfo } = useUserStore()
 
 const handleLogout = async () => {
   try {
-    await logout()
-    showSuccess('Logout successful!')
+    const response = await logout()
+    showSuccess(response.message)
     setTimeout(() => {
       router.push({ name: 'home' })
     }, 500)
   } catch (error) {
-    showError(error as string)
+    if (error instanceof Error) {
+      showError(error.message)
+    } else {
+      showError(String(error))
+    }
   }
 }
 

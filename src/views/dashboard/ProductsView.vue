@@ -114,7 +114,11 @@ const fetchProducts = async (params: QueryParams) => {
     totalProducts.value = response.totalElements
     totalPages.value = response.totalPages
   } catch (error) {
-    showError(error as string)
+    if (error instanceof Error) {
+      showError(error.message)
+    } else {
+      showError(String(error))
+    }
   } finally {
     isLoading.value = false
   }

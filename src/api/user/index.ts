@@ -8,10 +8,13 @@ import type {
   UserProfileUpdateRequest,
   UserPasswordUpdateRequest,
   RefreshTokenResponse,
+  ResultResponse,
 } from './interface'
 
-export const register = async (payload: RegisterRequest): Promise<void> => {
-  await api.post<void>('/public/user/register', payload)
+export const register = async (payload: RegisterRequest): Promise<ResultResponse> => {
+  const response = await api.post<ResultResponse>('/public/user/register', payload)
+
+  return response.data
 }
 
 export const login = async (payload: LoginRequest): Promise<LoginResponse> => {
@@ -26,8 +29,10 @@ export const refreshToken = async (): Promise<RefreshTokenResponse> => {
   return response.data
 }
 
-export const logout = async (): Promise<void> => {
-  await api.post('/user/logout')
+export const logout = async (): Promise<ResultResponse> => {
+  const response = await api.post<ResultResponse>('/user/logout')
+
+  return response.data
 }
 
 export const getUser = async (): Promise<UserResponse> => {
@@ -44,6 +49,10 @@ export const updateUserProfile = async (
   return response.data
 }
 
-export const updateUserPassword = async (payload: UserPasswordUpdateRequest): Promise<void> => {
-  await api.put('/user/me/password', payload)
+export const updateUserPassword = async (
+  payload: UserPasswordUpdateRequest,
+): Promise<ResultResponse> => {
+  const response = await api.put<ResultResponse>('/user/me/password', payload)
+
+  return response.data
 }

@@ -14,7 +14,7 @@ import type {
   RegisterRequest,
   LoginRequest,
   UserResponse,
-  SuccessResponse,
+  ResultResponse,
 } from '@/api/user/interface'
 
 export const useUserStore = defineStore(
@@ -69,7 +69,7 @@ export const useUserStore = defineStore(
       token.value = null
     }
 
-    const register = async (credentials: RegisterRequest): Promise<SuccessResponse> => {
+    const register = async (credentials: RegisterRequest): Promise<ResultResponse> => {
       try {
         const response = await apiRegister(credentials)
 
@@ -103,7 +103,7 @@ export const useUserStore = defineStore(
       }
     }
 
-    const logout = async (): Promise<SuccessResponse> => {
+    const logout = async (): Promise<ResultResponse> => {
       try {
         const response = await apiLogout()
 
