@@ -1,14 +1,8 @@
 <script setup lang="ts">
 const model = defineModel('')
-
-withDefaults(
-  defineProps<{
-    loading?: boolean
-  }>(),
-  {
-    loading: false,
-  }
-)
+defineProps<{
+  loading?: boolean
+}>()
 
 defineEmits<{
   (event: 'submit'): void

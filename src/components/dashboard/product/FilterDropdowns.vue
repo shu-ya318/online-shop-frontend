@@ -1,15 +1,10 @@
 <script setup lang="ts">
 import type { Filter } from '@/views/dashboard/ProductsView.vue'
 
-withDefaults(
-  defineProps<{
-    modelValue: Filter[]
-    loading?: boolean
-  }>(),
-  {
-    loading: false,
-  }
-)
+defineProps<{
+  modelValue: Filter[]
+  loading?: boolean
+}>()
 
 defineEmits(['update:modelValue'])
 </script>

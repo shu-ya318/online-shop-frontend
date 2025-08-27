@@ -9,7 +9,6 @@ withDefaults(
   }>(),
   {
     product: null,
-    isError: false,
   }
 )
 

@@ -78,6 +78,12 @@ const routes: RouteRecordRaw[] = [
         meta: { title: 'Products', requiresAuth: false },
         component: () => import('../views/dashboard/ProductsView.vue'),
       },
+      {
+        path: 'products/:productUuid',
+        name: 'product-detail',
+        meta: { title: 'Product Detail', requiresAuth: false },
+        component: () => import('../views/dashboard/ProductDetailView.vue'),
+      },
     ],
   },
 ]
