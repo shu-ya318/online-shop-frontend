@@ -7,10 +7,15 @@ import {
   login as apiLogin,
   logout as apiLogout,
   getUser,
-  refreshToken as apiRefreshToken,
+  // refreshToken as apiRefreshToken,
 } from '@/api/user'
 
-import type { RegisterRequest, LoginRequest, UserResponse } from '@/api/user/interface'
+import type {
+  RegisterRequest,
+  LoginRequest,
+  UserResponse,
+  SuccessResponse,
+} from '@/api/user/interface'
 
 export const useUserStore = defineStore(
   'user',
@@ -18,11 +23,11 @@ export const useUserStore = defineStore(
     // States
     const token = ref<string | null>(null)
     const isInitialized = ref(false)
-    const isRefreshing = ref(false)
-    const failedQueue: Array<{
-      resolve: (value: string | unknown) => void
-      reject: (reason?: unknown) => void
-    }> = []
+    // const isRefreshing = ref(false)
+    // const failedQueue: Array<{
+    //   resolve: (value: string | unknown) => void
+    //   reject: (reason?: unknown) => void
+    // }> = []
     const userInfo = ref<UserResponse | null>(null)
 
     const isAuthenticated = computed(() => {
@@ -30,17 +35,17 @@ export const useUserStore = defineStore(
     })
 
     // Utils
-    const processQueue = (error: unknown, tokenValue: string | null = null) => {
-      failedQueue.forEach((prom) => {
-        if (error) {
-          prom.reject(error)
-        } else {
-          prom.resolve(tokenValue)
-        }
-      })
+    // const processQueue = (error: unknown, tokenValue: string | null = null) => {
+    //   failedQueue.forEach((prom) => {
+    //     if (error) {
+    //       prom.reject(error)
+    //     } else {
+    //       prom.resolve(tokenValue)
+    //     }
+    //   })
 
-      failedQueue.length = 0
-    }
+    //   failedQueue.length = 0
+    // }
 
     const verifyToken = (): boolean => {
       if (!token.value) return false
@@ -64,9 +69,11 @@ export const useUserStore = defineStore(
       token.value = null
     }
 
-    const register = async (credentials: RegisterRequest): Promise<void> => {
+    const register = async (credentials: RegisterRequest): Promise<SuccessResponse> => {
       try {
-        await apiRegister(credentials)
+        const response = await apiRegister(credentials)
+
+        return response
       } catch (error) {
         throw error
       }
@@ -96,39 +103,41 @@ export const useUserStore = defineStore(
       }
     }
 
-    const logout = async (): Promise<void> => {
+    const logout = async (): Promise<SuccessResponse> => {
       try {
-        await apiLogout()
+        const response = await apiLogout()
+
+        return response
       } finally {
         removeToken()
         userInfo.value = null
       }
     }
 
-    const refreshToken = async (): Promise<string> => {
-      if (isRefreshing.value) {
-        return new Promise<unknown>((resolve, reject) => {
-          failedQueue.push({ resolve, reject })
-        }) as Promise<string>
-      }
+    // const refreshToken = async (): Promise<string> => {
+    //   if (isRefreshing.value) {
+    //     return new Promise<unknown>((resolve, reject) => {
+    //       failedQueue.push({ resolve, reject })
+    //     }) as Promise<string>
+    //   }
 
-      isRefreshing.value = true
+    //   isRefreshing.value = true
 
-      try {
-        const { accessToken } = await apiRefreshToken()
-        setToken(accessToken)
-        processQueue(null, accessToken)
+    //   try {
+    //     const { accessToken } = await apiRefreshToken()
+    //     setToken(accessToken)
+    //     processQueue(null, accessToken)
 
-        return accessToken
-      } catch (error) {
-        processQueue(error, null)
-        logout()
+    //     return accessToken
+    //   } catch (error) {
+    //     processQueue(error, null)
+    //     logout()
 
-        return Promise.reject(error)
-      } finally {
-        isRefreshing.value = false
-      }
-    }
+    //     return Promise.reject(error)
+    //   } finally {
+    //     isRefreshing.value = false
+    //   }
+    // }
 
     const initializeAuth = async (): Promise<void> => {
       if (isInitialized.value) return
@@ -158,7 +167,7 @@ export const useUserStore = defineStore(
       fetchUser,
       login,
       logout,
-      refreshToken,
+      // refreshToken,
       initializeAuth,
     }
   },
