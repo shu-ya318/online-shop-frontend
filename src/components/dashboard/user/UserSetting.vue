@@ -108,6 +108,7 @@ const [confirmPassword] = definePasswordField('confirmPassword')
 const showOldPassword = ref(false)
 const showNewPassword = ref(false)
 const showConfirmPassword = ref(false)
+const birthMenu = ref(false)
 
 watch(
   () => userStore.userInfo,
@@ -154,7 +155,13 @@ const onPasswordUpdate = handlePasswordSubmit(async (values) => {
       <!-- Birth -->
       <v-col cols="12" style="padding-top: 0.25rem; padding-bottom: 0">
         <v-label class="text-caption text-primary" :required="true">Birth</v-label>
-        <form-input v-model="birth" :error-messages="profileErrors.birth"></form-input>
+        <v-menu v-model="birthMenu" :close-on-content-click="false" transition="scale-transition">
+          <template v-slot:activator="{ props }">
+            <form-input v-model="birth" :error-messages="profileErrors.birth" readonly v-bind="props"></form-input>
+          </template>
+          <v-date-picker v-model="birth" @update:model-value="birthMenu = false" title="Select birth date"
+            color="primary" show-adjacent-months></v-date-picker>
+        </v-menu>
       </v-col>
       <!-- Phone Number -->
       <v-col cols="12" style="padding-top: 0.25rem; padding-bottom: 0">
