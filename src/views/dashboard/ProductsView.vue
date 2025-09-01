@@ -145,16 +145,16 @@ const handleProductsSearch = debounce(() => {
   applyFiltersAndSearch()
 }, 500)
 
-const handleProductsFilter = () => {
+const filterProducts = () => {
   applyFiltersAndSearch()
 }
 
-const handleProductsChange = (newPage: number) => {
+const changeProducts = (newPage: number) => {
   queryParams.page = newPage
   fetchProducts({ ...queryParams, page: newPage })
 }
 
-const handleNavigateToProductDetail = (productUuid: string) => {
+const NavigateToProductDetail = (productUuid: string) => {
   router.push({ name: 'product-detail', params: { productUuid } })
 }
 </script>
@@ -162,7 +162,7 @@ const handleNavigateToProductDetail = (productUuid: string) => {
 <template>
   <v-layout width="70%" max-width="75rem" class="d-flex flex-column pt-8 ga-10">
     <search-bar v-model="searchTerm" :loading="isLoading" @submit="handleProductsSearch" />
-    <filter-dropdowns v-model="filterItems" @update:model-value="handleProductsFilter" />
+    <filter-dropdowns v-model="filterItems" @update:model-value="filterProducts" />
     <!-- Result -->
     <v-container class="d-flex flex-column ga-7">
       <!-- Result Title -->
@@ -191,14 +191,14 @@ const handleNavigateToProductDetail = (productUuid: string) => {
             <v-col v-for="product in products" :key="product.uuid" :cols="12" :sm="6" :md="4" :lg="3">
               <!-- Card -->
               <product-card :product="product" :discount-price="product.discountedPrice"
-                @navigate="handleNavigateToProductDetail(product.uuid)" />
+                @navigate="NavigateToProductDetail(product.uuid)" />
             </v-col>
           </v-row>
         </v-row>
       </v-container>
       <!-- Pagination -->
       <v-pagination v-if="totalPages > 1" rounded="circle" color="accent" active-color="success" total-visible="6"
-        :length="totalPages" v-model="pagination" @update:model-value="handleProductsChange" />
+        :length="totalPages" v-model="pagination" @update:model-value="changeProducts" />
     </v-container>
     <!-- Snackbar -->
     <v-snackbar timeout="3000" location="top" :color="snackbarColor" v-model="showSnackbar">

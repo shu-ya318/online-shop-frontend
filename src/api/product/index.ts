@@ -8,7 +8,7 @@ import type {
 } from './interface'
 
 export const getProducts = async (payload: ProductsRequest) => {
-  const response = await api.get<ProductsResponse>('/products', payload)
+  const response = await api.get<ProductsResponse>('/public/products', payload)
 
   return response.data
 }
@@ -16,7 +16,8 @@ export const getProducts = async (payload: ProductsRequest) => {
 export const getProductByUuid = async (
   payload: ProductDetailRequest,
 ): Promise<ProductDetailResponse> => {
-  const response = await api.get<ProductDetailResponse>(`/products/${payload.uuid}`)
+  const { uuid } = payload
+  const response = await api.get<ProductDetailResponse>(`/public/products/${uuid}`)
 
   return response.data
 }
