@@ -43,9 +43,9 @@ const { showSnackbar, snackbarColor, resultMessage, showSuccess, showError } = u
 
 const showPassword = ref(false)
 
-const loading = ref(false)
+const isLoading = ref(false)
 
-const onSubmit = handleSubmit(async (values) => {
+const onLogin = handleSubmit(async (values) => {
   try {
     await login(values)
     showSuccess('Login success!')
@@ -62,7 +62,7 @@ const onSubmit = handleSubmit(async (values) => {
 })
 
 const loginWithGoogle = () => {
-  loading.value = true
+  isLoading.value = true
   window.location.href = `http://localhost:8081/oauth2/authorization/google`
 }
 </script>
@@ -73,7 +73,7 @@ const loginWithGoogle = () => {
     title="Login"
     button-text="Login with email"
     :loading="isSubmitting"
-    @submit="onSubmit"
+    @submit="onLogin"
   >
     <!-- Inputs -->
     <form-input
@@ -97,7 +97,7 @@ const loginWithGoogle = () => {
       color="accent"
       class="mb-4"
       :block="true"
-      :loading="loading"
+      :loading="isLoading"
       @click="loginWithGoogle"
       >Login with Google</v-btn
     >

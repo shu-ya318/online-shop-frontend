@@ -17,6 +17,14 @@ export const register = async (payload: RegisterRequest): Promise<ResultResponse
   return response.data
 }
 
+export const exchangeOAuth2Code = async (payload: string): Promise<LoginResponse> => {
+  const response = await api.post<LoginResponse>('/public/user/oauth2/exchange-code', {
+    oauth2Code: payload
+  })
+
+  return response.data
+}
+
 export const login = async (payload: LoginRequest): Promise<LoginResponse> => {
   const response = await api.post<LoginResponse>('/public/user/login', payload)
 

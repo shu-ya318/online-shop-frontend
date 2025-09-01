@@ -24,7 +24,7 @@ const emit = defineEmits<{
   (event: 'update-password', values: PasswordUpdateDefaultValues): void
 }>()
 
-const updateProfileSchema = z.object({
+const profileUpdateSchema = z.object({
   email: z.string(),
   name: z.string().min(1, 'Name is required'),
   phoneNumber: z
@@ -38,7 +38,7 @@ const updateProfileSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'Birth must be in yyyy-MM-dd format' }),
 })
 
-const updatePasswordSchema = z
+const passwordUpdateSchema = z
   .object({
     oldPassword: z
       .string()
@@ -78,7 +78,7 @@ const {
     address: '',
     birth: '',
   },
-  validationSchema: toTypedSchema(updateProfileSchema),
+  validationSchema: toTypedSchema(profileUpdateSchema),
 })
 
 const {
@@ -91,7 +91,7 @@ const {
     newPassword: '',
     confirmPassword: '',
   },
-  validationSchema: toTypedSchema(updatePasswordSchema),
+  validationSchema: toTypedSchema(passwordUpdateSchema),
 })
 
 // Profile
@@ -125,8 +125,16 @@ watch(
       })
     }
   },
-  { deep: true, immediate: true }
+  { deep: true, immediate: true },
 )
+
+const onBirthChange = (newDate: Date) => {
+  const year = newDate.getFullYear()
+  const month = String(newDate.getMonth() + 1).padStart(2, '0')
+  const day = String(newDate.getDate()).padStart(2, '0')
+  birth.value = `${year}-${month}-${day}`
+  birthMenu.value = false
+}
 
 const onProfileUpdate = handleProfileSubmit(async (values) => {
   emit('update-profile', values)
@@ -139,8 +147,13 @@ const onPasswordUpdate = handlePasswordSubmit(async (values) => {
 
 <template>
   <!-- Profile Setting Form -->
-  <user-form-card class="mb-4" title="Profile Setting" button-text="Save Changes" :loading="isProfileUpdating"
-    @submit="onProfileUpdate">
+  <user-form-card
+    class="mb-4"
+    title="Profile Setting"
+    button-text="Save Changes"
+    :loading="isProfileUpdating"
+    @submit="onProfileUpdate"
+  >
     <v-row>
       <!-- Email -->
       <v-col cols="12" style="padding-top: 0.25rem; padding-bottom: 0">
@@ -157,10 +170,19 @@ const onPasswordUpdate = handlePasswordSubmit(async (values) => {
         <v-label class="text-caption text-primary" :required="true">Birth</v-label>
         <v-menu v-model="birthMenu" :close-on-content-click="false" transition="scale-transition">
           <template v-slot:activator="{ props }">
-            <form-input v-model="birth" :error-messages="profileErrors.birth" readonly v-bind="props"></form-input>
+            <form-input
+              v-model="birth"
+              :error-messages="profileErrors.birth"
+              readonly
+              v-bind="props"
+            ></form-input>
           </template>
-          <v-date-picker v-model="birth" @update:model-value="birthMenu = false" title="Select birth date"
-            color="primary" show-adjacent-months></v-date-picker>
+          <v-date-picker
+            :model-value="birth ? new Date(birth) : new Date()"
+            @update:model-value="onBirthChange"
+            title="Select birth date"
+            color="primary"
+          ></v-date-picker>
         </v-menu>
       </v-col>
       <!-- Phone Number -->
@@ -176,30 +198,45 @@ const onPasswordUpdate = handlePasswordSubmit(async (values) => {
     </v-row>
   </user-form-card>
   <!-- Change Password Form -->
-  <user-form-card title="Change Password" button-text="Change Password" :loading="isPasswordUpdating"
-    @submit="onPasswordUpdate">
+  <user-form-card
+    title="Change Password"
+    button-text="Change Password"
+    :loading="isPasswordUpdating"
+    @submit="onPasswordUpdate"
+  >
     <v-row>
       <!-- Old Password -->
       <v-col cols="12" class="pt-2 pb-0">
         <v-label class="text-caption text-primary" :required="true">Old Password</v-label>
-        <form-input v-model="oldPassword" :type="showOldPassword ? 'text' : 'password'"
-          :append-inner-icon="showOldPassword ? 'mdi-eye' : 'mdi-eye-off'" :error-messages="passwordErrors.oldPassword"
-          @click:append-inner="showOldPassword = !showOldPassword"></form-input>
+        <form-input
+          v-model="oldPassword"
+          :type="showOldPassword ? 'text' : 'password'"
+          :append-inner-icon="showOldPassword ? 'mdi-eye' : 'mdi-eye-off'"
+          :error-messages="passwordErrors.oldPassword"
+          @click:append-inner="showOldPassword = !showOldPassword"
+        ></form-input>
       </v-col>
       <!-- New Password -->
       <v-col cols="12" class="pt-2 pb-0">
         <v-label class="text-caption text-primary" :required="true">New Password</v-label>
-        <form-input v-model="newPassword" :type="showNewPassword ? 'text' : 'password'"
-          :append-inner-icon="showNewPassword ? 'mdi-eye' : 'mdi-eye-off'" :error-messages="passwordErrors.newPassword"
-          @click:append-inner="showNewPassword = !showNewPassword"></form-input>
+        <form-input
+          v-model="newPassword"
+          :type="showNewPassword ? 'text' : 'password'"
+          :append-inner-icon="showNewPassword ? 'mdi-eye' : 'mdi-eye-off'"
+          :error-messages="passwordErrors.newPassword"
+          @click:append-inner="showNewPassword = !showNewPassword"
+        ></form-input>
       </v-col>
       <!-- Confirm Password -->
       <v-col cols="12" class="pb-6">
         <v-label class="text-caption text-primary" :required="true">Confirm Password</v-label>
-        <form-input v-model="confirmPassword" :type="showConfirmPassword ? 'text' : 'password'"
+        <form-input
+          v-model="confirmPassword"
+          :type="showConfirmPassword ? 'text' : 'password'"
           :append-inner-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
           :error-messages="passwordErrors.confirmPassword"
-          @click:append-inner="showConfirmPassword = !showConfirmPassword"></form-input>
+          @click:append-inner="showConfirmPassword = !showConfirmPassword"
+        ></form-input>
       </v-col>
     </v-row>
   </user-form-card>

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
+import { useUserStore } from '@/stores/userStore'
 import { useNotification } from '@/composables/useNotification'
 import { useResponsiveCount } from '@/composables/useResponsiveCount'
 
@@ -9,7 +10,7 @@ import HomeBanner from '@/components/dashboard/home/HomeBanner.vue'
 import BestSellerSection from '@/components/dashboard/home/BestSellerSection.vue'
 import CategoriesSection from '@/components/dashboard/home/CategoriesSection.vue'
 
-import { getProducts } from '@/api/product/index'
+import { getProducts } from '@/api/product'
 
 import type { ProductDetailResponse } from '@/api/product/interface'
 
@@ -20,7 +21,11 @@ import grainsImage from '@/assets/images/grains.png'
 
 const router = useRouter()
 
-const { showSnackbar, snackbarColor, resultMessage, showError } = useNotification()
+const route = useRoute()
+
+const { exchangeOAuth2Code } = useUserStore()
+
+const { showSnackbar, snackbarColor, resultMessage, showError, showSuccess } = useNotification()
 
 const { count } = useResponsiveCount()
 
@@ -43,6 +48,7 @@ const categories = [
   },
 ]
 
+const isOAuth2CodeLoading = ref(false)
 const isLoading = ref(true)
 const isError = ref(false)
 const bestSellers = ref<ProductDetailResponse[] | null>(null)
@@ -87,6 +93,34 @@ const fetchBestSellers = async () => {
 
 onMounted(() => {
   fetchBestSellers()
+})
+
+onMounted(async () => {
+  const oauth2Code = route.query.oauth2Code
+  console.log('authCode: ', oauth2Code)
+  if (oauth2Code) {
+    isOAuth2CodeLoading.value = true
+
+    try {
+      await exchangeOAuth2Code(oauth2Code)
+      console.log('exchangeOAuth2Code取得成功: ', oauth2Code)
+      showSuccess('Login success!')
+      setTimeout(() => {
+        router.push({ name: 'home' })
+      }, 500)
+    } catch (error) {
+      if (error instanceof Error) {
+        showError(error.message)
+      } else {
+        showError(String(error))
+      }
+    } finally {
+      const { oauth2Code: __, ...query } = route.query
+      router.replace({ query })
+      console.log('route query: ', route.query)
+      isOAuth2CodeLoading.value = false
+    }
+  }
 })
 
 const NavigateToProducts = () => {

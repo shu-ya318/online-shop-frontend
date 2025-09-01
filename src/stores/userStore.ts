@@ -5,6 +5,7 @@ import { jwtDecode } from 'jwt-decode'
 import {
   register as apiRegister,
   login as apiLogin,
+  exchangeOAuth2Code as apiExchangeOAuth2Code,
   logout as apiLogout,
   getUser,
   // refreshToken as apiRefreshToken,
@@ -89,6 +90,20 @@ export const useUserStore = defineStore(
       }
     }
 
+    const exchangeOAuth2Code = async (credentials: string): Promise<void> => {
+      try {
+        const response = await apiExchangeOAuth2Code(credentials)
+        if (response.accessToken) {
+          setToken(response.accessToken)
+          await fetchUser()
+        }
+      } catch (error) {
+        removeToken()
+        userInfo.value = null
+        throw error
+      }
+    }
+
     const login = async (credentials: LoginRequest): Promise<void> => {
       try {
         const response = await apiLogin(credentials)
@@ -166,6 +181,7 @@ export const useUserStore = defineStore(
       register,
       fetchUser,
       login,
+      exchangeOAuth2Code,
       logout,
       // refreshToken,
       initializeAuth,

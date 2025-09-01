@@ -51,7 +51,6 @@ const UpdatePassword = async (values: PasswordUpdateDefaultValues) => {
 
   try {
     const response = await updateUserPassword(values)
-
     showSuccess(response.message)
   } catch (error) {
     if (error instanceof Error) {
