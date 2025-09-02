@@ -69,44 +69,23 @@ const loginWithGoogle = () => {
 
 <template>
   <!-- Form -->
-  <auth-form-card
-    title="Login"
-    button-text="Login with email"
-    :loading="isSubmitting"
-    @submit="onLogin"
-  >
-    <!-- Inputs -->
-    <form-input
-      label="Email"
-      v-model="email"
-      :required="true"
-      :error-messages="errors.email"
-    ></form-input>
-    <form-input
-      label="Password"
-      v-model="password"
-      :type="showPassword ? 'text' : 'password'"
-      :required="true"
-      :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
-      :error-messages="errors.password"
-      @click:append-inner="showPassword = !showPassword"
-    ></form-input>
+  <auth-form-card title="Login" button-text="Login with email" :loading="isSubmitting" @submit="onLogin">
+    <template #form-inputs>
+      <!-- Inputs -->
+      <form-input label="Email" v-model="email" :required="true" :error-messages="errors.email"></form-input>
+      <form-input label="Password" v-model="password" :type="showPassword ? 'text' : 'password'" :required="true"
+        :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'" :error-messages="errors.password"
+        @click:append-inner="showPassword = !showPassword"></form-input>
+    </template>
     <!-- Login with Google -->
-    <v-btn
-      prepend-icon="mdi-google"
-      color="accent"
-      class="mb-4"
-      :block="true"
-      :loading="isLoading"
-      @click="loginWithGoogle"
-      >Login with Google</v-btn
-    >
+    <template #third-party-auths>
+      <v-divider color="info" :thickness="2">or</v-divider>
+      <v-btn prepend-icon="mdi-google" color="accent" class="mb-4" :block="true" :loading="isLoading"
+        @click="loginWithGoogle">Login with Google</v-btn>
+    </template>
     <!-- Redirect link -->
-    <template #actions>
-      <router-link
-        class="text-decoration-none text-primary bg-transparent"
-        :to="{ name: 'register' }"
-      >
+    <template #redirect-link>
+      <router-link class="text-decoration-none text-primary bg-transparent" :to="{ name: 'register' }">
         Don't have account?
         <span style="color: #000000; font-weight: bold">Register</span>
       </router-link>

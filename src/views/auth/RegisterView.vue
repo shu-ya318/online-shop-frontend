@@ -108,79 +108,38 @@ const onBirthChange = (newDate: Date) => {
 
 <template>
   <!-- Form -->
-  <auth-form-card
-    title="Register"
-    button-text="Register"
-    :loading="isSubmitting"
-    @submit="onRegister"
-  >
+  <auth-form-card title="Register" button-text="Register" :loading="isSubmitting" @submit="onRegister">
     <!-- Inputs -->
-    <form-input
-      label="Name"
-      placeholder="Please enter your name"
-      v-model="name"
-      :error-messages="errors.name"
-      :required="true"
-    ></form-input>
-    <form-input
-      label="Email"
-      placeholder="Please enter a valid email address"
-      v-model="email"
-      :error-messages="errors.email"
-      :required="true"
-    ></form-input>
-    <form-input
-      label="Password"
-      placeholder="Please enter 8-20 characters"
-      :type="showPassword ? 'text' : 'password'"
-      :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
-      v-model="password"
-      :error-messages="errors.password"
-      @click:append-inner="showPassword = !showPassword"
-      :required="true"
-    ></form-input>
-    <form-input
-      label="Confirm Password"
-      placeholder="Please enter the password again"
-      :type="showConfirmPassword ? 'text' : 'password'"
-      :append-inner-icon="showConfirmPassword ? 'mdi-eye-off' : 'mdi-eye'"
-      v-model="confirmPassword"
-      :error-messages="errors.confirmPassword"
-      @click:append-inner="showConfirmPassword = !showConfirmPassword"
-      :required="true"
-    ></form-input>
-    <v-menu v-model="birthMenu" :close-on-content-click="false" transition="scale-transition">
-      <template v-slot:activator="{ props }">
-        <form-input
-          label="Birth"
-          placeholder="Please select your birth date"
-          v-model="birth"
-          :error-messages="errors.birth"
-          readonly
-          v-bind="props"
-        ></form-input>
-      </template>
-      <v-date-picker
-        :model-value="birth ? new Date(birth) : new Date()"
-        @update:model-value="onBirthChange"
-        title="Select birth date"
-        color="primary"
-      ></v-date-picker>
-    </v-menu>
-    <form-input
-      label="Phone Number"
-      placeholder="Please enter 10 digits"
-      v-model="phoneNumber"
-      :error-messages="errors.phoneNumber"
-    ></form-input>
-    <form-input
-      label="Address"
-      placeholder="Please enter your address"
-      v-model="address"
-      :error-messages="errors.address"
-    ></form-input>
+    <template #form-inputs>
+      <!-- Inputs -->
+      <form-input label="Name" placeholder="Please enter your name" v-model="name" :error-messages="errors.name"
+        :required="true"></form-input>
+      <form-input label="Email" placeholder="Please enter a valid email address" v-model="email"
+        :error-messages="errors.email" :required="true"></form-input>
+      <form-input label="Password" placeholder="Please enter 8-20 characters" :type="showPassword ? 'text' : 'password'"
+        :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'" v-model="password"
+        :error-messages="errors.password" @click:append-inner="showPassword = !showPassword"
+        :required="true"></form-input>
+      <form-input label="Confirm Password" placeholder="Please enter the password again"
+        :type="showConfirmPassword ? 'text' : 'password'"
+        :append-inner-icon="showConfirmPassword ? 'mdi-eye-off' : 'mdi-eye'" v-model="confirmPassword"
+        :error-messages="errors.confirmPassword" @click:append-inner="showConfirmPassword = !showConfirmPassword"
+        :required="true"></form-input>
+      <v-menu v-model="birthMenu" :close-on-content-click="false" transition="scale-transition">
+        <template v-slot:activator="{ props }">
+          <form-input label="Birth" placeholder="Please select your birth date" v-model="birth"
+            :error-messages="errors.birth" readonly v-bind="props"></form-input>
+        </template>
+        <v-date-picker :model-value="birth ? new Date(birth) : new Date()" @update:model-value="onBirthChange"
+          title="Select birth date" color="primary"></v-date-picker>
+      </v-menu>
+      <form-input label="Phone Number" placeholder="Please enter 10 digits" v-model="phoneNumber"
+        :error-messages="errors.phoneNumber"></form-input>
+      <form-input label="Address" placeholder="Please enter your address" v-model="address"
+        :error-messages="errors.address"></form-input>
+    </template>
     <!-- Redirect link -->
-    <template #actions>
+    <template #redirect-link>
       <router-link class="text-decoration-none text-primary bg-transparent" :to="{ name: 'login' }">
         Already have account?
         <span style="color: #000000; font-weight: bold">Login</span>

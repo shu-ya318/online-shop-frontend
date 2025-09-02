@@ -18,17 +18,18 @@ defineEmits(['submit'])
       <!-- Form -->
       <v-card-text>
         <vee-form @submit="$emit('submit')">
-          <!-- Inputs and buttons -->
-          <slot></slot>
+          <!-- Inputs -->
+          <slot name="form-inputs"></slot>
           <!-- Submit button -->
           <v-btn type="submit" color="success" :block="true" :loading="loading">
             {{ buttonText }}
           </v-btn>
         </vee-form>
       </v-card-text>
+      <slot name="third-party-auths"></slot>
       <!-- Action: redirect link -->
       <v-card-actions class="d-flex justify-center pa-0" style="min-height: auto">
-        <slot name="actions"></slot>
+        <slot name="redirect-link"></slot>
       </v-card-actions>
     </v-container>
   </v-card>
