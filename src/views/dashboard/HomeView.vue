@@ -49,15 +49,16 @@ const categories = [
 ]
 
 const isOAuth2CodeLoading = ref(false)
-const isLoading = ref(true)
+
+const isProductsLoading = ref(true)
 const isError = ref(false)
-const bestSellers = ref<ProductDetailResponse[] | null>(null)
+const products = ref<ProductDetailResponse[] | null>(null)
 const perPage = ref(12)
 const total = ref(0)
 
 const groupedBestSellers = computed(() => {
   const chunkSize = 3
-  const itemsToGroup = bestSellers.value
+  const itemsToGroup = products.value
 
   return Array.from(
     { length: Math.ceil((itemsToGroup?.length ?? 0) / chunkSize) },
@@ -69,16 +70,16 @@ const fetchBestSellers = async () => {
   isError.value = false
 
   try {
-    // const response = await getProducts({
-    //   page: 0,
-    //   size: perPage.value,
-    //   sort: 'totalSold,desc',
-    //   filter: '',
-    // })
-    // const { content, totalElements } = response
-    // bestSellers.value = content
-    // total.value = totalElements
-    console.log('待完成fetchBestSellers')
+    const response = await getProducts({
+      page: 0,
+      size: perPage.value,
+      sort: 'totalSold,desc',
+      category: '',
+      name: '',
+    })
+    const { content, totalElements } = response
+    products.value = content
+    total.value = totalElements
   } catch (error) {
     isError.value = true
     if (error instanceof Error) {
@@ -87,7 +88,7 @@ const fetchBestSellers = async () => {
       showError(String(error))
     }
   } finally {
-    isLoading.value = false
+    isProductsLoading.value = false
   }
 }
 
@@ -97,8 +98,8 @@ onMounted(() => {
 
 onMounted(async () => {
   const oauth2Code = route.query.oauth2Code
-  console.log('authCode: ', oauth2Code)
-  if (oauth2Code) {
+
+  if (oauth2Code && typeof oauth2Code === 'string') {
     isOAuth2CodeLoading.value = true
 
     try {
@@ -117,7 +118,6 @@ onMounted(async () => {
     } finally {
       const { oauth2Code: __, ...query } = route.query
       router.replace({ query })
-      console.log('route query: ', route.query)
       isOAuth2CodeLoading.value = false
     }
   }
@@ -150,7 +150,7 @@ const AddToCart = (uuid: string) => {
       <!-- Best Sellers -->
       <best-seller-section
         :skeletons-count="count"
-        :is-loading="isLoading"
+        :is-loading="isProductsLoading"
         :groups="groupedBestSellers"
         :is-error="isError"
         @add-to-cart="AddToCart"

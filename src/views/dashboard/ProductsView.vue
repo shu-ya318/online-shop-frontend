@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { reactive, ref, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { reactive, ref, onMounted, computed, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import debounce from 'lodash/debounce'
 
 import { useNotification } from '@/composables/useNotification'
@@ -32,6 +32,8 @@ const { showSnackbar, snackbarColor, resultMessage, showError } = useNotificatio
 const { count } = useResponsiveCount()
 
 const router = useRouter()
+
+const route = useRoute()
 
 const searchTerm = ref('')
 const queryOptions = ref<QueryOption[]>([
@@ -86,19 +88,6 @@ const computedSortQuery = computed((): SortString | '' => {
   return sortOptions.length > 0 ? (sortOptions[0] as SortString) : ''
 })
 
-// const computedFilterQuery = computed(() => {
-//   const params: string[] = []
-
-//   const categoryFilter = queryOptions.value.find(
-//     (filter) => filter.type === 'filter' && filter.model,
-//   )
-//   if (categoryFilter) params.push(categoryFilter.model as string)
-
-//   if (searchTerm.value) params.push(searchTerm.value)
-
-//   return params.join(',')
-// })
-
 const fetchProducts = async (params: ProductsRequest) => {
   try {
     const response = await getProducts(params)
@@ -116,9 +105,53 @@ const fetchProducts = async (params: ProductsRequest) => {
   }
 }
 
+const initializeFromRouteQuery = () => {
+  const { category, sort, name } = route.query
+
+  if (category && typeof category === 'string') {
+    const categoryFilter = queryOptions.value.find(
+      (option) => option.type === QueryOptionType.FILTER && option.placeholder === 'Select Category'
+    )
+    if (categoryFilter) {
+      categoryFilter.model = category
+      queryParams.category = category
+    }
+  }
+
+  if (sort && typeof sort === 'string') {
+    const sortFilter = queryOptions.value.find(
+      (option) => option.type === QueryOptionType.SORT &&
+      Array.isArray(option.items) &&
+      option.items.some((item) => typeof item === 'object' && item.value === sort)
+    )
+    if (sortFilter) {
+      sortFilter.model = sort
+      queryParams.sort = sort as SortString
+    }
+  }
+
+  if (name && typeof name === 'string') {
+    searchTerm.value = name
+    queryParams.name = name
+  }
+}
+
 onMounted(() => {
+  initializeFromRouteQuery()
   fetchProducts(queryParams)
 })
+
+watch(
+  () => route.query,
+  () => {
+    queryParams.page = 0
+    currentDisplayPage.value = 1
+
+    initializeFromRouteQuery()
+    fetchProducts(queryParams)
+  },
+  { deep: true }
+)
 
 const applyFiltersAndSearch = () => {
   queryParams.sort = computedSortQuery.value
