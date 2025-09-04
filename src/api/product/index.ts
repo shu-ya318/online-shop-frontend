@@ -1,14 +1,14 @@
 import api from '@/api/axios/instance'
 
-import type {
-  ProductDetailRequest,
-  ProductDetailResponse,
-  ProductsRequest,
-  ProductsResponse,
-} from './interface'
+import type { PaginatedResponse } from '@/types/common'
+import type { ProductsRequest } from './interface'
+import type { ProductDetailRequest, ProductDetailResponse } from './interface'
 
 export const getProducts = async (payload: ProductsRequest) => {
-  const response = await api.get<ProductsResponse>('/public/products', payload)
+  const response = await api.get<PaginatedResponse<ProductDetailResponse>>(
+    '/public/products',
+    payload,
+  )
 
   return response.data
 }

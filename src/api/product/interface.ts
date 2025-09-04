@@ -1,3 +1,12 @@
+import type { AvailabilityStatus } from '@/enums/product/availabilityStatus'
+import type { Category } from '@/enums/product/category'
+import type { PaginatedRequest } from '@/types/common'
+
+export interface ProductsRequest extends PaginatedRequest {
+  name: string
+  category: string
+}
+
 export interface ProductDetailRequest {
   uuid: string
 }
@@ -5,29 +14,14 @@ export interface ProductDetailRequest {
 export interface ProductDetailResponse {
   uuid: string
   name: string
-  availabilityStatus: string
+  availabilityStatus: AvailabilityStatus
   sku: string
   price: number
   discountPercentage: number
   discountPrice: number
   description: string
-  category: string
+  category: Category
   stock: number
   totalSold: number
   imageUrl: string
-}
-
-export interface ProductsRequest {
-  page: number
-  filter: string
-  size: number
-  sort: string
-}
-
-export interface ProductsResponse {
-  content: ProductDetailResponse[]
-  currentPage: number
-  size: number
-  totalPages: number
-  totalElements: number
 }

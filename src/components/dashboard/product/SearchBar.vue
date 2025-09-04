@@ -1,23 +1,31 @@
 <script setup lang="ts">
-const model = defineModel('')
-defineProps<{
+import { computed } from 'vue'
+
+const props = defineProps<{
+  modelValue: string
   loading?: boolean
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
+  (event: 'update:modelValue', payload: string): void
   (event: 'submit'): void
 }>()
+
+const searchTerm = computed({
+  get: () => props.modelValue,
+  set: (value) => emit('update:modelValue', value)
+})
 </script>
 
 <template>
   <v-container fluid height="3rem" class="pa-0">
     <div class="w-100 h-100 d-flex align-center mx-auto" style="max-width: 30rem">
       <!-- Input -->
-      <v-text-field v-model="model" hide-details flex-grow rounded="sm" density="comfortable" class="rounded-e-0"
-        variant="outlined" placeholder="Search" type="search" @keydown.enter.prevent="$emit('submit')" />
+      <v-text-field v-model="searchTerm" hide-details flex-grow rounded="sm" density="comfortable" class="rounded-e-0"
+        variant="outlined" placeholder="Search" type="search" @keydown.enter.prevent="emit('submit')" />
       <!-- Submit button -->
       <v-btn width="4.25rem" height="100%" color="success" rounded="lg" class="rounded-s-0" :loading="loading"
-        @click="$emit('submit')">
+        @click="emit('submit')">
         <v-icon color="background">mdi-magnify</v-icon>
       </v-btn>
     </div>
