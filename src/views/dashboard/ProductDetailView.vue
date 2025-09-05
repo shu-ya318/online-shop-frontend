@@ -31,14 +31,14 @@ const productSpecifications = computed(() => {
   }
 })
 
-const fetchProductDetail = async (params: ProductDetailRequest) => {
-  if (!params.uuid) {
+const fetchProductDetail = async (values: ProductDetailRequest) => {
+  if (!values.uuid) {
     showError('Product uuid is missing')
     return
   }
 
   try {
-    const response = await getProductByUuid(params)
+    const response = await getProductByUuid(values)
     productDetail.value = response
     console.log(productDetail.value.imageUrl)
   } catch (error) {

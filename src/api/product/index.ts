@@ -4,19 +4,19 @@ import type { PaginatedResponse } from '@/types/common'
 import type { ProductsRequest } from './interface'
 import type { ProductDetailRequest, ProductDetailResponse } from './interface'
 
-export const getProducts = async (payload: ProductsRequest) => {
+export const getProducts = async (request: ProductsRequest) => {
   const response = await api.get<PaginatedResponse<ProductDetailResponse>>(
     '/public/products',
-    payload,
+    request,
   )
 
   return response.data
 }
 
 export const getProductByUuid = async (
-  payload: ProductDetailRequest,
+  request: ProductDetailRequest,
 ): Promise<ProductDetailResponse> => {
-  const { uuid } = payload
+  const { uuid } = request
   const response = await api.get<ProductDetailResponse>(`/public/products/${uuid}`)
 
   return response.data

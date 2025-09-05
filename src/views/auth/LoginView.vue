@@ -17,7 +17,7 @@ interface LoginForm {
 }
 
 const schema = z.object({
-  email: z.string(), //z.string().email({ message: 'Must be a valid email' }),
+  email: z.string(),
   password: z
     .string()
     .min(8, { message: 'Password must be at least 8 characters' })

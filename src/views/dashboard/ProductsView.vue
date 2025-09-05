@@ -88,9 +88,9 @@ const computedSortQuery = computed((): SortString | '' => {
   return sortOptions.length > 0 ? (sortOptions[0] as SortString) : ''
 })
 
-const fetchProducts = async (params: ProductsRequest) => {
+const fetchProducts = async (values: ProductsRequest) => {
   try {
-    const response = await getProducts(params)
+    const response = await getProducts(values)
     products.value = response.content
     totalProducts.value = response.totalElements
     totalPages.value = response.totalPages
@@ -121,8 +121,8 @@ const initializeFromRouteQuery = () => {
   if (sort && typeof sort === 'string') {
     const sortFilter = queryOptions.value.find(
       (option) => option.type === QueryOptionType.SORT &&
-      Array.isArray(option.items) &&
-      option.items.some((item) => typeof item === 'object' && item.value === sort)
+        Array.isArray(option.items) &&
+        option.items.some((item) => typeof item === 'object' && item.value === sort)
     )
     if (sortFilter) {
       sortFilter.model = sort
@@ -215,24 +215,14 @@ const NavigateToProductDetail = (productUuid: string) => {
             </v-row>
           </div>
           <!-- Result :  Success but not found -->
-          <div
-            v-else-if="products && products.length === 0"
-            class="w-100 d-flex flex-column justify-center align-center ga-1"
-            style="min-height: 15rem"
-          >
+          <div v-else-if="products && products.length === 0"
+            class="w-100 d-flex flex-column justify-center align-center ga-1" style="min-height: 15rem">
             <v-icon icon="mdi-alert-circle-outline" size="x-large" color="secondary" />
             <div class="text-subtitle-2 text-secondary">No products found</div>
           </div>
           <!-- Result : Success -->
           <v-row v-else>
-            <v-col
-              v-for="product in products"
-              :key="product.uuid"
-              :cols="12"
-              :sm="6"
-              :md="4"
-              :lg="3"
-            >
+            <v-col v-for="product in products" :key="product.uuid" :cols="12" :sm="6" :md="4" :lg="3">
               <!-- Card -->
               <product-card :product="product" @navigate="NavigateToProductDetail(product.uuid)" />
             </v-col>
@@ -240,16 +230,8 @@ const NavigateToProductDetail = (productUuid: string) => {
         </v-row>
       </v-container>
       <!-- Pagination -->
-      <v-pagination
-        v-if="totalPages > 1"
-        rounded="circle"
-        color="accent"
-        active-color="success"
-        total-visible="6"
-        :length="totalPages"
-        v-model="currentDisplayPage"
-        @update:model-value="changeProductsPage"
-      />
+      <v-pagination v-if="totalPages > 1" rounded="circle" color="accent" active-color="success" total-visible="6"
+        :length="totalPages" v-model="currentDisplayPage" @update:model-value="changeProductsPage" />
     </v-container>
     <!-- Snackbar -->
     <v-snackbar timeout="3000" location="top" :color="snackbarColor" v-model="showSnackbar">

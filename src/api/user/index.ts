@@ -11,22 +11,22 @@ import type {
   ResultResponse,
 } from './interface'
 
-export const register = async (payload: RegisterRequest): Promise<ResultResponse> => {
-  const response = await api.post<ResultResponse>('/public/user/register', payload)
+export const register = async (request: RegisterRequest): Promise<ResultResponse> => {
+  const response = await api.post<ResultResponse>('/public/user/register', request)
 
   return response.data
 }
 
-export const exchangeOAuth2Code = async (payload: string): Promise<LoginResponse> => {
+export const exchangeOAuth2Code = async (request: string): Promise<LoginResponse> => {
   const response = await api.post<LoginResponse>('/public/user/oauth2/exchange-code', {
-    oauth2Code: payload
+    oauth2Code: request,
   })
 
   return response.data
 }
 
-export const login = async (payload: LoginRequest): Promise<LoginResponse> => {
-  const response = await api.post<LoginResponse>('/public/user/login', payload)
+export const login = async (request: LoginRequest): Promise<LoginResponse> => {
+  const response = await api.post<LoginResponse>('/public/user/login', request)
 
   return response.data
 }
@@ -50,17 +50,17 @@ export const getUser = async (): Promise<UserResponse> => {
 }
 
 export const updateUserProfile = async (
-  payload: UserProfileUpdateRequest,
+  request: UserProfileUpdateRequest,
 ): Promise<UserResponse> => {
-  const response = await api.put<UserResponse>('/user/me/profile', payload)
+  const response = await api.put<UserResponse>('/user/me/profile', request)
 
   return response.data
 }
 
 export const updateUserPassword = async (
-  payload: UserPasswordUpdateRequest,
+  request: UserPasswordUpdateRequest,
 ): Promise<ResultResponse> => {
-  const response = await api.put<ResultResponse>('/user/me/password', payload)
+  const response = await api.put<ResultResponse>('/user/me/password', request)
 
   return response.data
 }
