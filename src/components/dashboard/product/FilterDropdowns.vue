@@ -6,7 +6,11 @@ defineProps<{
   loading?: boolean
 }>()
 
-defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'option-changed'])
+
+const handleOptionChange = (option: QueryOption) => {
+  emit('option-changed', option)
+}
 </script>
 
 <template>
@@ -15,7 +19,7 @@ defineEmits(['update:modelValue'])
     <v-select v-for="(filter, index) in modelValue" :key="index" density="compact" variant="outlined" hide-details
       clearable :placeholder="filter.placeholder" class="mr-2 custom-placeholder-color" :loading="loading"
       style="width: 12rem; flex: none" :items="filter.items" v-model="filter.model"
-      @update:model-value="$emit('update:modelValue', modelValue)"></v-select>
+      @update:model-value="handleOptionChange(filter)"></v-select>
   </v-container>
 </template>
 

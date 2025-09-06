@@ -12,12 +12,15 @@ import CategoriesSection from '@/components/dashboard/home/CategoriesSection.vue
 
 import { getProducts } from '@/api/product'
 
+import { SortDirection } from '@/types/common'
+import { Category } from '@/enums/product/category'
 import type { ProductDetailResponse } from '@/api/product/interface'
 
 import vegetablesImage from '@/assets/images/vegetables.png'
 import fruitsImage from '@/assets/images/fruits.png'
 import proteinImage from '@/assets/images/protein.png'
 import grainsImage from '@/assets/images/grains.png'
+
 
 const router = useRouter()
 
@@ -32,33 +35,37 @@ const { count } = useResponsiveCount()
 const categories = [
   {
     name: 'Vegetables',
+    value: Category.VEGETABLES,
     image: vegetablesImage,
   },
   {
     name: 'Fruits',
+    value: Category.FRUITS,
     image: fruitsImage,
   },
   {
     name: 'Protein',
+    value: Category.PROTEIN,
     image: proteinImage,
   },
   {
     name: 'Grains',
+    value: Category.GRAINS,
     image: grainsImage,
   },
 ]
 
 const isOAuth2CodeLoading = ref(false)
 
-const isProductsLoading = ref(true)
+const isBestSellersLoading = ref(true)
 const isError = ref(false)
-const products = ref<ProductDetailResponse[] | null>(null)
+const bestSellers = ref<ProductDetailResponse[] | null>(null)
 const perPage = ref(12)
-const total = ref(0)
+const totalPages = ref(0)
 
 const groupedBestSellers = computed(() => {
   const chunkSize = 3
-  const itemsToGroup = products.value
+  const itemsToGroup = bestSellers.value
 
   return Array.from(
     { length: Math.ceil((itemsToGroup?.length ?? 0) / chunkSize) },
@@ -73,13 +80,12 @@ const fetchBestSellers = async () => {
     const response = await getProducts({
       page: 0,
       size: perPage.value,
-      sort: 'totalSold,desc',
-      category: '',
-      name: '',
+      sortBy: 'totalSold',
+      sortDirection: SortDirection.DESC,
+      filter: {},
     })
-    const { content, totalElements } = response
-    products.value = content
-    total.value = totalElements
+    bestSellers.value = response.content
+    totalPages.value = response.totalElements
   } catch (error) {
     isError.value = true
     if (error instanceof Error) {
@@ -88,7 +94,7 @@ const fetchBestSellers = async () => {
       showError(String(error))
     }
   } finally {
-    isProductsLoading.value = false
+    isBestSellersLoading.value = false
   }
 }
 
@@ -104,7 +110,6 @@ onMounted(async () => {
 
     try {
       await exchangeOAuth2Code(oauth2Code)
-      console.log('exchangeOAuth2Code取得成功: ', oauth2Code)
       showSuccess('Login success!')
       setTimeout(() => {
         router.push({ name: 'home' })
@@ -127,7 +132,7 @@ const NavigateToProducts = () => {
   router.push({ name: 'products' })
 }
 
-const NavigateToCategory = (category: string) => {
+const NavigateToProductsWithCategory = (category: Category) => {
   router.push({ name: 'products', query: { category } })
 }
 
@@ -150,13 +155,13 @@ const AddToCart = (uuid: string) => {
       <!-- Best Sellers -->
       <best-seller-section
         :skeletons-count="count"
-        :is-loading="isProductsLoading"
+        :is-loading="isBestSellersLoading"
         :groups="groupedBestSellers"
         :is-error="isError"
         @add-to-cart="AddToCart"
       />
       <!-- Categories -->
-      <categories-section :items="categories" @navigate="NavigateToCategory" />
+      <categories-section :items="categories" @navigate="NavigateToProductsWithCategory" />
     </v-container>
     <!-- Snackbar -->
     <v-snackbar timeout="3000" location="top" :color="snackbarColor" v-model="showSnackbar">

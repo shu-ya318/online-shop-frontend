@@ -85,7 +85,7 @@ defineEmits<{
                     {{ item.name ?? '--' }}
                   </div>
                   <div class="text-h6 text-primary font-weight-bold">
-                    ${{ item.discountedPrice ?? '--' }}
+                    ${{ item.discountPrice ?? '--' }}
                     <span class="text-info line-through">${{ item.price ?? '--' }}</span>
                   </div>
                 </div>

@@ -3,15 +3,13 @@ export enum SortDirection {
   DESC = 'desc',
 }
 
-export type SortString = `${string},${SortDirection}`
-
 export interface PaginatedRequest {
-  // filter: string
+  filter: { [key: string]: string }
+  sortBy: string
+  sortDirection: SortDirection
   page: number
   size: number
-  sort: SortString | ''
 }
-
 export interface PaginatedResponse<T> {
   content: T[]
   currentPage: number
