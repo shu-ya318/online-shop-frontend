@@ -1,3 +1,15 @@
+export enum AvailabilityStatus {
+  IN_STOCK = 'IN_STOCK',
+  OUT_OF_STOCK = 'OUT_OF_STOCK',
+}
+
+export enum Category {
+  VEGETABLES = 'vegetables',
+  FRUITS = 'fruits',
+  PROTEIN = 'protein',
+  GRAINS = 'grains',
+}
+
 export enum SortDirection {
   ASC = 'asc',
   DESC = 'desc',
