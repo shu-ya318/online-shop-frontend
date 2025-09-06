@@ -34,7 +34,7 @@ const UpdateProfile = async (values: ProfileUpdateDefaultValues) => {
 
   try {
     await updateUserProfile(values)
-    showSuccess('User profile updated successfully')
+    showSuccess('User profile updated successfully!')
   } catch (error) {
     if (error instanceof Error) {
       showError(error.message)

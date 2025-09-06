@@ -12,13 +12,13 @@ import type {
 } from './interface'
 
 export const register = async (request: RegisterRequest): Promise<ResultResponse> => {
-  const response = await api.post<ResultResponse>('/public/user/register', request)
+  const response = await api.post<ResultResponse>('/public/users/register', request)
 
   return response.data
 }
 
 export const exchangeOAuth2Code = async (request: string): Promise<LoginResponse> => {
-  const response = await api.post<LoginResponse>('/public/user/oauth2/exchange-code', {
+  const response = await api.post<LoginResponse>('/public/users/oauth2/exchange-code', {
     oauth2Code: request,
   })
 
@@ -26,25 +26,25 @@ export const exchangeOAuth2Code = async (request: string): Promise<LoginResponse
 }
 
 export const login = async (request: LoginRequest): Promise<LoginResponse> => {
-  const response = await api.post<LoginResponse>('/public/user/login', request)
+  const response = await api.post<LoginResponse>('/public/users/login', request)
 
   return response.data
 }
 
 export const refreshToken = async (): Promise<RefreshTokenResponse> => {
-  const response = await api.post<RefreshTokenResponse>('/user/refresh-token')
+  const response = await api.post<RefreshTokenResponse>('/users/refresh-token')
 
   return response.data
 }
 
 export const logout = async (): Promise<ResultResponse> => {
-  const response = await api.post<ResultResponse>('/user/logout')
+  const response = await api.post<ResultResponse>('/users/logout')
 
   return response.data
 }
 
 export const getUser = async (): Promise<UserResponse> => {
-  const response = await api.get<UserResponse>('/user/me')
+  const response = await api.get<UserResponse>('/users/me')
 
   return response.data
 }
@@ -52,7 +52,7 @@ export const getUser = async (): Promise<UserResponse> => {
 export const updateUserProfile = async (
   request: UserProfileUpdateRequest,
 ): Promise<UserResponse> => {
-  const response = await api.put<UserResponse>('/user/me/profile', request)
+  const response = await api.put<UserResponse>('/users/me/profile', request)
 
   return response.data
 }
@@ -60,7 +60,7 @@ export const updateUserProfile = async (
 export const updateUserPassword = async (
   request: UserPasswordUpdateRequest,
 ): Promise<ResultResponse> => {
-  const response = await api.put<ResultResponse>('/user/me/password', request)
+  const response = await api.put<ResultResponse>('/users/me/password', request)
 
   return response.data
 }

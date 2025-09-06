@@ -152,6 +152,7 @@ const onPasswordUpdate = handlePasswordSubmit(async (values) => {
     title="Profile Setting"
     button-text="Save Changes"
     :loading="isProfileUpdating"
+    :disabled="isProfileUpdating"
     @submit="onProfileUpdate"
   >
     <v-row>
@@ -202,6 +203,7 @@ const onPasswordUpdate = handlePasswordSubmit(async (values) => {
     title="Change Password"
     button-text="Change Password"
     :loading="isPasswordUpdating"
+    :disabled="isPasswordUpdating"
     @submit="onPasswordUpdate"
   >
     <v-row>

@@ -5,6 +5,7 @@ defineProps<{
   title: string
   buttonText: string
   loading?: boolean
+  disabled?: boolean
 }>()
 
 defineEmits(['submit'])
@@ -23,7 +24,13 @@ defineEmits(['submit'])
           <!-- Inputs -->
           <slot></slot>
           <!-- Submit button -->
-          <v-btn :loading="loading" type="submit" color="success" class="text-subtitle-2">
+          <v-btn
+            :loading="loading"
+            :disabled="disabled"
+            type="submit"
+            color="success"
+            class="text-subtitle-2"
+          >
             {{ buttonText }}
           </v-btn>
         </vee-form>
