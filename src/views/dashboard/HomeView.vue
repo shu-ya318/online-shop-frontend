@@ -60,7 +60,7 @@ const isOAuth2CodeLoading = ref(false)
 const isBestSellersLoading = ref(true)
 const isError = ref(false)
 const bestSellers = ref<ProductDetailResponse[] | null>(null)
-const perPage = ref(12)
+const pageSize = ref(12)
 const totalPages = ref(0)
 
 const groupedBestSellers = computed(() => {
@@ -79,7 +79,7 @@ const fetchBestSellers = async () => {
   try {
     const response = await getProducts({
       page: 0,
-      size: perPage.value,
+      size: pageSize.value,
       sortBy: 'totalSold',
       sortDirection: SortDirection.DESC,
       filter: {},
@@ -121,8 +121,10 @@ onMounted(async () => {
         showError(String(error))
       }
     } finally {
-      const { oauth2Code: __, ...query } = route.query
+      const query = { ...route.query }
+      delete query.oauth2Code
       router.replace({ query })
+
       isOAuth2CodeLoading.value = false
     }
   }

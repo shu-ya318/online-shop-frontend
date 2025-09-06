@@ -102,6 +102,7 @@ const fetchProducts = async () => {
 const SearchProducts = debounce(() => {
   queryParams.filter.keyword = searchTerm.value
   queryParams.page = 0
+  currentDisplayPage.value = 1
 
   router.push({ query: {} })
 }, 500)
@@ -118,6 +119,7 @@ const SelectProducts = (queryOption: QueryOption) => {
   }
 
   queryParams.page = 0
+  currentDisplayPage.value = 1
 
   router.push({ query: {} })
 }
