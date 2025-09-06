@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 import { useUserStore } from '@/stores/userStore'
+import { useCartStore } from '@/stores/cartStore'
 import { useNotification } from '@/composables/useNotification'
 import { useResponsiveCount } from '@/composables/useResponsiveCount'
 
@@ -12,8 +13,8 @@ import CategoriesSection from '@/components/dashboard/home/CategoriesSection.vue
 
 import { getProducts } from '@/api/product'
 
-import { SortDirection } from '@/types/common'
-import { Category } from '@/enums/product/category'
+import { SortDirection, Category } from '@/types/common'
+
 import type { ProductDetailResponse } from '@/api/product/interface'
 
 import vegetablesImage from '@/assets/images/vegetables.png'
@@ -21,12 +22,13 @@ import fruitsImage from '@/assets/images/fruits.png'
 import proteinImage from '@/assets/images/protein.png'
 import grainsImage from '@/assets/images/grains.png'
 
-
 const router = useRouter()
 
 const route = useRoute()
 
 const { exchangeOAuth2Code } = useUserStore()
+
+const { addCartItem } = useCartStore()
 
 const { showSnackbar, snackbarColor, resultMessage, showError, showSuccess } = useNotification()
 
@@ -138,9 +140,17 @@ const NavigateToProductsWithCategory = (category: Category) => {
   router.push({ name: 'products', query: { category } })
 }
 
-// TODO: Add to cart
-const AddToCart = (uuid: string) => {
-  console.log('add to cart:', uuid)
+const addItemToCart = async (productUuid: string) => {
+  try {
+    await addCartItem({ productUuid, quantity: 1 })
+    showSuccess('Add to cart successfully!')
+  } catch (error) {
+    if (error instanceof Error) {
+      showError(error.message)
+    } else {
+      showError(String(error))
+    }
+  }
 }
 </script>
 
@@ -160,7 +170,7 @@ const AddToCart = (uuid: string) => {
         :is-loading="isBestSellersLoading"
         :groups="groupedBestSellers"
         :is-error="isError"
-        @add-to-cart="AddToCart"
+        @add-to-cart="addItemToCart"
       />
       <!-- Categories -->
       <categories-section :items="categories" @navigate="NavigateToProductsWithCategory" />

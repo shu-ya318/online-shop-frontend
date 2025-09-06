@@ -11,11 +11,11 @@ withDefaults(
   {
     groups: null,
     skeletonsCount: 0,
-  }
+  },
 )
 
 defineEmits<{
-  (event: 'add-to-cart', uuid: string): void
+  (event: 'add-to-cart', productUuid: string): void
 }>()
 </script>
 
@@ -45,7 +45,7 @@ defineEmits<{
     </div>
     <!-- Result : Success but not found -->
     <div
-      v-else-if="!groups?.length"
+      v-else-if="!groups || groups.length === 0"
       class="w-100 d-flex flex-column justify-center align-center ga-1 border-md border-accent rounded-lg"
       style="min-height: 6rem"
     >
@@ -95,8 +95,8 @@ defineEmits<{
                 icon="mdi-cart-outline"
                 variant="text"
                 color="accent"
-                :disabled="isError"
-                @click="$emit('add-to-cart', item?.uuid)"
+                :disabled="isError || !item.uuid"
+                @click.stop="$emit('add-to-cart', item.uuid)"
               />
             </v-card>
           </v-col>

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import debounce from 'lodash/debounce'
 
+import { useCartStore } from '@/stores/cartStore'
 import { useNotification } from '@/composables/useNotification'
 import { useResponsiveCount } from '@/composables/useResponsiveCount'
 
@@ -13,7 +13,7 @@ import ProductCard from '@/components/dashboard/product/ProductCard.vue'
 import { getProducts } from '@/api/product'
 
 import { SortDirection } from '@/types/common'
-import type { Category } from '@/enums/product/category'
+import type { Category } from '@/types/common'
 import type { ProductDetailResponse } from '@/api/product/interface'
 import type { PaginatedRequest } from '@/types/common'
 
@@ -56,13 +56,15 @@ const queryOptions = ref<QueryOption[]>([
   },
 ])
 
-const { showSnackbar, snackbarColor, resultMessage, showError } = useNotification()
+const { showSnackbar, snackbarColor, resultMessage, showError, showSuccess } = useNotification()
 
 const { count } = useResponsiveCount()
 
 const router = useRouter()
 
 const route = useRoute()
+
+const { addCartItem } = useCartStore()
 
 const searchTerm = ref('')
 const queryParams = reactive<PaginatedRequest>({
@@ -99,13 +101,13 @@ const fetchProducts = async () => {
   }
 }
 
-const SearchProducts = debounce(() => {
+const SearchProducts = () => {
   queryParams.filter.keyword = searchTerm.value
   queryParams.page = 0
   currentDisplayPage.value = 1
 
   router.push({ query: {} })
-}, 500)
+}
 
 const SelectProducts = (queryOption: QueryOption) => {
   if (queryOption.type === QueryOptionType.FILTER) {
@@ -134,6 +136,19 @@ watch(queryParams, fetchProducts, { deep: true, immediate: true })
 const NavigateToProductDetail = (productUuid: string) => {
   router.push({ name: 'product-detail', params: { productUuid } })
 }
+
+const addItemToCart = async (productUuid: string) => {
+  try {
+    await addCartItem({ productUuid, quantity: 1 })
+    showSuccess('Add to cart successfully!')
+  } catch (error) {
+    if (error instanceof Error) {
+      showError(error.message)
+    } else {
+      showError(String(error))
+    }
+  }
+}
 </script>
 
 <template>
@@ -159,7 +174,7 @@ const NavigateToProductDetail = (productUuid: string) => {
           </div>
           <!-- Result :  Success but not found -->
           <div
-            v-else-if="products && products.length === 0"
+            v-else-if="products.length === 0"
             class="w-100 d-flex flex-column justify-center align-center ga-1"
             style="min-height: 15rem"
           >
@@ -177,7 +192,11 @@ const NavigateToProductDetail = (productUuid: string) => {
               :lg="3"
             >
               <!-- Card -->
-              <product-card :product="product" @navigate="NavigateToProductDetail(product.uuid)" />
+              <product-card
+                :product="product"
+                @navigate="NavigateToProductDetail(product.uuid)"
+                @add-to-cart="addItemToCart"
+              />
             </v-col>
           </v-row>
         </v-row>
@@ -190,6 +209,8 @@ const NavigateToProductDetail = (productUuid: string) => {
         active-color="success"
         total-visible="6"
         :length="totalPages"
+        :loading="isLoading"
+        :disabled="isLoading"
         v-model="currentDisplayPage"
         @update:model-value="changeProductsPage"
       />

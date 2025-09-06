@@ -2,17 +2,21 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+import { useCartStore } from '@/stores/cartStore'
 import { useNotification } from '@/composables/useNotification'
 
 import AddToCartControls from '@/components/common/AddToCartControls.vue'
 
 import { getProductByUuid } from '@/api/product'
 
-import type { ProductDetailRequest, ProductDetailResponse } from '@/api/product/interface'
+import { AvailabilityStatus } from '@/types/common'
+import type { ProductDetailResponse } from '@/api/product/interface'
 
-const { showSnackbar, snackbarColor, resultMessage, showError } = useNotification()
+const { showSnackbar, snackbarColor, resultMessage, showError, showSuccess } = useNotification()
 
 const route = useRoute()
+
+const { addCartItem, isLoading: isAddingToCart } = useCartStore()
 
 const isLoading = ref(true)
 const productDetail = ref<ProductDetailResponse | null>(null)
@@ -31,8 +35,8 @@ const productSpecifications = computed(() => {
   }
 })
 
-const fetchProductDetail = async (values: ProductDetailRequest) => {
-  if (!values.uuid) {
+const fetchProductDetail = async (values: string) => {
+  if (!values) {
     showError('Product uuid is missing')
     return
   }
@@ -53,11 +57,11 @@ const fetchProductDetail = async (values: ProductDetailRequest) => {
 }
 
 onMounted(() => {
-  fetchProductDetail({ uuid: route.params.productUuid as string })
+  fetchProductDetail(route.params.productUuid as string)
 })
 
 const IncreaseQuantity = () => {
-  if (productDetail.value?.availabilityStatus === 'IN_STOCK') {
+  if (productDetail.value?.availabilityStatus === AvailabilityStatus.IN_STOCK) {
     productQuantity.value++
   } else {
     showError('Please select the quantity under the stock')
@@ -67,6 +71,19 @@ const IncreaseQuantity = () => {
 const decreaseQuantity = () => {
   if (productQuantity.value > 1) {
     productQuantity.value--
+  }
+}
+
+const addItemToCart = async (productUuid: string) => {
+  try {
+    await addCartItem({ productUuid, quantity: 1 })
+    showSuccess('Add to cart successfully!')
+  } catch (error) {
+    if (error instanceof Error) {
+      showError(error.message)
+    } else {
+      showError(String(error))
+    }
   }
 }
 </script>
@@ -86,8 +103,11 @@ const decreaseQuantity = () => {
       </v-row>
     </v-container>
     <!-- Result : Not found -->
-    <div v-else-if="!productDetail" class="w-100 d-flex flex-column justify-center align-center ga-1"
-      style="min-height: 20rem">
+    <div
+      v-else-if="!productDetail"
+      class="w-100 d-flex flex-column justify-center align-center ga-1"
+      style="min-height: 20rem"
+    >
       <v-icon icon="mdi-alert-circle-outline" size="x-large" color="secondary" />
       <div class="text-subtitle-2 text-secondary">No product found</div>
     </div>
@@ -96,7 +116,13 @@ const decreaseQuantity = () => {
       <v-row>
         <v-col cols="12" md="4" class="d-flex justify-center">
           <!-- Image -->
-          <v-img :width="300" height="300" :src="productDetail.imageUrl" :alt="productDetail.name" class="mx-auto">
+          <v-img
+            :width="300"
+            height="300"
+            :src="productDetail.imageUrl"
+            :alt="productDetail.name"
+            class="mx-auto"
+          >
             <template #error>
               <v-row class="fill-height ma-0" align="center" justify="center">
                 <v-icon icon="mdi-image-remove-outline" size="x-large" color="grey-lighten-1" />
@@ -137,17 +163,33 @@ const decreaseQuantity = () => {
             <div class="d-flex flex-column ga-6">
               <v-divider color="info" :thickness="2"></v-divider>
               <div class="d-flex flex-column ga-3">
-                <div v-for="(value, key) in productSpecifications" :key="key" class="text-body-1 text-primary">
+                <div
+                  v-for="(value, key) in productSpecifications"
+                  :key="key"
+                  class="text-body-1 text-primary"
+                >
                   {{ key }}: <span class="text-secondary ml-2">{{ value }}</span>
                 </div>
               </div>
             </div>
             <!-- Add to cart -->
             <div class="d-flex ga-3 align-center mt-6" style="height: 3rem">
-              <AddToCartControls :product-quantity="productQuantity" :on-increment="IncreaseQuantity"
-                :on-decrement="decreaseQuantity" />
+              <AddToCartControls
+                :product-quantity="productQuantity"
+                :on-increment="IncreaseQuantity"
+                :on-decrement="decreaseQuantity"
+              />
               <!-- Submit -->
-              <v-btn color="success" append-icon="mdi-cart" size="x-large" class="flex-grow-1">Add to cart</v-btn>
+              <v-btn
+                color="success"
+                append-icon="mdi-cart"
+                size="x-large"
+                class="flex-grow-1"
+                @click="addItemToCart(productDetail.uuid)"
+                :loading="isAddingToCart"
+                :disabled="isAddingToCart"
+                >Add to cart</v-btn
+              >
             </div>
           </v-container>
         </v-col>
