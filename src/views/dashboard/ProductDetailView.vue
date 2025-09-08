@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 
 import { useCartStore } from '@/stores/cartStore'
 import { useNotification } from '@/composables/useNotification'
+import { hasDiscount as productHasDiscount } from '@/utils/hasDiscount'
 
 import AddToCartControls from '@/components/common/AddToCartControls.vue'
 
@@ -22,6 +23,8 @@ const isLoading = ref(true)
 const productDetail = ref<ProductDetailResponse | null>(null)
 
 const productQuantity = ref(1)
+
+const hasDiscount = computed(() => productHasDiscount(productDetail.value))
 
 const productSpecifications = computed(() => {
   if (!productDetail.value) {
@@ -44,7 +47,6 @@ const fetchProductDetail = async (values: string) => {
   try {
     const response = await getProductByUuid(values)
     productDetail.value = response
-    console.log(productDetail.value.imageUrl)
   } catch (error) {
     if (error instanceof Error) {
       showError(error.message)
@@ -103,11 +105,8 @@ const addItemToCart = async (productUuid: string) => {
       </v-row>
     </v-container>
     <!-- Result : Not found -->
-    <div
-      v-else-if="!productDetail"
-      class="w-100 d-flex flex-column justify-center align-center ga-1"
-      style="min-height: 20rem"
-    >
+    <div v-else-if="!productDetail" class="w-100 d-flex flex-column justify-center align-center ga-1"
+      style="min-height: 20rem">
       <v-icon icon="mdi-alert-circle-outline" size="x-large" color="secondary" />
       <div class="text-subtitle-2 text-secondary">No product found</div>
     </div>
@@ -116,13 +115,7 @@ const addItemToCart = async (productUuid: string) => {
       <v-row>
         <v-col cols="12" md="4" class="d-flex justify-center">
           <!-- Image -->
-          <v-img
-            :width="300"
-            height="300"
-            :src="productDetail.imageUrl"
-            :alt="productDetail.name"
-            class="mx-auto"
-          >
+          <v-img :width="300" height="300" :src="productDetail.imageUrl" :alt="productDetail.name" class="mx-auto">
             <template #error>
               <v-row class="fill-height ma-0" align="center" justify="center">
                 <v-icon icon="mdi-image-remove-outline" size="x-large" color="grey-lighten-1" />
@@ -147,7 +140,7 @@ const addItemToCart = async (productUuid: string) => {
               </div>
               <!-- Price -->
               <div class="text-h6 text-primary font-weight-bold">
-                <template v-if="productDetail.discountPrice">
+                <template v-if="hasDiscount">
                   ${{ Math.round(productDetail.discountPrice) }}
                   <span class="ml-2 text-info text-decoration-line-through">
                     ${{ Math.round(productDetail.price) ?? '--' }}
@@ -163,33 +156,19 @@ const addItemToCart = async (productUuid: string) => {
             <div class="d-flex flex-column ga-6">
               <v-divider color="info" :thickness="2"></v-divider>
               <div class="d-flex flex-column ga-3">
-                <div
-                  v-for="(value, key) in productSpecifications"
-                  :key="key"
-                  class="text-body-1 text-primary"
-                >
+                <div v-for="(value, key) in productSpecifications" :key="key" class="text-body-1 text-primary">
                   {{ key }}: <span class="text-secondary ml-2">{{ value }}</span>
                 </div>
               </div>
             </div>
             <!-- Add to cart -->
             <div class="d-flex ga-3 align-center mt-6" style="height: 3rem">
-              <AddToCartControls
-                :product-quantity="productQuantity"
-                :on-increment="IncreaseQuantity"
-                :on-decrement="decreaseQuantity"
-              />
+              <AddToCartControls :product-quantity="productQuantity" :on-increment="IncreaseQuantity"
+                :on-decrement="decreaseQuantity" />
               <!-- Submit -->
-              <v-btn
-                color="success"
-                append-icon="mdi-cart"
-                size="x-large"
-                class="flex-grow-1"
-                @click="addItemToCart(productDetail.uuid)"
-                :loading="isAddingToCart"
-                :disabled="isAddingToCart"
-                >Add to cart</v-btn
-              >
+              <v-btn color="success" append-icon="mdi-cart" size="x-large" class="flex-grow-1"
+                @click="addItemToCart(productDetail.uuid)" :loading="isAddingToCart" :disabled="isAddingToCart">Add to
+                cart</v-btn>
             </div>
           </v-container>
         </v-col>
