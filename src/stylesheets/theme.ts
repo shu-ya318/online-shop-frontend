@@ -59,6 +59,10 @@ export const vuetifyConfig = {
         text-transform: none; `,
       },
     },
+    // Dialog
+    VDialog: {
+      rounded: 'lg',
+    },
     // Menu list item
     VListItem: {
       color: 'info',

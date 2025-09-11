@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import debounce from 'lodash/debounce'
+import { storeToRefs } from 'pinia'
 
 import { useCartStore } from '@/stores/cartStore'
 import { useNotification } from '@/composables/useNotification'
@@ -13,17 +14,12 @@ const { showSnackbar, snackbarColor, resultMessage, showError, showSuccess } = u
 
 const router = useRouter()
 
-const {
-  isLoading,
-  cart,
-  removeCartItem,
-  cartSubtotal,
-  cartShipping,
-  cartTotal,
-  updateCartItemQuantity,
-} = useCartStore()
+const cartStore = useCartStore()
+const { isLoading, cart, cartSubtotal, cartShipping, cartTotal } = storeToRefs(cartStore)
+const { fetchUserCart, removeCartItem, updateCartItemQuantity } = cartStore
 
 const isOpen = ref(false)
+const selectedItemUuid = ref('')
 
 const updateItemQuantity = debounce(async (payload: { productUuid: string; quantity: number }) => {
   try {
@@ -38,12 +34,14 @@ const updateItemQuantity = debounce(async (payload: { productUuid: string; quant
   }
 }, 1000)
 
-const openWarningDialog = () => {
+const openDialog = (uuid: string) => {
+  selectedItemUuid.value = uuid
   isOpen.value = true
 }
 
-const closeWarningDialog = () => {
+const closeDialog = () => {
   isOpen.value = false
+  selectedItemUuid.value = ''
 }
 
 const removeItemFromCart = async (productUuid: string) => {
@@ -66,6 +64,10 @@ const NavigateToProducts = () => {
 const proceedToOrder = () => {
   router.push({ name: 'order' })
 }
+
+onMounted(() => {
+  fetchUserCart()
+})
 </script>
 
 <template>
@@ -76,21 +78,25 @@ const proceedToOrder = () => {
     <div class="w-100 d-flex align-center mx-auto mt-8">
       <!-- Loader -->
       <v-skeleton v-if="isLoading">
-        <v-col cols="12" sm="8" md="8" lg="8" xl="8">
-          <v-skeleton-loader type="table-row" height="100px" />
-        </v-col>
-        <v-col cols="12" sm="4" md="4" lg="4" xl="4">
-          <v-skeleton-loader type="table-row" height="100px" />
-        </v-col>
+        <v-skeleton-loader type="table" min-height="100px" />
       </v-skeleton>
       <!-- Result :  Success but not found -->
       <div
         v-else-if="!cart || cart.items.length === 0"
-        class="w-100 d-flex flex-column justify-center align-center ga-1"
-        style="min-height: 15rem"
+        class="w-100 d-flex flex-column justify-center align-center ga-1 border-sm rounded-lg"
+        style="min-height: 20rem"
       >
         <v-icon icon="mdi-cart-remove" size="x-large" color="secondary" />
-        <div class="text-subtitle-2 text-secondary">Your cart is empty</div>
+        <div class="text-subtitle-2 text-secondary mt-2 mb-6">Your cart is empty</div>
+        <div class="justify-center">
+          <v-btn
+            variant="tonal"
+            color="info"
+            class="px-3 text-subtitle-2"
+            @click="NavigateToProducts"
+            >Return to shop</v-btn
+          >
+        </div>
       </div>
       <!-- Result : Success -->
       <v-container v-else fluid class="pa-0">
@@ -100,9 +106,10 @@ const proceedToOrder = () => {
             <CartList
               :items="cart.items"
               :is-open="isOpen"
+              :selected-item-uuid="selectedItemUuid"
               @navigate="NavigateToProducts"
-              @open-dialog="openWarningDialog"
-              @close-dialog="closeWarningDialog"
+              @open-dialog="openDialog"
+              @close-dialog="closeDialog"
               @remove-item="removeItemFromCart"
               @update-item-quantity="updateItemQuantity"
             />

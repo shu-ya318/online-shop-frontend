@@ -1,6 +1,8 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 
+import { hasDiscount } from '@/utils/hasDiscount'
+
 import {
   addCartItem as apiAddCartItem,
   getUserCart,
@@ -9,19 +11,23 @@ import {
 } from '@/api/cart'
 
 import type {
-  AddCartItemRequest,
+  CartAddItemRequest,
   CartResponse,
-  UpdateCartItemQuantityRequest,
+  CartItemQuantityUpdateRequest,
 } from '@/api/cart/interface'
 
 export const useCartStore = defineStore('cart', () => {
-  const isLoading = ref(true)
+  const isLoading = ref(false)
   const cart = ref<CartResponse | null>(null)
 
   const cartSubtotal = computed(() => {
     if (!cart.value) return 0
 
-    return cart.value.items.reduce((total, item) => total + item.price * item.quantity, 0)
+    return cart.value.items.reduce((total, item) => {
+      const itemPrice = hasDiscount(item) ? item.discountPrice : item.price
+
+      return total + Math.round(itemPrice * item.quantity)
+    }, 0)
   })
 
   const cartShipping = computed(() => {
@@ -33,6 +39,8 @@ export const useCartStore = defineStore('cart', () => {
   })
 
   const fetchUserCart = async (): Promise<void> => {
+    isLoading.value = true
+
     try {
       const response = await getUserCart()
       cart.value = response
@@ -44,24 +52,12 @@ export const useCartStore = defineStore('cart', () => {
     }
   }
 
-  const addCartItem = async (request: AddCartItemRequest): Promise<void> => {
-    if (!cart.value) throw new Error('Cart not found')
-
+  const addCartItem = async (request: CartAddItemRequest): Promise<void> => {
     isLoading.value = true
-    try {
-      const { productUuid, quantity } = request
 
-      const existingItem = cart.value.items.find((item) => item.productUuid === productUuid)
-      if (existingItem) {
-        const response = await apiUpdateCartItemQuantity({
-          productUuid,
-          quantity: existingItem.quantity + quantity,
-        })
-        cart.value = response
-      } else {
-        const response = await apiAddCartItem({ productUuid, quantity })
-        cart.value = response
-      }
+    try {
+      const response = await apiAddCartItem(request)
+      cart.value = response
     } catch (error) {
       throw error
     } finally {
@@ -69,13 +65,9 @@ export const useCartStore = defineStore('cart', () => {
     }
   }
 
-  const updateCartItemQuantity = async (request: UpdateCartItemQuantityRequest): Promise<void> => {
-    if (!cart.value) throw new Error('Cart not found')
-
-    const hasItem = cart.value.items.some((item) => item.productUuid === request.productUuid)
-    if (!hasItem) throw new Error('Item not found')
-
+  const updateCartItemQuantity = async (request: CartItemQuantityUpdateRequest): Promise<void> => {
     isLoading.value = true
+
     try {
       const response = await apiUpdateCartItemQuantity(request)
       cart.value = response
@@ -87,12 +79,8 @@ export const useCartStore = defineStore('cart', () => {
   }
 
   const removeCartItem = async (productUuid: string): Promise<void> => {
-    if (!cart.value) throw new Error('Cart not found')
-
-    const hasItem = cart.value.items.some((item) => item.productUuid === productUuid)
-    if (!hasItem) throw new Error('Item not found')
-
     isLoading.value = true
+
     try {
       const response = await apiRemoveCartItem(productUuid)
       cart.value = response

@@ -1,4 +1,4 @@
-export interface AddCartItemRequest {
+export interface CartAddItemRequest {
   productUuid: string
   quantity: number
 }
@@ -9,8 +9,8 @@ export interface CartItem {
   price: number
   discountPercentage: number
   discountPrice: number
-  quantity: number
   imageUrl: string
+  quantity: number
 }
 
 export interface CartResponse {
@@ -22,7 +22,7 @@ export interface CartResponse {
   totalQuantity: number
 }
 
-export interface UpdateCartItemQuantityRequest {
+export interface CartItemQuantityUpdateRequest {
   productUuid: string
   quantity: number
 }

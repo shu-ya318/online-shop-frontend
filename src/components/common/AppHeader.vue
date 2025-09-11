@@ -13,9 +13,9 @@ defineEmits<{
   (event: 'toggle-sidebar'): void
 }>()
 
-const { logout, userInfo } = useUserStore()
+const { logout } = useUserStore()
 
-const handleLogout = async () => {
+const onLogout = async () => {
   try {
     const response = await logout()
     showSuccess(response.message)
@@ -33,7 +33,7 @@ const handleLogout = async () => {
 
 const menuItems = [
   { title: 'My Account', icon: 'mdi-account-box-outline', to: '/user' },
-  { title: 'Log out', icon: 'mdi-logout', action: handleLogout },
+  { title: 'Log out', icon: 'mdi-logout', action: onLogout },
 ]
 </script>
 
@@ -75,7 +75,7 @@ const menuItems = [
         </v-list>
       </v-menu>
       <!-- Cart -->
-      <RouterLink custom v-slot="{ navigate }" :to="`/cart/${userInfo?.uuid}`">
+      <RouterLink custom v-slot="{ navigate }" :to="{ name: 'cart' }">
         <v-btn icon variant="plain" color="background" active-color="white" @click="navigate">
           <v-icon color="background">mdi-cart-outline</v-icon>
         </v-btn>
