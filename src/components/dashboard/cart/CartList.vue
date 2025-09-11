@@ -62,7 +62,7 @@ defineEmits<{
         <!-- Quantity -->
         <v-col cols="8" md="3">
           <AddToCartControls
-            :product-quantity="item.quantity"
+            :selected-quantity="item.quantity"
             @on-increment="
               $emit('updateItemQuantity', {
                 productUuid: item.productUuid,

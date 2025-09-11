@@ -1,9 +1,12 @@
 <script setup lang="ts">
-withDefaults(defineProps<{
-  productQuantity: number
-}>(), {
-  productQuantity: 1
-})
+withDefaults(
+  defineProps<{
+    selectedQuantity: number
+  }>(),
+  {
+    selectedQuantity: 1,
+  },
+)
 
 defineEmits<{
   (event: 'on-increment'): void
@@ -13,13 +16,26 @@ defineEmits<{
 
 <template>
   <v-sheet rounded="pill" class="d-inline-flex align-center border border-info pa-1">
-    <v-btn variant="flat" icon="mdi-minus" size="x-small" color="grey-lighten-3" class="ma-1"
-      :disabled="productQuantity <= 1" @click="$emit('on-decrement')"></v-btn>
+    <v-btn
+      variant="flat"
+      icon="mdi-minus"
+      size="x-small"
+      color="grey-lighten-3"
+      class="ma-1"
+      :disabled="selectedQuantity <= 1"
+      @click="$emit('on-decrement')"
+    ></v-btn>
     <div class="px-4 text-body-1">
-      {{ productQuantity }}
+      {{ selectedQuantity }}
     </div>
-    <v-btn variant="flat" icon="mdi-plus" size="x-small" color="grey-lighten-3" class="ma-1"
-      @click="$emit('on-increment')"></v-btn>
+    <v-btn
+      variant="flat"
+      icon="mdi-plus"
+      size="x-small"
+      color="grey-lighten-3"
+      class="ma-1"
+      @click="$emit('on-increment')"
+    ></v-btn>
   </v-sheet>
 </template>
 
