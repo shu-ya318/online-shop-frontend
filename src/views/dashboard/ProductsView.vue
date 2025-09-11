@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { storeToRefs } from 'pinia'
 
+import { useUserStore } from '@/stores/userStore'
 import { useCartStore } from '@/stores/cartStore'
 import { useNotification } from '@/composables/useNotification'
 import { useResponsiveCount } from '@/composables/useResponsiveCount'
@@ -63,6 +65,9 @@ const { count } = useResponsiveCount()
 const router = useRouter()
 
 const route = useRoute()
+
+const userStore = useUserStore()
+const { isAuthenticated } = storeToRefs(userStore)
 
 const { addCartItem } = useCartStore()
 
@@ -138,6 +143,11 @@ const NavigateToProductDetail = (productUuid: string) => {
 }
 
 const addItemToCart = async (productUuid: string) => {
+  if (!isAuthenticated.value) {
+    router.push({ name: 'login' })
+    return
+  }
+
   try {
     await addCartItem({ productUuid, quantity: 1 })
     showSuccess('Add to cart successfully!')
@@ -173,47 +183,25 @@ const addItemToCart = async (productUuid: string) => {
             </v-row>
           </div>
           <!-- Result :  Success but not found -->
-          <div
-            v-else-if="products.length === 0"
-            class="w-100 d-flex flex-column justify-center align-center ga-1"
-            style="min-height: 15rem"
-          >
+          <div v-else-if="products.length === 0" class="w-100 d-flex flex-column justify-center align-center ga-1"
+            style="min-height: 15rem">
             <v-icon icon="mdi-alert-circle-outline" size="x-large" color="secondary" />
             <div class="text-subtitle-2 text-secondary">No products found</div>
           </div>
           <!-- Result : Success -->
           <v-row v-else>
-            <v-col
-              v-for="product in products"
-              :key="product.uuid"
-              :cols="12"
-              :sm="6"
-              :md="4"
-              :lg="3"
-            >
+            <v-col v-for="product in products" :key="product.uuid" :cols="12" :sm="6" :md="4" :lg="3">
               <!-- Card -->
-              <product-card
-                :product="product"
-                @navigate="NavigateToProductDetail(product.uuid)"
-                @add-to-cart="addItemToCart"
-              />
+              <product-card :product="product" @navigate="NavigateToProductDetail(product.uuid)"
+                @add-to-cart="addItemToCart" />
             </v-col>
           </v-row>
         </v-row>
       </v-container>
       <!-- Pagination -->
-      <v-pagination
-        v-if="totalPages > 1"
-        rounded="circle"
-        color="accent"
-        active-color="success"
-        total-visible="6"
-        :length="totalPages"
-        :loading="isLoading"
-        :disabled="isLoading"
-        v-model="currentDisplayPage"
-        @update:model-value="changeProductsPage"
-      />
+      <v-pagination v-if="totalPages > 1" rounded="circle" color="accent" active-color="success" total-visible="6"
+        :length="totalPages" :loading="isLoading" :disabled="isLoading" v-model="currentDisplayPage"
+        @update:model-value="changeProductsPage" />
     </v-container>
     <!-- Snackbar -->
     <v-snackbar timeout="3000" location="top" :color="snackbarColor" v-model="showSnackbar">

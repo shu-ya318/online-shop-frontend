@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { storeToRefs } from 'pinia'
 
 import { useUserStore } from '@/stores/userStore'
 import { useCartStore } from '@/stores/cartStore'
@@ -26,7 +27,9 @@ const router = useRouter()
 
 const route = useRoute()
 
-const { exchangeOAuth2Code } = useUserStore()
+const userStore = useUserStore()
+const { isAuthenticated } = storeToRefs(userStore);
+const { exchangeOAuth2Code } = userStore
 
 const { addCartItem } = useCartStore()
 
@@ -141,6 +144,11 @@ const NavigateToProductsWithCategory = (category: Category) => {
 }
 
 const addItemToCart = async (productUuid: string) => {
+  if (!isAuthenticated.value) {
+    router.push({ name: 'login' })
+    return
+  }
+
   try {
     await addCartItem({ productUuid, quantity: 1 })
     showSuccess('Add to cart successfully!')
@@ -158,20 +166,11 @@ const addItemToCart = async (productUuid: string) => {
   <v-layout class="d-flex flex-column">
     <!-- Home Banner -->
     <home-banner @navigate="NavigateToProducts" />
-    <v-container
-      width="70%"
-      max-width="75rem"
-      class="d-flex flex-column justify-space-between align-center mt-16 mb-16 pa-0"
-      style="gap: 5rem"
-    >
+    <v-container width="70%" max-width="75rem"
+      class="d-flex flex-column justify-space-between align-center mt-16 mb-16 pa-0" style="gap: 5rem">
       <!-- Best Sellers -->
-      <best-seller-section
-        :skeletons-count="count"
-        :is-loading="isBestSellersLoading"
-        :groups="groupedBestSellers"
-        :is-error="isError"
-        @add-to-cart="addItemToCart"
-      />
+      <best-seller-section :skeletons-count="count" :is-loading="isBestSellersLoading" :groups="groupedBestSellers"
+        :is-error="isError" @add-to-cart="addItemToCart" />
       <!-- Categories -->
       <categories-section :items="categories" @navigate="NavigateToProductsWithCategory" />
     </v-container>

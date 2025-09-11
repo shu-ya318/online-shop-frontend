@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
 
+import { useUserStore } from '@/stores/userStore'
 import { useCartStore } from '@/stores/cartStore'
 import { useNotification } from '@/composables/useNotification'
 import { hasDiscount as productHasDiscount } from '@/utils/hasDiscount'
@@ -17,6 +19,11 @@ const { showSnackbar, snackbarColor, resultMessage, showError, showSuccess } = u
 
 const route = useRoute()
 
+const router = useRouter()
+
+const userStore = useUserStore()
+const { isAuthenticated } = storeToRefs(userStore)
+
 const { addCartItem, isLoading: isAddingToCart } = useCartStore()
 
 const isLoading = ref(true)
@@ -27,14 +34,12 @@ const productQuantity = ref(1)
 const hasDiscount = computed(() => productHasDiscount(productDetail.value))
 
 const productSpecifications = computed(() => {
-  if (!productDetail.value) {
-    return {}
-  }
+  if (!productDetail.value) return {}
 
   return {
-    Category: productDetail.value.category,
+    Category: productDetail.value.category?.toLowerCase(),
     'Total Sold': productDetail.value.totalSold,
-    'Stock Status': productDetail.value.availabilityStatus,
+    'Stock Status': productDetail.value.availabilityStatus?.toLowerCase(),
   }
 })
 
@@ -66,19 +71,22 @@ const IncreaseQuantity = () => {
   if (productDetail.value?.availabilityStatus === AvailabilityStatus.IN_STOCK) {
     productQuantity.value++
   } else {
-    showError('Please select the quantity under the stock')
+    showError('Please select the quantity under the stock!')
   }
 }
 
 const decreaseQuantity = () => {
-  if (productQuantity.value > 1) {
-    productQuantity.value--
-  }
+  if (productQuantity.value > 1) productQuantity.value--
 }
 
 const addItemToCart = async (productUuid: string) => {
+  if (!isAuthenticated.value) {
+    router.push({ name: 'login' })
+    return
+  }
+
   try {
-    await addCartItem({ productUuid, quantity: 1 })
+    await addCartItem({ productUuid, quantity: productQuantity.value })
     showSuccess('Add to cart successfully!')
   } catch (error) {
     if (error instanceof Error) {
@@ -156,19 +164,30 @@ const addItemToCart = async (productUuid: string) => {
             <div class="d-flex flex-column ga-6">
               <v-divider color="info" :thickness="2"></v-divider>
               <div class="d-flex flex-column ga-3">
-                <div v-for="(value, key) in productSpecifications" :key="key" class="text-body-1 text-primary">
-                  {{ key }}: <span class="text-secondary ml-2">{{ value }}</span>
+                <div v-for="(value, key) in productSpecifications" :key="key"
+                  class="text-body-1 text-primary d-flex align-center ga-2">
+                  {{ key }}:
+                  <template v-if="key === 'Category'">
+                    <v-chip size="small">{{ value }}</v-chip>
+                  </template>
+                  <template v-else-if="key === 'Stock Status'">
+                    <v-chip size="small" :color="value === 'in_stock' ? 'success' : 'error'">
+                      {{ value }}
+                    </v-chip>
+                  </template>
+                  <template v-else>
+                    <span class="text-secondary ml-2">{{ value }}</span>
+                  </template>
                 </div>
               </div>
             </div>
             <!-- Add to cart -->
             <div class="d-flex ga-3 align-center mt-6" style="height: 3rem">
-              <AddToCartControls :product-quantity="productQuantity" :on-increment="IncreaseQuantity"
-                :on-decrement="decreaseQuantity" />
+              <AddToCartControls :product-quantity="productQuantity" @on-increment="IncreaseQuantity"
+                @on-decrement="decreaseQuantity" />
               <!-- Submit -->
-              <v-btn color="success" append-icon="mdi-cart" size="x-large" class="flex-grow-1"
-                @click="addItemToCart(productDetail.uuid)" :loading="isAddingToCart" :disabled="isAddingToCart">Add to
-                cart</v-btn>
+              <v-btn color="success" append-icon="mdi-cart" size="x-large" class="flex-grow-1" :loading="isAddingToCart"
+                :disabled="isAddingToCart" @click="addItemToCart(productDetail.uuid)">Add to cart</v-btn>
             </div>
           </v-container>
         </v-col>
