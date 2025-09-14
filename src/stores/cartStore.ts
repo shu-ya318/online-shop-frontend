@@ -1,7 +1,5 @@
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
-
-import { hasDiscount } from '@/utils/hasDiscount'
 
 import {
   addCartItem as apiAddCartItem,
@@ -19,24 +17,6 @@ import type {
 export const useCartStore = defineStore('cart', () => {
   const isLoading = ref(false)
   const cart = ref<CartResponse | null>(null)
-
-  const cartSubtotal = computed(() => {
-    if (!cart.value) return 0
-
-    return cart.value.items.reduce((total, item) => {
-      const itemPrice = hasDiscount(item) ? item.discountPrice : item.price
-
-      return total + Math.round(itemPrice * item.quantity)
-    }, 0)
-  })
-
-  const cartShipping = computed(() => {
-    return cartSubtotal.value >= 300 ? 0 : 60
-  })
-
-  const cartTotal = computed(() => {
-    return cartSubtotal.value + cartShipping.value
-  })
 
   const fetchUserCart = async (): Promise<void> => {
     isLoading.value = true
@@ -95,10 +75,6 @@ export const useCartStore = defineStore('cart', () => {
     // state
     isLoading,
     cart,
-    // getters
-    cartSubtotal,
-    cartShipping,
-    cartTotal,
     // actions
     fetchUserCart,
     addCartItem,

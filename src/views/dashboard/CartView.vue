@@ -15,7 +15,7 @@ const { showSnackbar, snackbarColor, resultMessage, showError, showSuccess } = u
 const router = useRouter()
 
 const cartStore = useCartStore()
-const { isLoading, cart, cartSubtotal, cartShipping, cartTotal } = storeToRefs(cartStore)
+const { isLoading, cart } = storeToRefs(cartStore)
 const { fetchUserCart, removeCartItem, updateCartItemQuantity } = cartStore
 
 const isOpen = ref(false)
@@ -119,9 +119,9 @@ onMounted(() => {
             <CheckoutSummaryCard
               title="Cart Total"
               button-text="Proceed to order"
-              :shipping="cartShipping === 0 ? 'Free' : cartShipping"
-              :subtotal="cartSubtotal"
-              :total="cartTotal"
+              :shipping="cart.shipping === 0 ? 'Free' : cart.shipping"
+              :subtotal="cart.subtotal"
+              :total="cart.total"
               @button-click="proceedToOrder"
             />
           </v-col>

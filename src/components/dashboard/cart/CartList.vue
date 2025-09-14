@@ -83,8 +83,8 @@ defineEmits<{
           <div class="text-subtitle-1 text-primary">
             ${{
               cartItemHasDiscount(item)
-                ? Math.round(item.discountPrice * item.quantity)
-                : Math.round(item.price * item.quantity)
+                ? Math.round(item.discountPrice) * item.quantity
+                : Math.round(item.price) * item.quantity
             }}
           </div>
         </v-col>

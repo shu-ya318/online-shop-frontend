@@ -17,8 +17,9 @@ export interface CartResponse {
   cartUuid: string
   userUuid: string
   items: CartItem[]
+  subtotal: number
+  shipping: number
   total: number
-  discountTotal: number
   totalQuantity: number
 }
 
