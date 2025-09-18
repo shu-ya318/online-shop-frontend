@@ -5,14 +5,14 @@ import debounce from 'lodash/debounce'
 import { storeToRefs } from 'pinia'
 
 import { useCartStore } from '@/stores/cartStore'
-import { useNotification } from '@/composables/useNotification'
+import { useNotificationStore } from '@/stores/notificationStore'
 
 import CartList from '@/components/dashboard/cart/CartList.vue'
 import CheckoutSummaryCard from '@/components/common/CheckoutSummaryCard.vue'
 
-const { showSnackbar, snackbarColor, resultMessage, showError, showSuccess } = useNotification()
-
 const router = useRouter()
+
+const { showError, showSuccess } = useNotificationStore()
 
 const cartStore = useCartStore()
 const { isLoading, cart } = storeToRefs(cartStore)
@@ -34,8 +34,8 @@ const updateItemQuantity = debounce(async (payload: { productUuid: string; quant
   }
 }, 1000)
 
-const openDialog = (uuid: string) => {
-  selectedItemUuid.value = uuid
+const openDialog = (productUuid: string) => {
+  selectedItemUuid.value = productUuid
   isOpen.value = true
 }
 
@@ -119,9 +119,7 @@ onMounted(() => {
             <CheckoutSummaryCard
               title="Cart Total"
               button-text="Proceed to order"
-              :shipping="cart.shipping === 0 ? 'Free' : cart.shipping"
-              :subtotal="cart.subtotal"
-              :total="cart.total"
+              :button-type="'button'"
               @button-click="proceedToOrder"
             />
           </v-col>
@@ -129,10 +127,6 @@ onMounted(() => {
       </v-container>
     </div>
   </v-layout>
-  <!-- Snackbar -->
-  <v-snackbar timeout=" 3000" location="top" :color="snackbarColor" v-model="showSnackbar">
-    {{ resultMessage }}
-  </v-snackbar>
 </template>
 
 <style scoped></style>

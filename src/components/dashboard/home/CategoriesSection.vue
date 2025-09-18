@@ -1,13 +1,41 @@
 <script setup lang="ts">
-defineProps<{
-  items: {
-    name: string
-    value: string
-    image: string
-  }[]
-}>()
+import { useRouter } from 'vue-router'
 
-defineEmits(['navigate'])
+import { Category } from '@/types/common'
+
+import vegetablesImage from '@/assets/images/vegetables.png'
+import fruitsImage from '@/assets/images/fruits.png'
+import proteinImage from '@/assets/images/protein.png'
+import grainsImage from '@/assets/images/grains.png'
+
+const categoryData = [
+  {
+    name: 'Vegetables',
+    value: Category.VEGETABLES,
+    image: vegetablesImage,
+  },
+  {
+    name: 'Fruits',
+    value: Category.FRUITS,
+    image: fruitsImage,
+  },
+  {
+    name: 'Protein',
+    value: Category.PROTEIN,
+    image: proteinImage,
+  },
+  {
+    name: 'Grains',
+    value: Category.GRAINS,
+    image: grainsImage,
+  },
+]
+
+const router = useRouter()
+
+const NavigateToProductsWithCategory = (category: Category) => {
+  router.push({ name: 'products', query: { category } })
+}
 </script>
 
 <template>
@@ -16,9 +44,12 @@ defineEmits(['navigate'])
       Categories
     </div>
     <v-row class="ga-9">
-      <v-col v-for="item in items" :key="item.name"
+      <v-col
+        v-for="item in categoryData"
+        :key="item.name"
         class="category-item d-flex flex-column justify-center align-center border-md border-accent rounded pt-2 pb-2 ps-1 ga-4"
-        @click="$emit('navigate', item.value)">
+        @click="NavigateToProductsWithCategory(item.value)"
+      >
         <v-img width="4rem" height="4rem" :src="item.image" />
         <div class="category-item-text text-subtitle-1 text-center text-accent">
           {{ item.name }}

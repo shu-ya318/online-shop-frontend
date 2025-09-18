@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
+
 import bannerImage from '@/assets/images/banner.png'
 
-defineEmits<{
-  (event: 'navigate'): void
-}>()
+const router = useRouter()
+
+const NavigateToProducts = () => {
+  router.push({ name: 'products' })
+}
 </script>
 
 <template>
@@ -24,7 +28,7 @@ defineEmits<{
         append-icon="mdi-arrow-right"
         color="success"
         class="text-subtitle-2"
-        @click="$emit('navigate')"
+        @click="NavigateToProducts"
       >
         Shop now
       </v-btn>

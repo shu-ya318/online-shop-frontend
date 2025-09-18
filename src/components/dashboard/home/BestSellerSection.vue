@@ -1,25 +1,94 @@
 <script setup lang="ts">
-import { hasDiscount } from '@/utils/hasDiscount'
-import { AvailabilityStatus } from '@/types/common'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
 
+import { useUserStore } from '@/stores/userStore'
+import { useCartStore } from '@/stores/cartStore'
+import { useNotificationStore } from '@/stores/notificationStore'
+import { useResponsiveCount } from '@/composables/useResponsiveCount'
+import { hasDiscount } from '@/utils/hasDiscount'
+
+import { getProducts } from '@/api/product'
+
+import { AvailabilityStatus, SortDirection } from '@/types/common'
 import type { ProductDetailResponse } from '@/api/product/interface'
 
-withDefaults(
-  defineProps<{
-    groups?: ProductDetailResponse[][] | null
-    isLoading?: boolean
-    skeletonsCount?: number
-    isError?: boolean
-  }>(),
-  {
-    groups: null,
-    skeletonsCount: 0,
-  },
-)
+const router = useRouter()
 
-defineEmits<{
-  (event: 'add-to-cart', productUuid: string): void
-}>()
+const userStore = useUserStore()
+const { isAuthenticated } = storeToRefs(userStore)
+
+const { addCartItem } = useCartStore()
+
+const { showError, showSuccess } = useNotificationStore()
+
+const { count } = useResponsiveCount()
+
+const isBestSellerDataLoading = ref(true)
+const isBestSellerDataError = ref(false)
+const bestSellerData = ref<ProductDetailResponse[]>([])
+const pageSize = ref(12)
+const totalPages = ref(0)
+
+const groupedBestSellerData = computed(() => {
+  const chunkSize = 3
+  const itemsToGroup = bestSellerData.value
+
+  if (!itemsToGroup) return []
+
+  return Array.from({ length: Math.ceil(itemsToGroup.length / chunkSize) }, (_, index) =>
+    itemsToGroup.slice(index * chunkSize, index * chunkSize + chunkSize),
+  )
+})
+
+const fetchBestSellerData = async () => {
+  isBestSellerDataError.value = false
+
+  try {
+    const response = await getProducts({
+      page: 0,
+      size: pageSize.value,
+      sortBy: 'totalSold',
+      sortDirection: SortDirection.DESC,
+      filter: {},
+    })
+    bestSellerData.value = response.content
+    totalPages.value = response.totalElements
+  } catch (error) {
+    isBestSellerDataError.value = true
+
+    if (error instanceof Error) {
+      showError(error.message)
+    } else {
+      showError(String(error))
+    }
+  } finally {
+    isBestSellerDataLoading.value = false
+  }
+}
+
+const addItemToCart = async (productUuid: string) => {
+  if (!isAuthenticated.value) {
+    router.push({ name: 'login' })
+    return
+  }
+
+  try {
+    await addCartItem({ productUuid, quantity: 1 })
+    showSuccess('Add to cart successfully!')
+  } catch (error) {
+    if (error instanceof Error) {
+      showError(error.message)
+    } else {
+      showError(String(error))
+    }
+  }
+}
+
+onMounted(() => {
+  fetchBestSellerData()
+})
 </script>
 
 <template>
@@ -30,16 +99,16 @@ defineEmits<{
     </div>
     <div class="mb-2 text-subtitle-1 text-accent text-center">Top 12</div>
     <!-- Loader -->
-    <div v-if="isLoading">
+    <div v-if="isBestSellerDataLoading" class="w-100">
       <v-row>
-        <v-col v-for="n in skeletonsCount" :key="n">
+        <v-col v-for="n in count" :key="n">
           <v-skeleton-loader type="card" />
         </v-col>
       </v-row>
     </div>
     <!-- Result : Error -->
     <div
-      v-else-if="isError"
+      v-else-if="isBestSellerDataError"
       class="w-100 d-flex flex-column justify-center align-center ga-1 border-md border-error rounded-lg"
       style="min-height: 6rem"
     >
@@ -48,17 +117,17 @@ defineEmits<{
     </div>
     <!-- Result : Success but not found -->
     <div
-      v-else-if="!groups || groups.length === 0"
+      v-if="!groupedBestSellerData || groupedBestSellerData.length === 0"
       class="w-100 d-flex flex-column justify-center align-center ga-1 border-md border-accent rounded-lg"
       style="min-height: 6rem"
     >
       <v-icon icon="mdi-alert-circle-outline" size="x-large" color="info" />
       <div class="text-body-2 text-info">No best seller products found</div>
     </div>
-    <!-- Result : Success -->
-    <v-carousel v-else hide-delimiters color="success" height="auto" cycle :show-arrows="false">
+    <!-- Result: Success -->
+    <v-carousel hide-delimiters color="success" height="auto" cycle :show-arrows="false">
       <!-- Carousel Items -->
-      <v-carousel-item v-for="(group, index) in groups" :key="index">
+      <v-carousel-item v-for="group in groupedBestSellerData" :key="group[0].uuid">
         <v-row>
           <v-col v-for="item in group" :key="item.uuid" cols="12" md="4">
             <v-card
@@ -104,11 +173,9 @@ defineEmits<{
                 variant="text"
                 color="accent"
                 :disabled="
-                  isError ||
-                  !item.uuid ||
-                  item.availabilityStatus === AvailabilityStatus.OUT_OF_STOCK
+                  !item.uuid || item.availabilityStatus === AvailabilityStatus.OUT_OF_STOCK
                 "
-                @click.stop="$emit('add-to-cart', item.uuid)"
+                @click.stop="addItemToCart(item.uuid)"
               />
             </v-card>
           </v-col>

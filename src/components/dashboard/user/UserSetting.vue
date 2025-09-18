@@ -2,29 +2,26 @@
 import { ref, watch } from 'vue'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
+import { storeToRefs } from 'pinia'
 import { z } from 'zod'
 
 import { useUserStore } from '@/stores/userStore'
+import { useNotificationStore } from '@/stores/notificationStore'
 
 import UserFormCard from '@/components/dashboard/user/UserFormCard.vue'
 import FormInput from '@/components/common/FormInput.vue'
 
-import type {
-  ProfileUpdateDefaultValues,
-  PasswordUpdateDefaultValues,
-} from '@/views/dashboard/UserView.vue'
+import { updateUserProfile, updateUserPassword } from '@/api/user'
 
-defineProps<{
-  isProfileUpdating: boolean
-  isPasswordUpdating: boolean
-}>()
+const { showSuccess, showError } = useNotificationStore()
 
-const emit = defineEmits<{
-  (event: 'update-profile', values: ProfileUpdateDefaultValues): void
-  (event: 'update-password', values: PasswordUpdateDefaultValues): void
-}>()
+const userStore = useUserStore()
+const { userInfo } = storeToRefs(userStore)
 
-const profileUpdateSchema = z.object({
+const isProfileUpdating = ref(false)
+const isPasswordUpdating = ref(false)
+
+const ProfileUpdateSchema = z.object({
   email: z.string(),
   name: z.string().min(1, 'Name is required'),
   phoneNumber: z
@@ -38,7 +35,7 @@ const profileUpdateSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'Birth must be in yyyy-MM-dd format' }),
 })
 
-const passwordUpdateSchema = z
+const PasswordUpdateSchema = z
   .object({
     oldPassword: z
       .string()
@@ -63,14 +60,16 @@ const passwordUpdateSchema = z
     }
   })
 
-const userStore = useUserStore()
+export type Profile = z.infer<typeof ProfileUpdateSchema>
+
+export type Password = z.infer<typeof PasswordUpdateSchema>
 
 const {
   errors: profileErrors,
   defineField: defineProfileField,
   handleSubmit: handleProfileSubmit,
   resetForm: resetProfileForm,
-} = useForm<ProfileUpdateDefaultValues>({
+} = useForm<Profile>({
   initialValues: {
     email: '',
     name: '',
@@ -78,20 +77,20 @@ const {
     address: '',
     birth: '',
   },
-  validationSchema: toTypedSchema(profileUpdateSchema),
+  validationSchema: toTypedSchema(ProfileUpdateSchema),
 })
 
 const {
   errors: passwordErrors,
   defineField: definePasswordField,
   handleSubmit: handlePasswordSubmit,
-} = useForm<PasswordUpdateDefaultValues>({
+} = useForm<Password>({
   initialValues: {
     oldPassword: '',
     newPassword: '',
     confirmPassword: '',
   },
-  validationSchema: toTypedSchema(passwordUpdateSchema),
+  validationSchema: toTypedSchema(PasswordUpdateSchema),
 })
 
 // Profile
@@ -107,11 +106,61 @@ const [confirmPassword] = definePasswordField('confirmPassword')
 
 const showOldPassword = ref(false)
 const showNewPassword = ref(false)
-const showConfirmPassword = ref(false)
+const isConfirmPasswordVisible = ref(false)
 const birthMenu = ref(false)
 
+const UpdateProfile = async (values: Profile) => {
+  isProfileUpdating.value = true
+
+  try {
+    await updateUserProfile(values)
+    showSuccess('User profile updated successfully!')
+  } catch (error) {
+    if (error instanceof Error) {
+      showError(error.message)
+    } else {
+      showError(String(error))
+    }
+  } finally {
+    isProfileUpdating.value = false
+  }
+}
+
+const UpdatePassword = async (values: Password) => {
+  isPasswordUpdating.value = true
+
+  try {
+    const response = await updateUserPassword(values)
+    showSuccess(response.message)
+  } catch (error) {
+    if (error instanceof Error) {
+      showError(error.message)
+    } else {
+      showError(String(error))
+    }
+  } finally {
+    isPasswordUpdating.value = false
+  }
+}
+
+const onProfileUpdate = handleProfileSubmit(async (values) => {
+  UpdateProfile(values)
+})
+
+const onPasswordUpdate = handlePasswordSubmit(async (values) => {
+  UpdatePassword(values)
+})
+
+const onBirthChange = (newDate: Date) => {
+  const year = newDate.getFullYear()
+  const month = String(newDate.getMonth() + 1).padStart(2, '0')
+  const day = String(newDate.getDate()).padStart(2, '0')
+  birth.value = `${year}-${month}-${day}`
+  birthMenu.value = false
+}
+
 watch(
-  () => userStore.userInfo,
+  () => userInfo.value,
   (userInfo) => {
     if (userInfo) {
       resetProfileForm({
@@ -127,22 +176,6 @@ watch(
   },
   { deep: true, immediate: true },
 )
-
-const onBirthChange = (newDate: Date) => {
-  const year = newDate.getFullYear()
-  const month = String(newDate.getMonth() + 1).padStart(2, '0')
-  const day = String(newDate.getDate()).padStart(2, '0')
-  birth.value = `${year}-${month}-${day}`
-  birthMenu.value = false
-}
-
-const onProfileUpdate = handleProfileSubmit(async (values) => {
-  emit('update-profile', values)
-})
-
-const onPasswordUpdate = handlePasswordSubmit(async (values) => {
-  emit('update-password', values)
-})
 </script>
 
 <template>
@@ -234,10 +267,10 @@ const onPasswordUpdate = handlePasswordSubmit(async (values) => {
         <v-label class="text-caption text-primary" :required="true">Confirm Password</v-label>
         <form-input
           v-model="confirmPassword"
-          :type="showConfirmPassword ? 'text' : 'password'"
-          :append-inner-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
+          :type="isConfirmPasswordVisible ? 'text' : 'password'"
+          :append-inner-icon="isConfirmPasswordVisible ? 'mdi-eye' : 'mdi-eye-off'"
           :error-messages="passwordErrors.confirmPassword"
-          @click:append-inner="showConfirmPassword = !showConfirmPassword"
+          @click:append-inner="isConfirmPasswordVisible = !isConfirmPasswordVisible"
         ></form-input>
       </v-col>
     </v-row>

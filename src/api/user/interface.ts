@@ -2,9 +2,9 @@ export interface RegisterRequest {
   email: string
   password: string
   name: string
-  phoneNumber: string
-  birth: string
-  address: string
+  phoneNumber?: string
+  birth?: string
+  address?: string
 }
 
 export interface LoginRequest {

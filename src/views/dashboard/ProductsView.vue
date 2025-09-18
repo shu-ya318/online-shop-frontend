@@ -5,7 +5,7 @@ import { storeToRefs } from 'pinia'
 
 import { useUserStore } from '@/stores/userStore'
 import { useCartStore } from '@/stores/cartStore'
-import { useNotification } from '@/composables/useNotification'
+import { useNotificationStore } from '@/stores/notificationStore'
 import { useResponsiveCount } from '@/composables/useResponsiveCount'
 
 import SearchBar from '@/components/dashboard/product/SearchBar.vue'
@@ -58,13 +58,13 @@ const queryOptions = ref<QueryOption[]>([
   },
 ])
 
-const { showSnackbar, snackbarColor, resultMessage, showError, showSuccess } = useNotification()
-
-const { count } = useResponsiveCount()
-
 const router = useRouter()
 
 const route = useRoute()
+
+const { count } = useResponsiveCount()
+
+const { showError, showSuccess } = useNotificationStore()
 
 const userStore = useUserStore()
 const { isAuthenticated } = storeToRefs(userStore)
@@ -83,17 +83,17 @@ const queryParams = reactive<PaginatedRequest>({
 })
 
 const isLoading = ref(true)
-const products = ref<ProductDetailResponse[]>([])
+const productData = ref<ProductDetailResponse[]>([])
 const totalPages = ref(0)
-const totalProducts = ref(0)
+const totalProductData = ref(0)
 
 const currentDisplayPage = ref(1)
 
-const fetchProducts = async () => {
+const fetchProductData = async () => {
   try {
     const response = await getProducts(queryParams)
-    products.value = response.content
-    totalProducts.value = response.totalElements
+    productData.value = response.content
+    totalProductData.value = response.totalElements
     totalPages.value = response.totalPages
   } catch (error) {
     if (error instanceof Error) {
@@ -106,7 +106,7 @@ const fetchProducts = async () => {
   }
 }
 
-const SearchProducts = () => {
+const SearchProductData = () => {
   queryParams.filter.keyword = searchTerm.value
   queryParams.page = 0
   currentDisplayPage.value = 1
@@ -114,15 +114,15 @@ const SearchProducts = () => {
   router.push({ query: {} })
 }
 
-const SelectProducts = (queryOption: QueryOption) => {
+const SelectProductData = (queryOption: QueryOption) => {
   if (queryOption.type === QueryOptionType.FILTER) {
     queryParams.filter.category = queryOption.model as Category
-  } else {
-    if (queryOption.model) {
-      const [field, direction] = queryOption.model.split(',')
-      queryParams.sortBy = field
-      queryParams.sortDirection = direction as SortDirection
-    }
+  } else if (queryOption.type === QueryOptionType.SORT) {
+    if (!queryOption.model) return
+
+    const [field, direction] = queryOption.model.split(',')
+    queryParams.sortBy = field
+    queryParams.sortDirection = direction as SortDirection
   }
 
   queryParams.page = 0
@@ -131,12 +131,10 @@ const SelectProducts = (queryOption: QueryOption) => {
   router.push({ query: {} })
 }
 
-const changeProductsPage = (newDisplayPage: number) => {
+const changeProductDataPage = (newDisplayPage: number) => {
   queryParams.page = newDisplayPage - 1
   currentDisplayPage.value = newDisplayPage
 }
-
-watch(queryParams, fetchProducts, { deep: true, immediate: true })
 
 const NavigateToProductDetail = (productUuid: string) => {
   router.push({ name: 'product-detail', params: { productUuid } })
@@ -159,17 +157,19 @@ const addItemToCart = async (productUuid: string) => {
     }
   }
 }
+
+watch(queryParams, fetchProductData, { deep: true, immediate: true })
 </script>
 
 <template>
   <v-layout width="70%" max-width="75rem" class="d-flex flex-column pt-8 ga-10">
-    <search-bar v-model="searchTerm" :loading="isLoading" @submit="SearchProducts" />
-    <filter-dropdowns v-model="queryOptions" @option-changed="SelectProducts" />
+    <search-bar v-model="searchTerm" :loading="isLoading" @submit="SearchProductData" />
+    <filter-dropdowns v-model="queryOptions" @option-changed="SelectProductData" />
     <!-- Result -->
     <v-container class="d-flex flex-column ga-7">
       <!-- Result Title -->
       <div class="text-body-1 text-primary">
-        <span class="font-weight-medium">{{ totalProducts }}</span> results found
+        <span class="font-weight-medium">{{ totalProductData }}</span> results found
       </div>
       <!-- Product List -->
       <v-container>
@@ -183,30 +183,48 @@ const addItemToCart = async (productUuid: string) => {
             </v-row>
           </div>
           <!-- Result :  Success but not found -->
-          <div v-else-if="products.length === 0" class="w-100 d-flex flex-column justify-center align-center ga-1"
-            style="min-height: 15rem">
+          <div
+            v-else-if="productData.length === 0"
+            class="w-100 d-flex flex-column justify-center align-center ga-1"
+            style="min-height: 15rem"
+          >
             <v-icon icon="mdi-alert-circle-outline" size="x-large" color="secondary" />
-            <div class="text-subtitle-2 text-secondary">No products found</div>
+            <div class="text-subtitle-2 text-secondary">No productData found</div>
           </div>
           <!-- Result : Success -->
           <v-row v-else>
-            <v-col v-for="product in products" :key="product.uuid" :cols="12" :sm="6" :md="4" :lg="3">
+            <v-col
+              v-for="product in productData"
+              :key="product.uuid"
+              :cols="12"
+              :sm="6"
+              :md="4"
+              :lg="3"
+            >
               <!-- Card -->
-              <product-card :product="product" @navigate="NavigateToProductDetail(product.uuid)"
-                @add-to-cart="addItemToCart" />
+              <product-card
+                :product="product"
+                @navigate="NavigateToProductDetail(product.uuid)"
+                @add-to-cart="addItemToCart"
+              />
             </v-col>
           </v-row>
         </v-row>
       </v-container>
       <!-- Pagination -->
-      <v-pagination v-if="totalPages > 1" rounded="circle" color="accent" active-color="success" total-visible="6"
-        :length="totalPages" :loading="isLoading" :disabled="isLoading" v-model="currentDisplayPage"
-        @update:model-value="changeProductsPage" />
+      <v-pagination
+        v-if="totalPages > 1"
+        rounded="circle"
+        color="accent"
+        active-color="success"
+        total-visible="6"
+        :length="totalPages"
+        :loading="isLoading"
+        :disabled="isLoading"
+        v-model="currentDisplayPage"
+        @update:model-value="changeProductDataPage"
+      />
     </v-container>
-    <!-- Snackbar -->
-    <v-snackbar timeout="3000" location="top" :color="snackbarColor" v-model="showSnackbar">
-      {{ resultMessage }}
-    </v-snackbar>
   </v-layout>
 </template>
 

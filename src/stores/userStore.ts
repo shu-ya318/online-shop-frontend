@@ -48,7 +48,7 @@ export const useUserStore = defineStore(
     //   failedQueue.length = 0
     // }
 
-    const verifyToken = (): boolean => {
+    const verifyToken = () => {
       if (!token.value) return false
 
       try {
@@ -62,7 +62,7 @@ export const useUserStore = defineStore(
     }
 
     // Actions
-    const setToken = (newToken: string): void => {
+    const setToken = (newToken: string) => {
       token.value = newToken
     }
 
@@ -80,7 +80,7 @@ export const useUserStore = defineStore(
       }
     }
 
-    const fetchUser = async (): Promise<void> => {
+    const fetchUser = async () => {
       try {
         const response = await getUser()
         userInfo.value = response
@@ -90,7 +90,7 @@ export const useUserStore = defineStore(
       }
     }
 
-    const exchangeOAuth2Code = async (credentials: string): Promise<void> => {
+    const exchangeOAuth2Code = async (credentials: string) => {
       try {
         const response = await apiExchangeOAuth2Code(credentials)
         if (response.accessToken) {
@@ -104,7 +104,7 @@ export const useUserStore = defineStore(
       }
     }
 
-    const login = async (credentials: LoginRequest): Promise<void> => {
+    const login = async (credentials: LoginRequest) => {
       try {
         const response = await apiLogin(credentials)
         if (response.accessToken) {
@@ -154,7 +154,7 @@ export const useUserStore = defineStore(
     //   }
     // }
 
-    const initializeAuth = async (): Promise<void> => {
+    const initializeAuth = async () => {
       if (isInitialized.value) return
 
       const isTokenValid = verifyToken()

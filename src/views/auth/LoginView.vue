@@ -6,30 +6,27 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { z } from 'zod'
 
 import { useUserStore } from '@/stores/userStore'
-import { useNotification } from '@/composables/useNotification'
+import { useNotificationStore } from '@/stores/notificationStore'
 
 import AuthFormCard from '@/components/auth/AuthFormCard.vue'
 import FormInput from '@/components/common/FormInput.vue'
 
-interface LoginForm {
-  email: string
-  password: string
-}
-
-const schema = z.object({
-  email: z.string(),
+const LoginSchema = z.object({
+  email: z.string().min(1, 'Email is required').email('Must be a valid email'),
   password: z
     .string()
     .min(8, { message: 'Password must be at least 8 characters' })
     .max(20, { message: 'Password must be at most 20 characters' }),
 })
 
-const { handleSubmit, defineField, errors, isSubmitting } = useForm<LoginForm>({
+type Login = z.infer<typeof LoginSchema>
+
+const { handleSubmit, defineField, errors, isSubmitting } = useForm<Login>({
   initialValues: {
     email: '',
     password: '',
   },
-  validationSchema: toTypedSchema(schema),
+  validationSchema: toTypedSchema(LoginSchema),
 })
 
 const [email] = defineField('email')
@@ -39,9 +36,9 @@ const router = useRouter()
 
 const { login } = useUserStore()
 
-const { showSnackbar, snackbarColor, resultMessage, showSuccess, showError } = useNotification()
+const { showSuccess, showError } = useNotificationStore()
 
-const showPassword = ref(false)
+const isPasswordVisible = ref(false)
 
 const isLoading = ref(false)
 
@@ -61,7 +58,7 @@ const onLogin = handleSubmit(async (values) => {
   }
 })
 
-const loginWithGoogle = () => {
+const onLoginWithGoogle = () => {
   isLoading.value = true
   window.location.href = `http://localhost:8081/oauth2/authorization/google`
 }
@@ -87,11 +84,11 @@ const loginWithGoogle = () => {
       <form-input
         label="Password"
         v-model="password"
-        :type="showPassword ? 'text' : 'password'"
+        :type="isPasswordVisible ? 'text' : 'password'"
         :required="true"
-        :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+        :append-inner-icon="isPasswordVisible ? 'mdi-eye-off' : 'mdi-eye'"
         :error-messages="errors.password"
-        @click:append-inner="showPassword = !showPassword"
+        @click:append-inner="isPasswordVisible = !isPasswordVisible"
       ></form-input>
     </template>
     <!-- Login with Google -->
@@ -104,7 +101,7 @@ const loginWithGoogle = () => {
         :block="true"
         :loading="isLoading"
         :disabled="isLoading"
-        @click="loginWithGoogle"
+        @click="onLoginWithGoogle"
         >Login with Google</v-btn
       >
     </template>
@@ -119,10 +116,6 @@ const loginWithGoogle = () => {
       </router-link>
     </template>
   </auth-form-card>
-  <!-- Snackbar -->
-  <v-snackbar v-model="showSnackbar" :color="snackbarColor" :timeout="3000" location="top">
-    {{ resultMessage }}
-  </v-snackbar>
 </template>
 
 <style scoped></style>

@@ -6,22 +6,12 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { z } from 'zod'
 
 import { useUserStore } from '@/stores/userStore'
-import { useNotification } from '@/composables/useNotification'
+import { useNotificationStore } from '@/stores/notificationStore'
 
 import AuthFormCard from '@/components/auth/AuthFormCard.vue'
 import FormInput from '@/components/common/FormInput.vue'
 
-interface RegisterForm {
-  name: string
-  email: string
-  password: string
-  confirmPassword: string
-  birth: string
-  phoneNumber: string
-  address: string
-}
-
-const schema = z
+const RegisterSchema = z
   .object({
     name: z.string().min(1, { message: 'Name is required' }),
     email: z
@@ -36,9 +26,9 @@ const schema = z
       .string()
       .min(8, { message: 'Password must be at least 8 characters long' })
       .max(20, { message: 'Password must be at most 20 characters long' }),
-    phoneNumber: z.string(),
-    address: z.string(),
-    birth: z.string(),
+    phoneNumber: z.string().optional(),
+    address: z.string().optional(),
+    birth: z.string().optional(),
   })
   .superRefine(({ password, confirmPassword }, ctx) => {
     if (password !== confirmPassword) {
@@ -50,9 +40,11 @@ const schema = z
     }
   })
 
+type Register = z.infer<typeof RegisterSchema>
+
 const { register } = useUserStore()
 
-const { handleSubmit, defineField, errors, isSubmitting } = useForm<RegisterForm>({
+const { handleSubmit, defineField, errors, isSubmitting } = useForm<Register>({
   initialValues: {
     name: '',
     email: '',
@@ -62,7 +54,7 @@ const { handleSubmit, defineField, errors, isSubmitting } = useForm<RegisterForm
     phoneNumber: '',
     address: '',
   },
-  validationSchema: toTypedSchema(schema),
+  validationSchema: toTypedSchema(RegisterSchema),
 })
 
 const [name] = defineField('name')
@@ -75,10 +67,10 @@ const [confirmPassword] = defineField('confirmPassword')
 
 const router = useRouter()
 
-const { showSnackbar, snackbarColor, resultMessage, showSuccess, showError } = useNotification()
+const { showSuccess, showError } = useNotificationStore()
 
-const showPassword = ref(false)
-const showConfirmPassword = ref(false)
+const isPasswordVisible = ref(false)
+const isConfirmPasswordVisible = ref(false)
 const birthMenu = ref(false)
 
 const onRegister = handleSubmit(async (values) => {
@@ -101,6 +93,7 @@ const onBirthChange = (newDate: Date) => {
   const year = newDate.getFullYear()
   const month = String(newDate.getMonth() + 1).padStart(2, '0')
   const day = String(newDate.getDate()).padStart(2, '0')
+
   birth.value = `${year}-${month}-${day}`
   birthMenu.value = false
 }
@@ -135,21 +128,21 @@ const onBirthChange = (newDate: Date) => {
       <form-input
         label="Password"
         placeholder="Please enter 8-20 characters"
-        :type="showPassword ? 'text' : 'password'"
-        :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+        :type="isPasswordVisible ? 'text' : 'password'"
+        :append-inner-icon="isPasswordVisible ? 'mdi-eye-off' : 'mdi-eye'"
         v-model="password"
         :error-messages="errors.password"
-        @click:append-inner="showPassword = !showPassword"
+        @click:append-inner="isPasswordVisible = !isPasswordVisible"
         :required="true"
       ></form-input>
       <form-input
         label="Confirm Password"
         placeholder="Please enter the password again"
-        :type="showConfirmPassword ? 'text' : 'password'"
-        :append-inner-icon="showConfirmPassword ? 'mdi-eye-off' : 'mdi-eye'"
+        :type="isConfirmPasswordVisible ? 'text' : 'password'"
+        :append-inner-icon="isConfirmPasswordVisible ? 'mdi-eye-off' : 'mdi-eye'"
         v-model="confirmPassword"
         :error-messages="errors.confirmPassword"
-        @click:append-inner="showConfirmPassword = !showConfirmPassword"
+        @click:append-inner="isConfirmPasswordVisible = !isConfirmPasswordVisible"
         :required="true"
       ></form-input>
       <v-menu v-model="birthMenu" :close-on-content-click="false" transition="scale-transition">
@@ -191,10 +184,6 @@ const onBirthChange = (newDate: Date) => {
       </router-link>
     </template>
   </auth-form-card>
-  <!-- Snackbar -->
-  <v-snackbar v-model="showSnackbar" :color="snackbarColor" :timeout="3000" location="top">
-    {{ resultMessage }}
-  </v-snackbar>
 </template>
 
 <style scoped></style>
