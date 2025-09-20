@@ -1,3 +1,4 @@
+// Product
 export enum AvailabilityStatus {
   IN_STOCK = 'IN_STOCK',
   OUT_OF_STOCK = 'OUT_OF_STOCK',
@@ -15,6 +16,16 @@ export enum SortDirection {
   DESC = 'desc',
 }
 
+// Order
+export enum OrderStatus {
+  PENDING = 'PENDING',
+  PROCESSING = 'PROCESSING',
+  ON_THE_WAY = 'ON_THE_WAY',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+}
+
+// List
 export interface PaginatedRequest {
   filter: { [key: string]: string }
   sortBy: string
