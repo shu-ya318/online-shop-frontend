@@ -1,49 +1,28 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 
 import { useNotificationStore } from '@/stores/notificationStore'
-import { useUserStore } from '@/stores/userStore'
 
 import AppFooter from '@/components/common/AppFooter.vue'
 import AppHeader from '@/components/common/AppHeader.vue'
 import AppSidebar from '@/components/common/AppSidebar.vue'
 
-const userStore = useUserStore()
-const { userInfo } = storeToRefs(userStore)
-
 const notificationStore = useNotificationStore()
 const { isSnackbarVisible, snackbarColor, resultMessage } = storeToRefs(notificationStore)
 
-const drawer = ref(false)
+const sidebarRef = ref<InstanceType<typeof AppSidebar> | null>(null)
 
-const sidebarData = computed(() => {
-  if (!userInfo.value) return []
-
-  return [
-    {
-      title: 'Products',
-      value: 'products',
-      to: '/products',
-    },
-    {
-      title: 'ShoppingCart',
-      value: 'ShoppingCart',
-      to: `/cart/${userInfo.value.uuid}`,
-    },
-    {
-      title: 'User',
-      value: 'user',
-      to: '/user',
-    },
-  ]
-})
+const toggleSidebar = () => {
+  if (!sidebarRef.value) return
+  sidebarRef.value.toggle()
+}
 </script>
 
 <template>
   <v-layout class="d-flex flex-column" width="100vw">
-    <AppHeader @toggle-sidebar="drawer = !drawer" />
-    <AppSidebar v-model="drawer" :sidebar-items="sidebarData" />
+    <AppHeader @toggle-sidebar="toggleSidebar" />
+    <AppSidebar ref="sidebarRef" />
     <v-main class="d-flex justify-center">
       <router-view />
     </v-main>

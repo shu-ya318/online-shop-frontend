@@ -1,13 +1,17 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
 
 import { useUserStore } from '@/stores/userStore'
-
-import { useNotification } from '@/composables/useNotification'
+import { useNotificationStore } from '@/stores/notificationStore'
 
 const router = useRouter()
 
-const { showSuccess, showError } = useNotification()
+const userStore = useUserStore()
+const { userInfo } = storeToRefs(userStore)
+
+const { showSuccess, showError } = useNotificationStore()
 
 defineEmits<{
   (event: 'toggle-sidebar'): void
@@ -31,16 +35,20 @@ const onLogout = async () => {
   }
 }
 
-const menuItems = [
+const menuData = computed(() => [
   { title: 'My Account', icon: 'mdi-account-box-outline', to: '/user' },
-  { title: 'Log out', icon: 'mdi-logout', action: onLogout },
-]
+  {
+    title: userInfo.value ? 'Log out' : 'Login',
+    icon: userInfo.value ? 'mdi-logout' : 'mdi-login',
+    action: userInfo.value ? onLogout : () => router.push({ name: 'login' }),
+  },
+])
 </script>
 
 <template>
-  <v-app-bar :elevation="0" color="primary">
+  <v-app-bar elevation="0" color="primary">
     <div class="w-100 d-flex align-center mx-auto" style="max-width: 75rem">
-      <!-- Sidebar toggle -->
+      <!-- Toggle Sidebar -->
       <v-app-bar-nav-icon
         color="background"
         variant="text"
@@ -63,14 +71,18 @@ const menuItems = [
         <!-- Menu items -->
         <v-list nav>
           <v-list-item
-            v-for="item in menuItems"
+            v-for="item in menuData"
             :key="item.title"
             :value="item.title"
             :to="item.to"
-            :prepend-icon="item.icon"
             @click="item.action"
           >
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
+            <template v-slot:prepend>
+              <v-icon color="#000000" :icon="item.icon"></v-icon>
+            </template>
+            <v-list-item-title class="text-body-2 font-weight-medium">{{
+              item.title
+            }}</v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>

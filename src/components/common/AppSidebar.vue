@@ -1,31 +1,43 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 
-interface SidebarItem {
-  title: string
-  value: string
-  to: string
-}
+const drawer = ref(false)
 
-const props = defineProps<{
-  modelValue: boolean
-  sidebarItems: SidebarItem[]
-}>()
+defineExpose({
+  toggle: () => {
+    drawer.value = !drawer.value
+  },
+})
 
-const emit = defineEmits<{
-  (event: 'update:modelValue', value: boolean): void
-}>()
-
-const drawer = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value),
+const sidebarData = computed(() => {
+  return [
+    {
+      title: 'Products',
+      value: 'products',
+      to: '/products',
+    },
+    {
+      title: 'Cart',
+      value: 'Cart',
+      to: '/cart',
+    },
+    {
+      title: 'User',
+      value: 'user',
+      to: '/user',
+    },
+  ]
 })
 </script>
 
 <template>
-  <v-navigation-drawer v-model="drawer" :location="$vuetify.display.mobile ? 'bottom' : undefined" temporary>
+  <v-navigation-drawer
+    v-model="drawer"
+    :location="$vuetify.display.mobile ? 'bottom' : undefined"
+    temporary
+  >
     <v-list>
-      <v-list-item v-for="item in props.sidebarItems" :key="item.value" :to="item.to" :value="item.value">
+      <v-list-item v-for="item in sidebarData" :key="item.value" :to="item.to" :value="item.value">
         <v-list-item-title>{{ item.title }}</v-list-item-title>
       </v-list-item>
     </v-list>
