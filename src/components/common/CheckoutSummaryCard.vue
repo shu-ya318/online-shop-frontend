@@ -12,7 +12,6 @@ const props = defineProps<{
 const emit = defineEmits(['button-click', 'submit'])
 
 const handleButtonClick = () => {
-  console.log('handleButtonClick', props.buttonType)
   if (props.buttonType === 'button') {
     emit('button-click')
   } else if (props.buttonType === 'submit') {

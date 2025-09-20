@@ -93,10 +93,10 @@ const onOrder = handleSubmit(async (values) => {
       })),
     }
 
-    await createUserOrder(request)
+    const { orderUuid } = await createUserOrder(request)
     showSuccess('Order submitted successfully!')
     setTimeout(() => {
-      router.push({ name: 'order' })
+      router.push({ name: 'order-detail', params: { orderUuid: `${orderUuid}` } })
     }, 500)
   } catch (error) {
     if (error instanceof Error) {
@@ -151,26 +151,46 @@ watch(isSameAsUserInfo, (isSame) => {
       <v-row>
         <!-- Billing Info -->
         <v-col cols="12" sm="8" md="8" lg="8" xl="8">
-          <billing-info v-model:userEmail="userEmail" v-model:username="username"
-            v-model:userPhoneNumber="userPhoneNumber" v-model:userAddress="userAddress"
-            v-model:isSameAsUserInfo="isSameAsUserInfo" v-model:recipientName="recipientName"
-            v-model:recipientPhoneNumber="recipientPhoneNumber" v-model:recipientAddress="recipientAddress"
-            v-model:orderNotes="orderNotes" />
+          <billing-info
+            v-model:userEmail="userEmail"
+            v-model:username="username"
+            v-model:userPhoneNumber="userPhoneNumber"
+            v-model:userAddress="userAddress"
+            v-model:isSameAsUserInfo="isSameAsUserInfo"
+            v-model:recipientName="recipientName"
+            v-model:recipientPhoneNumber="recipientPhoneNumber"
+            v-model:recipientAddress="recipientAddress"
+            v-model:orderNotes="orderNotes"
+          />
         </v-col>
         <!-- Order Summary -->
         <v-col cols="12" sm="4" md="4" lg="4" xl="4">
           <!-- Loader -->
           <!-- Result : Error -->
           <!-- Result : Success -->
-          <CheckoutSummaryCard title="Order Summary" button-text="Submit order" button-type="submit" @submit="onOrder">
+          <CheckoutSummaryCard
+            title="Order Summary"
+            button-text="Submit order"
+            button-type="submit"
+            @submit="onOrder"
+          >
             <!-- Order Items -->
             <template #items>
               <div v-if="cart">
-                <div v-for="item in cart.items" :key="item.productUuid"
-                  class="d-flex justify-space-between align-center mb-4">
+                <div
+                  v-for="item in cart.items"
+                  :key="item.productUuid"
+                  class="d-flex justify-space-between align-center mb-4"
+                >
                   <div class="d-flex align-center text-body-1 text-primary">
                     <!-- Image -->
-                    <v-img :src="item.imageUrl" :alt="item.productName" width="60" height="60" class="mr-4" />
+                    <v-img
+                      :src="item.imageUrl"
+                      :alt="item.productName"
+                      width="60"
+                      height="60"
+                      class="mr-4"
+                    />
                     <!-- Name and Quantity -->
                     <div>{{ item.productName }} x{{ item.quantity }}</div>
                   </div>

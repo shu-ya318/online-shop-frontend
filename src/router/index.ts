@@ -96,6 +96,12 @@ const routes: RouteRecordRaw[] = [
         meta: { title: 'User Order', requiresAuth: true },
         component: () => import('../views/dashboard/OrderView.vue'),
       },
+      {
+        path: 'order/:orderUuid',
+        name: 'order-detail',
+        meta: { title: 'User Order Detail', requiresAuth: true },
+        component: () => import('../views/dashboard/OrderDetailView.vue'),
+      },
     ],
   },
 ]
