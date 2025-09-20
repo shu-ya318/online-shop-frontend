@@ -33,7 +33,7 @@ const categoryData = [
 
 const router = useRouter()
 
-const NavigateToProductsWithCategory = (category: Category) => {
+const onNavigateToProductsWithCategory = (category: Category) => {
   router.push({ name: 'products', query: { category } })
 }
 </script>
@@ -48,7 +48,7 @@ const NavigateToProductsWithCategory = (category: Category) => {
         v-for="item in categoryData"
         :key="item.name"
         class="category-item d-flex flex-column justify-center align-center border-md border-accent rounded pt-2 pb-2 ps-1 ga-4"
-        @click="NavigateToProductsWithCategory(item.value)"
+        @click="onNavigateToProductsWithCategory(item.value)"
       >
         <v-img width="4rem" height="4rem" :src="item.image" />
         <div class="category-item-text text-subtitle-1 text-center text-accent">

@@ -5,7 +5,7 @@ import bannerImage from '@/assets/images/banner.png'
 
 const router = useRouter()
 
-const NavigateToProducts = () => {
+const onNavigateToProducts = () => {
   router.push({ name: 'products' })
 }
 </script>
@@ -28,7 +28,7 @@ const NavigateToProducts = () => {
         append-icon="mdi-arrow-right"
         color="success"
         class="text-subtitle-2"
-        @click="NavigateToProducts"
+        @click="onNavigateToProducts"
       >
         Shop now
       </v-btn>

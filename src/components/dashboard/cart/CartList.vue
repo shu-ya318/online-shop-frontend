@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+import debounce from 'lodash/debounce'
+
+import { useNotificationStore } from '@/stores/notificationStore'
+import { useCartStore } from '@/stores/cartStore'
 import { hasDiscount as cartItemHasDiscount } from '@/utils/hasDiscount'
 
 import AddToCartControls from '@/components/common/AddToCartControls.vue'
@@ -7,17 +12,57 @@ import type { CartItem } from '@/api/cart/interface'
 
 defineProps<{
   items: CartItem[]
-  isOpen: boolean
-  selectedItemUuid: string
 }>()
 
 defineEmits<{
-  (event: 'open-dialog', uuid: string): void
-  (event: 'close-dialog'): void
-  (event: 'removeItem', productUuid: string): void
-  (event: 'updateItemQuantity', payload: { productUuid: string; quantity: number }): void
   (event: 'navigate'): void
 }>()
+
+const { showError, showSuccess } = useNotificationStore()
+
+const { updateCartItemQuantity, removeCartItem } = useCartStore()
+
+const isOpen = ref(false)
+const selectedItemUuid = ref('')
+
+const updateItemQuantity = debounce(async (payload: { productUuid: string; quantity: number }) => {
+  try {
+    await updateCartItemQuantity(payload)
+    showSuccess('Update quantity successfully!')
+  } catch (error) {
+    if (error instanceof Error) {
+      showError(error.message)
+    } else {
+      showError(String(error))
+    }
+  }
+}, 1000)
+
+const openDialog = (productUuid: string) => {
+  selectedItemUuid.value = productUuid
+  isOpen.value = true
+}
+
+const closeDialog = () => {
+  isOpen.value = false
+  selectedItemUuid.value = ''
+}
+
+const removeItemFromCart = async (productUuid: string) => {
+  try {
+    await removeCartItem(productUuid)
+    showSuccess('Remove item successfully!')
+  } catch (error) {
+    if (error instanceof Error) {
+      showError(error.message)
+    } else {
+      showError(String(error))
+    }
+  }
+}
+
+
+
 </script>
 
 <template>
@@ -37,13 +82,7 @@ defineEmits<{
         <!-- Product -->
         <v-col cols="12" md="4">
           <div class="d-flex align-center">
-            <v-img
-              :src="item.imageUrl"
-              :alt="item.productName"
-              width="80"
-              height="80"
-              class="mr-4 rounded"
-            ></v-img>
+            <v-img :src="item.imageUrl" :alt="item.productName" width="80" height="80" class="mr-4 rounded"></v-img>
             <span class="text-body-1 text-primary">{{ item.productName }}</span>
           </div>
         </v-col>
@@ -61,21 +100,17 @@ defineEmits<{
         </v-col>
         <!-- Quantity -->
         <v-col cols="8" md="3">
-          <AddToCartControls
-            :selected-quantity="item.quantity"
-            @on-increment="
-              $emit('updateItemQuantity', {
-                productUuid: item.productUuid,
-                quantity: item.quantity + 1,
-              })
-            "
-            @on-decrement="
-              $emit('updateItemQuantity', {
+          <AddToCartControls :selected-quantity="item.quantity" @on-increment="
+            updateItemQuantity({
+              productUuid: item.productUuid,
+              quantity: item.quantity + 1,
+            })
+            " @on-decrement="
+              updateItemQuantity({
                 productUuid: item.productUuid,
                 quantity: item.quantity - 1,
               })
-            "
-          />
+              " />
         </v-col>
         <!-- Subtotal -->
         <v-col cols="12" md="2" class="position-relative">
@@ -90,11 +125,7 @@ defineEmits<{
         </v-col>
         <!-- Remove button -->
         <v-col cols="12" md="1">
-          <v-btn
-            icon="mdi-trash-can-outline"
-            variant="text"
-            @click="$emit('open-dialog', item.productUuid)"
-          ></v-btn>
+          <v-btn icon="mdi-trash-can-outline" variant="text" @click="openDialog(item.productUuid)"></v-btn>
           <!-- Warning Dialog -->
           <v-dialog :model-value="isOpen && selectedItemUuid === item.productUuid" width="500">
             <v-card class="py-3 px-4">
@@ -103,10 +134,8 @@ defineEmits<{
                 Are you sure you want to remove {{ item.productName }}?
               </v-card-text>
               <v-card-actions>
-                <v-btn color="info" class="px-2" @click="$emit('close-dialog')">Cancel</v-btn>
-                <v-btn color="error" class="px-2" @click="$emit('removeItem', item.productUuid)"
-                  >Remove</v-btn
-                >
+                <v-btn color="info" class="px-2" @click="closeDialog">Cancel</v-btn>
+                <v-btn color="error" class="px-2" @click="removeItemFromCart(item.productUuid)">Remove</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -116,9 +145,8 @@ defineEmits<{
     </template>
     <!-- Return to products page -->
     <v-card-actions class="justify-center">
-      <v-btn variant="tonal" color="info" class="px-4 text-subtitle-2" @click="$emit('navigate')"
-        >Return to shop</v-btn
-      >
+      <v-btn variant="tonal" color="info" class="px-4 text-subtitle-2" @click="$emit('navigate')">Return to
+        shop</v-btn>
     </v-card-actions>
   </v-card>
 </template>

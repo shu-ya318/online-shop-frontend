@@ -180,14 +180,8 @@ watch(
 
 <template>
   <!-- Profile Setting Form -->
-  <user-form-card
-    class="mb-4"
-    title="Profile Setting"
-    button-text="Save Changes"
-    :loading="isProfileUpdating"
-    :disabled="isProfileUpdating"
-    @submit="onProfileUpdate"
-  >
+  <user-form-card class="mb-4" title="Profile Setting" button-text="Save Changes" :loading="isProfileUpdating"
+    :disabled="isProfileUpdating" @submit="onProfileUpdate">
     <v-row>
       <!-- Email -->
       <v-col cols="12" style="padding-top: 0.25rem; padding-bottom: 0">
@@ -204,19 +198,10 @@ watch(
         <v-label class="text-caption text-primary" :required="true">Birth</v-label>
         <v-menu v-model="birthMenu" :close-on-content-click="false" transition="scale-transition">
           <template v-slot:activator="{ props }">
-            <form-input
-              v-model="birth"
-              :error-messages="profileErrors.birth"
-              readonly
-              v-bind="props"
-            ></form-input>
+            <form-input v-model="birth" :error-messages="profileErrors.birth" readonly v-bind="props"></form-input>
           </template>
-          <v-date-picker
-            :model-value="birth ? new Date(birth) : new Date()"
-            @update:model-value="onBirthChange"
-            title="Select birth date"
-            color="primary"
-          ></v-date-picker>
+          <v-date-picker :model-value="birth ? new Date(birth) : new Date()" @update:model-value="onBirthChange"
+            title="Select birth date" color="primary"></v-date-picker>
         </v-menu>
       </v-col>
       <!-- Phone Number -->
@@ -232,46 +217,30 @@ watch(
     </v-row>
   </user-form-card>
   <!-- Change Password Form -->
-  <user-form-card
-    title="Change Password"
-    button-text="Change Password"
-    :loading="isPasswordUpdating"
-    :disabled="isPasswordUpdating"
-    @submit="onPasswordUpdate"
-  >
+  <user-form-card title="Change Password" button-text="Change Password" :loading="isPasswordUpdating"
+    :disabled="isPasswordUpdating" @submit="onPasswordUpdate">
     <v-row>
       <!-- Old Password -->
       <v-col cols="12" class="pt-2 pb-0">
         <v-label class="text-caption text-primary" :required="true">Old Password</v-label>
-        <form-input
-          v-model="oldPassword"
-          :type="showOldPassword ? 'text' : 'password'"
-          :append-inner-icon="showOldPassword ? 'mdi-eye' : 'mdi-eye-off'"
-          :error-messages="passwordErrors.oldPassword"
-          @click:append-inner="showOldPassword = !showOldPassword"
-        ></form-input>
+        <form-input v-model="oldPassword" :type="showOldPassword ? 'text' : 'password'"
+          :append-inner-icon="showOldPassword ? 'mdi-eye' : 'mdi-eye-off'" :error-messages="passwordErrors.oldPassword"
+          @click:append-inner="showOldPassword = !showOldPassword"></form-input>
       </v-col>
       <!-- New Password -->
       <v-col cols="12" class="pt-2 pb-0">
         <v-label class="text-caption text-primary" :required="true">New Password</v-label>
-        <form-input
-          v-model="newPassword"
-          :type="showNewPassword ? 'text' : 'password'"
-          :append-inner-icon="showNewPassword ? 'mdi-eye' : 'mdi-eye-off'"
-          :error-messages="passwordErrors.newPassword"
-          @click:append-inner="showNewPassword = !showNewPassword"
-        ></form-input>
+        <form-input v-model="newPassword" :type="showNewPassword ? 'text' : 'password'"
+          :append-inner-icon="showNewPassword ? 'mdi-eye' : 'mdi-eye-off'" :error-messages="passwordErrors.newPassword"
+          @click:append-inner="showNewPassword = !showNewPassword"></form-input>
       </v-col>
       <!-- Confirm Password -->
       <v-col cols="12" class="pb-6">
         <v-label class="text-caption text-primary" :required="true">Confirm Password</v-label>
-        <form-input
-          v-model="confirmPassword"
-          :type="isConfirmPasswordVisible ? 'text' : 'password'"
+        <form-input v-model="confirmPassword" :type="isConfirmPasswordVisible ? 'text' : 'password'"
           :append-inner-icon="isConfirmPasswordVisible ? 'mdi-eye' : 'mdi-eye-off'"
           :error-messages="passwordErrors.confirmPassword"
-          @click:append-inner="isConfirmPasswordVisible = !isConfirmPasswordVisible"
-        ></form-input>
+          @click:append-inner="isConfirmPasswordVisible = !isConfirmPasswordVisible"></form-input>
       </v-col>
     </v-row>
   </user-form-card>

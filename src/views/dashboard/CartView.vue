@@ -1,63 +1,20 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import debounce from 'lodash/debounce'
 import { storeToRefs } from 'pinia'
 
 import { useCartStore } from '@/stores/cartStore'
-import { useNotificationStore } from '@/stores/notificationStore'
 
 import CartList from '@/components/dashboard/cart/CartList.vue'
 import CheckoutSummaryCard from '@/components/common/CheckoutSummaryCard.vue'
 
 const router = useRouter()
 
-const { showError, showSuccess } = useNotificationStore()
-
 const cartStore = useCartStore()
 const { isLoading, cart } = storeToRefs(cartStore)
-const { fetchUserCart, removeCartItem, updateCartItemQuantity } = cartStore
+const { fetchUserCart } = cartStore
 
-const isOpen = ref(false)
-const selectedItemUuid = ref('')
-
-const updateItemQuantity = debounce(async (payload: { productUuid: string; quantity: number }) => {
-  try {
-    await updateCartItemQuantity(payload)
-    showSuccess('Update quantity successfully!')
-  } catch (error) {
-    if (error instanceof Error) {
-      showError(error.message)
-    } else {
-      showError(String(error))
-    }
-  }
-}, 1000)
-
-const openDialog = (productUuid: string) => {
-  selectedItemUuid.value = productUuid
-  isOpen.value = true
-}
-
-const closeDialog = () => {
-  isOpen.value = false
-  selectedItemUuid.value = ''
-}
-
-const removeItemFromCart = async (productUuid: string) => {
-  try {
-    await removeCartItem(productUuid)
-    showSuccess('Remove item successfully!')
-  } catch (error) {
-    if (error instanceof Error) {
-      showError(error.message)
-    } else {
-      showError(String(error))
-    }
-  }
-}
-
-const NavigateToProducts = () => {
+const onNavigateToProducts = () => {
   router.push({ name: 'products' })
 }
 
@@ -81,21 +38,14 @@ onMounted(() => {
         <v-skeleton-loader type="table" min-height="100px" />
       </v-skeleton>
       <!-- Result :  Success but not found -->
-      <div
-        v-else-if="!cart || cart.items.length === 0"
+      <div v-else-if="!cart || cart.items.length === 0"
         class="w-100 d-flex flex-column justify-center align-center ga-1 border-sm rounded-lg"
-        style="min-height: 20rem"
-      >
+        style="min-height: 20rem">
         <v-icon icon="mdi-cart-remove" size="x-large" color="secondary" />
         <div class="text-subtitle-2 text-secondary mt-2 mb-6">Your cart is empty</div>
         <div class="justify-center">
-          <v-btn
-            variant="tonal"
-            color="info"
-            class="px-3 text-subtitle-2"
-            @click="NavigateToProducts"
-            >Return to shop</v-btn
-          >
+          <v-btn variant="tonal" color="info" class="px-3 text-subtitle-2" @click="onNavigateToProducts">Return to
+            shop</v-btn>
         </div>
       </div>
       <!-- Result : Success -->
@@ -103,25 +53,12 @@ onMounted(() => {
         <v-row no-gutters class="fill-height">
           <!-- Cart items -->
           <v-col cols="12" sm="8" md="8" lg="8" xl="8">
-            <CartList
-              :items="cart.items"
-              :is-open="isOpen"
-              :selected-item-uuid="selectedItemUuid"
-              @navigate="NavigateToProducts"
-              @open-dialog="openDialog"
-              @close-dialog="closeDialog"
-              @remove-item="removeItemFromCart"
-              @update-item-quantity="updateItemQuantity"
-            />
+            <CartList :items="cart.items" @navigate="onNavigateToProducts" />
           </v-col>
           <!-- Cart total -->
           <v-col cols="12" sm="4" md="4" lg="4" xl="4">
-            <CheckoutSummaryCard
-              title="Cart Total"
-              button-text="Proceed to order"
-              :button-type="'button'"
-              @button-click="proceedToOrder"
-            />
+            <CheckoutSummaryCard title="Cart Total" button-text="Proceed to order" button-type="button"
+              @button-click="proceedToOrder" />
           </v-col>
         </v-row>
       </v-container>

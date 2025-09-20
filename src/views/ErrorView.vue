@@ -9,7 +9,7 @@ const errorMessage = computed(() => {
   return route.query.message || 'Please try again later.'
 })
 
-const navigateToHome = () => {
+const onNavigateToHome = () => {
   router.push({ name: 'home' })
 }
 </script>
@@ -20,7 +20,7 @@ const navigateToHome = () => {
       <v-card-title>Oops! Error has occurred</v-card-title>
       <v-card-text>{{ errorMessage }}</v-card-text>
       <v-card-actions>
-        <v-btn color="success" :block="true" @click="navigateToHome">
+        <v-btn color="success" :block="true" @click="onNavigateToHome">
           Back to home
         </v-btn>
       </v-card-actions>

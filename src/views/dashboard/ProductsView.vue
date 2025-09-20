@@ -106,7 +106,7 @@ const fetchProductData = async () => {
   }
 }
 
-const SearchProductData = () => {
+const onSearch = () => {
   queryParams.filter.keyword = searchTerm.value
   queryParams.page = 0
   currentDisplayPage.value = 1
@@ -114,7 +114,7 @@ const SearchProductData = () => {
   router.push({ query: {} })
 }
 
-const SelectProductData = (queryOption: QueryOption) => {
+const onSelectOption = (queryOption: QueryOption) => {
   if (queryOption.type === QueryOptionType.FILTER) {
     queryParams.filter.category = queryOption.model as Category
   } else if (queryOption.type === QueryOptionType.SORT) {
@@ -131,16 +131,16 @@ const SelectProductData = (queryOption: QueryOption) => {
   router.push({ query: {} })
 }
 
-const changeProductDataPage = (newDisplayPage: number) => {
+const onPageChange = (newDisplayPage: number) => {
   queryParams.page = newDisplayPage - 1
   currentDisplayPage.value = newDisplayPage
 }
 
-const NavigateToProductDetail = (productUuid: string) => {
+const onNavigateToProductDetail = (productUuid: string) => {
   router.push({ name: 'product-detail', params: { productUuid } })
 }
 
-const addItemToCart = async (productUuid: string) => {
+const onAddItemToCart = async (productUuid: string) => {
   if (!isAuthenticated.value) {
     router.push({ name: 'login' })
     return
@@ -163,8 +163,8 @@ watch(queryParams, fetchProductData, { deep: true, immediate: true })
 
 <template>
   <v-layout width="70%" max-width="75rem" class="d-flex flex-column pt-8 ga-10">
-    <search-bar v-model="searchTerm" :loading="isLoading" @submit="SearchProductData" />
-    <filter-dropdowns v-model="queryOptions" @option-changed="SelectProductData" />
+    <search-bar v-model="searchTerm" :loading="isLoading" @submit="onSearch" />
+    <filter-dropdowns v-model="queryOptions" @option-changed="onSelectOption" />
     <!-- Result -->
     <v-container class="d-flex flex-column ga-7">
       <!-- Result Title -->
@@ -183,47 +183,25 @@ watch(queryParams, fetchProductData, { deep: true, immediate: true })
             </v-row>
           </div>
           <!-- Result :  Success but not found -->
-          <div
-            v-else-if="productData.length === 0"
-            class="w-100 d-flex flex-column justify-center align-center ga-1"
-            style="min-height: 15rem"
-          >
+          <div v-else-if="productData.length === 0" class="w-100 d-flex flex-column justify-center align-center ga-1"
+            style="min-height: 15rem">
             <v-icon icon="mdi-alert-circle-outline" size="x-large" color="secondary" />
             <div class="text-subtitle-2 text-secondary">No productData found</div>
           </div>
           <!-- Result : Success -->
           <v-row v-else>
-            <v-col
-              v-for="product in productData"
-              :key="product.uuid"
-              :cols="12"
-              :sm="6"
-              :md="4"
-              :lg="3"
-            >
+            <v-col v-for="product in productData" :key="product.uuid" :cols="12" :sm="6" :md="4" :lg="3">
               <!-- Card -->
-              <product-card
-                :product="product"
-                @navigate="NavigateToProductDetail(product.uuid)"
-                @add-to-cart="addItemToCart"
-              />
+              <product-card :product="product" @navigate="onNavigateToProductDetail(product.uuid)"
+                @add-to-cart="onAddItemToCart" />
             </v-col>
           </v-row>
         </v-row>
       </v-container>
       <!-- Pagination -->
-      <v-pagination
-        v-if="totalPages > 1"
-        rounded="circle"
-        color="accent"
-        active-color="success"
-        total-visible="6"
-        :length="totalPages"
-        :loading="isLoading"
-        :disabled="isLoading"
-        v-model="currentDisplayPage"
-        @update:model-value="changeProductDataPage"
-      />
+      <v-pagination v-if="totalPages > 1" rounded="circle" color="accent" active-color="success" total-visible="6"
+        :length="totalPages" :loading="isLoading" :disabled="isLoading" v-model="currentDisplayPage"
+        @update:model-value="onPageChange" />
     </v-container>
   </v-layout>
 </template>
