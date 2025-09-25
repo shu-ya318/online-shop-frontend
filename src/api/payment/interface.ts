@@ -1,4 +1,4 @@
-import type { PaymentMethod, PaymentStatus } from '@/types/common'
+import type { PaymentMethod, PaymentStatus } from '@/types/common/enum'
 
 export interface PaymentCreateRequest {
   method: PaymentMethod
@@ -14,4 +14,12 @@ export interface PaymentResponse {
   currency: string
   orderUuid: string
   redirectUrl: string
+}
+
+export interface PaymentSummary {
+  uuid: string
+  status: PaymentStatus
+  method: PaymentMethod
+  amount: number
+  currency: string
 }

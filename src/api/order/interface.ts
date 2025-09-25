@@ -1,4 +1,5 @@
 import type { OrderStatus } from '@/types/common/enum'
+import type { PaymentSummary } from '../payment/interface'
 
 interface OrderItemCreateRequest {
   productUuid: string
@@ -33,8 +34,10 @@ export interface OrderResponse {
   orderUuid: string
   userUuid: string
   status: OrderStatus
+  items: OrderItem[]
   subtotal: number
   shipping: number
   total: number
   totalQuantity: number
+  payments: PaymentSummary[]
 }
