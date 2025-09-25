@@ -27,6 +27,7 @@ const { cart } = storeToRefs(cartStore)
   <v-card class="border-sm border-info pa-6">
     <v-card-title>{{ title }}</v-card-title>
     <v-card-text>
+      <!-- Cart Items -->
       <slot name="items"></slot>
       <!-- Charge -->
       <div class="mt-5 mb-5">
@@ -50,6 +51,7 @@ const { cart } = storeToRefs(cartStore)
           <span class="text-primary font-weight-bold">${{ cart?.total ?? '0' }}</span>
         </div>
       </div>
+      <!-- Payment Method -->
       <slot name="payment-method"></slot>
     </v-card-text>
     <!-- Button -->

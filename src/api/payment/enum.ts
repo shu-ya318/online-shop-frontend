@@ -1,0 +1,13 @@
+export enum PaymentMethod {
+  PAYPAL = 'PAYPAL',
+  CASH_ON_DELIVERY = 'CASH_ON_DELIVERY',
+}
+
+export enum PaymentStatus {
+  PAY_ON_DELIVERY = 'PAY_ON_DELIVERY',
+  AUTHORIZED = 'AUTHORIZED',
+  SUCCESS = 'SUCCESS',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED',
+  REFUNDED = 'REFUNDED',
+}

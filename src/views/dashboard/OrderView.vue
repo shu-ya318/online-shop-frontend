@@ -15,9 +15,15 @@ import BillingInfo from '@/components/dashboard/order/BillingInfo.vue'
 import CheckoutSummaryCard from '@/components/common/CheckoutSummaryCard.vue'
 
 import { createUserOrder } from '@/api/order'
+import { createPayment } from '@/api/payment'
+
+import { PaymentMethod } from '@/api/payment/enum'
+import type { OrderCreateRequest } from '@/api/order/interface'
+import type { PaymentCreateRequest, PaymentResponse } from '@/api/payment/interface'
 
 const Orderschema = z.object({
   orderNotes: z.string().optional(),
+  paymentMethod: z.nativeEnum(PaymentMethod),
   // User info
   userEmail: z.string(),
   username: z.string(),
@@ -59,11 +65,13 @@ const { handleSubmit, defineField, resetForm, setFieldValue } = useForm<Order>({
     recipientName: '',
     recipientPhoneNumber: '',
     recipientAddress: '',
+    paymentMethod: PaymentMethod.CASH_ON_DELIVERY,
   },
   validationSchema: toTypedSchema(Orderschema),
 })
 
 const [orderNotes] = defineField('orderNotes')
+const [paymentMethod] = defineField('paymentMethod')
 // User info
 const [userEmail] = defineField('userEmail')
 const [username] = defineField('username')
@@ -82,22 +90,30 @@ const onOrder = handleSubmit(async (values) => {
       return
     }
 
-    const request = {
+    // Create order
+    const orderRequest: OrderCreateRequest = {
       recipientName: values.recipientName,
       recipientPhoneNumber: values.recipientPhoneNumber,
       recipientAddress: values.recipientAddress,
       orderNotes: values.orderNotes || '',
+      paymentMethod: values.paymentMethod,
       items: cart.value.items.map((item) => ({
         productUuid: item.productUuid,
         quantity: item.quantity,
       })),
     }
 
-    const { orderUuid } = await createUserOrder(request)
-    showSuccess('Order submitted successfully!')
-    setTimeout(() => {
-      router.push({ name: 'order-detail', params: { orderUuid: `${orderUuid}` } })
-    }, 500)
+    const { orderUuid } = await createUserOrder(orderRequest)
+    showSuccess('Order created successfully!Proceeding to payment...')
+
+    // Create payment
+    const paymentRequest: PaymentCreateRequest = {
+      orderUuid,
+      method: values.paymentMethod,
+    }
+    const paymentResponse = await createPayment(paymentRequest)
+
+    await processPayment(orderUuid, values.paymentMethod, paymentResponse)
   } catch (error) {
     if (error instanceof Error) {
       showError(error.message)
@@ -106,6 +122,26 @@ const onOrder = handleSubmit(async (values) => {
     }
   }
 })
+
+const processPayment = async (
+  orderUuid: string,
+  paymentMethod: PaymentMethod,
+  paymentResponse: PaymentResponse
+) => {
+  if (paymentMethod === PaymentMethod.CASH_ON_DELIVERY) {
+    showSuccess('Order placed successfully with Cash on Delivery!')
+    setTimeout(() => {
+      router.push({ name: 'order-detail', params: { orderUuid: `${orderUuid}` } })
+    }, 500)
+  } else if (paymentMethod === PaymentMethod.PAYPAL) {
+    if (paymentResponse.redirectUrl) {
+      showSuccess('Redirecting to PayPal for payment authorization...')
+      window.location.href = paymentResponse.redirectUrl
+    } else {
+      throw new Error('PayPal payment initiation failed: Missing redirect URL!')
+    }
+  }
+}
 
 onMounted(() => {
   fetchUserCart()
@@ -151,46 +187,26 @@ watch(isSameAsUserInfo, (isSame) => {
       <v-row>
         <!-- Billing Info -->
         <v-col cols="12" sm="8" md="8" lg="8" xl="8">
-          <billing-info
-            v-model:userEmail="userEmail"
-            v-model:username="username"
-            v-model:userPhoneNumber="userPhoneNumber"
-            v-model:userAddress="userAddress"
-            v-model:isSameAsUserInfo="isSameAsUserInfo"
-            v-model:recipientName="recipientName"
-            v-model:recipientPhoneNumber="recipientPhoneNumber"
-            v-model:recipientAddress="recipientAddress"
-            v-model:orderNotes="orderNotes"
-          />
+          <billing-info v-model:userEmail="userEmail" v-model:username="username"
+            v-model:userPhoneNumber="userPhoneNumber" v-model:userAddress="userAddress"
+            v-model:isSameAsUserInfo="isSameAsUserInfo" v-model:recipientName="recipientName"
+            v-model:recipientPhoneNumber="recipientPhoneNumber" v-model:recipientAddress="recipientAddress"
+            v-model:orderNotes="orderNotes" />
         </v-col>
         <!-- Order Summary -->
         <v-col cols="12" sm="4" md="4" lg="4" xl="4">
           <!-- Loader -->
           <!-- Result : Error -->
           <!-- Result : Success -->
-          <CheckoutSummaryCard
-            title="Order Summary"
-            button-text="Submit order"
-            button-type="submit"
-            @submit="onOrder"
-          >
+          <CheckoutSummaryCard title="Order Summary" button-text="Submit order" button-type="submit" @submit="onOrder">
             <!-- Order Items -->
             <template #items>
               <div v-if="cart">
-                <div
-                  v-for="item in cart.items"
-                  :key="item.productUuid"
-                  class="d-flex justify-space-between align-center mb-4"
-                >
+                <div v-for="item in cart.items" :key="item.productUuid"
+                  class="d-flex justify-space-between align-center mb-4">
                   <div class="d-flex align-center text-body-1 text-primary">
                     <!-- Image -->
-                    <v-img
-                      :src="item.imageUrl"
-                      :alt="item.productName"
-                      width="60"
-                      height="60"
-                      class="mr-4"
-                    />
+                    <v-img :src="item.imageUrl" :alt="item.productName" width="60" height="60" class="mr-4" />
                     <!-- Name and Quantity -->
                     <div>{{ item.productName }} x{{ item.quantity }}</div>
                   </div>
@@ -204,6 +220,16 @@ watch(isSameAsUserInfo, (isSame) => {
                   </div>
                 </div>
               </div>
+            </template>
+            <!-- Payment Method -->
+            <template #payment-method>
+              <!-- Subtitle -->
+              <v-card-title>Payment Method</v-card-title>
+              <!-- Options -->
+              <v-radio-group v-model="paymentMethod" color="success">
+                <v-radio label="Cash on delivery" :value="PaymentMethod.CASH_ON_DELIVERY"></v-radio>
+                <v-radio label="Paypal" :value="PaymentMethod.PAYPAL"></v-radio>
+              </v-radio-group>
             </template>
           </CheckoutSummaryCard>
         </v-col>

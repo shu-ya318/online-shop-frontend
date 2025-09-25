@@ -10,6 +10,7 @@ export interface OrderCreateRequest {
   recipientPhoneNumber: string
   recipientAddress: string
   orderNotes: string
+  paymentMethod: string
   items: OrderItemCreateRequest[]
 }
 
