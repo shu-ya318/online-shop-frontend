@@ -11,7 +11,7 @@ import { hasDiscount } from '@/utils/hasDiscount'
 
 import { getProducts } from '@/api/product'
 
-import { AvailabilityStatus, SortDirection } from '@/types/common'
+import { AvailabilityStatus, SortDirection } from '@/types/common/enum'
 import type { ProductDetailResponse } from '@/api/product/interface'
 
 const router = useRouter()
@@ -107,20 +107,16 @@ onMounted(() => {
       </v-row>
     </div>
     <!-- Result : Error -->
-    <div
-      v-else-if="isBestSellerDataError"
+    <div v-else-if="isBestSellerDataError"
       class="w-100 d-flex flex-column justify-center align-center ga-1 border-md border-error rounded-lg"
-      style="min-height: 6rem"
-    >
+      style="min-height: 6rem">
       <v-icon icon="mdi-alert-circle-outline" size="x-large" color="error" />
       <div class="text-body-2 text-error">Fetch best seller products failed</div>
     </div>
     <!-- Result : Success but not found -->
-    <div
-      v-if="!groupedBestSellerData || groupedBestSellerData.length === 0"
+    <div v-if="!groupedBestSellerData || groupedBestSellerData.length === 0"
       class="w-100 d-flex flex-column justify-center align-center ga-1 border-md border-accent rounded-lg"
-      style="min-height: 6rem"
-    >
+      style="min-height: 6rem">
       <v-icon icon="mdi-alert-circle-outline" size="x-large" color="info" />
       <div class="text-body-2 text-info">No best seller products found</div>
     </div>
@@ -130,25 +126,12 @@ onMounted(() => {
       <v-carousel-item v-for="group in groupedBestSellerData" :key="group[0].uuid">
         <v-row>
           <v-col v-for="item in group" :key="item.uuid" cols="12" md="4">
-            <v-card
-              flat
-              class="d-flex align-center justify-space-between fill-height pa-2 border-md border-success"
-            >
+            <v-card flat class="d-flex align-center justify-space-between fill-height pa-2 border-md border-success">
               <div class="d-flex align-center ga-4">
-                <v-img
-                  width="3.5rem"
-                  height="3.5rem"
-                  contain
-                  style="flex: none"
-                  :src="item.imageUrl"
-                >
+                <v-img width="3.5rem" height="3.5rem" contain style="flex: none" :src="item.imageUrl">
                   <template #error>
                     <v-row class="fill-height ma-0" align="center" justify="center">
-                      <v-icon
-                        icon="mdi-image-remove-outline"
-                        size="x-large"
-                        color="grey-lighten-1"
-                      />
+                      <v-icon icon="mdi-image-remove-outline" size="x-large" color="grey-lighten-1" />
                     </v-row>
                   </template>
                 </v-img>
@@ -168,15 +151,8 @@ onMounted(() => {
                 </div>
                 <div class="text-body-2 text-secondary">{{ item.totalSold ?? 0 }}+ sold</div>
               </div>
-              <v-btn
-                icon="mdi-cart-outline"
-                variant="text"
-                color="accent"
-                :disabled="
-                  !item.uuid || item.availabilityStatus === AvailabilityStatus.OUT_OF_STOCK
-                "
-                @click.stop="addItemToCart(item.uuid)"
-              />
+              <v-btn icon="mdi-cart-outline" variant="text" color="accent" :disabled="!item.uuid || item.availabilityStatus === AvailabilityStatus.OUT_OF_STOCK
+                " @click.stop="addItemToCart(item.uuid)" />
             </v-card>
           </v-col>
         </v-row>

@@ -1,4 +1,4 @@
-import type { PaymentMethod, PaymentStatus } from './enum'
+import type { PaymentMethod, PaymentStatus } from '@/types/common'
 
 export interface PaymentCreateRequest {
   method: PaymentMethod

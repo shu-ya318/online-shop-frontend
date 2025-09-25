@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { hasDiscount as productHasDiscount } from '@/utils/hasDiscount'
-import { AvailabilityStatus } from '@/types/common'
+import { AvailabilityStatus } from '@/types/common/enum'
 
 import type { ProductDetailResponse } from '@/api/product/interface'
 
@@ -19,11 +19,8 @@ defineEmits<{
 </script>
 
 <template>
-  <v-card
-    rounded="lg"
-    class="d-flex flex-column justify-space-between border-sm border-success pa-4"
-    @click="$emit('navigate')"
-  >
+  <v-card rounded="lg" class="d-flex flex-column justify-space-between border-sm border-success pa-4"
+    @click="$emit('navigate')">
     <!-- Image -->
     <v-img :width="300" height="200" cover :src="product.imageUrl">
       <template #error>
@@ -50,15 +47,9 @@ defineEmits<{
       <div class="text-subtitle-2 text-secondary">{{ product.totalSold ?? 0 }}+ sold</div>
     </div>
     <!-- Add to Cart button -->
-    <v-btn
-      icon="mdi-cart-outline"
-      size="small"
-      variant="flat"
-      color="success"
-      class="mx-4 my-2"
+    <v-btn icon="mdi-cart-outline" size="small" variant="flat" color="success" class="mx-4 my-2"
       :disabled="isError || product.availabilityStatus === AvailabilityStatus.OUT_OF_STOCK"
-      @click.stop="$emit('add-to-cart', product.uuid)"
-    />
+      @click.stop="$emit('add-to-cart', product.uuid)" />
   </v-card>
 </template>
 

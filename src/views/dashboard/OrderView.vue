@@ -17,7 +17,7 @@ import CheckoutSummaryCard from '@/components/common/CheckoutSummaryCard.vue'
 import { createUserOrder } from '@/api/order'
 import { createPayment } from '@/api/payment'
 
-import { PaymentMethod } from '@/api/payment/enum'
+import { PaymentMethod } from '@/types/common'
 import type { OrderCreateRequest } from '@/api/order/interface'
 import type { PaymentCreateRequest, PaymentResponse } from '@/api/payment/interface'
 

@@ -1,4 +1,4 @@
-import type { OrderStatus } from '@/types/common'
+import type { OrderStatus } from '@/types/common/enum'
 
 interface OrderItemCreateRequest {
   productUuid: string

@@ -1,7 +1,7 @@
 import api from '@/api/axios/instance'
 
 import type { OrderCreateRequest, OrderResponse, PaginatedOrderRequest } from './interface'
-import type { PaginatedResponse } from '@/types/common'
+import type { PaginatedResponse } from '@/types/common/interface'
 
 export const createUserOrder = async (request: OrderCreateRequest): Promise<OrderResponse> => {
   const response = await api.post<OrderResponse>('/orders/me', request)

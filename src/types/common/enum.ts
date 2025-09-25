@@ -25,18 +25,17 @@ export enum OrderStatus {
   CANCELLED = 'CANCELLED',
 }
 
-// List
-export interface PaginatedRequest {
-  filter: { [key: string]: string }
-  sortBy: string
-  sortDirection: SortDirection
-  page: number
-  size: number
+// Payment
+export enum PaymentMethod {
+  PAYPAL = 'PAYPAL',
+  CASH_ON_DELIVERY = 'CASH_ON_DELIVERY',
 }
-export interface PaginatedResponse<T> {
-  content: T[]
-  currentPage: number
-  size: number
-  totalPages: number
-  totalElements: number
+
+export enum PaymentStatus {
+  PAY_ON_DELIVERY = 'PAY_ON_DELIVERY',
+  AUTHORIZED = 'AUTHORIZED',
+  SUCCESS = 'SUCCESS',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED',
+  REFUNDED = 'REFUNDED',
 }

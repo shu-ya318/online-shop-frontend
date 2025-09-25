@@ -1,4 +1,4 @@
-import type { AvailabilityStatus, Category } from '@/types/common'
+import type { AvailabilityStatus, Category } from '@/types/common/enum'
 
 export interface ProductDetailResponse {
   uuid: string

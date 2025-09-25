@@ -14,10 +14,10 @@ import ProductCard from '@/components/dashboard/product/ProductCard.vue'
 
 import { getProducts } from '@/api/product'
 
-import { SortDirection } from '@/types/common'
-import type { Category } from '@/types/common'
+import { SortDirection } from '@/types/common/enum'
+import type { Category } from '@/types/common/enum'
 import type { ProductDetailResponse } from '@/api/product/interface'
-import type { PaginatedRequest } from '@/types/common'
+import type { PaginatedRequest } from '@/types/common/interface'
 
 enum QueryOptionType {
   SORT = 'sort',
