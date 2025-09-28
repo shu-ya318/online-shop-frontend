@@ -22,3 +22,9 @@ export const getUserOrderByUuid = async (request: string): Promise<OrderResponse
 
   return response.data
 }
+
+export const cancelUserOrderByUuid = async (request: string): Promise<OrderResponse> => {
+  const response = await api.patch<OrderResponse>(`/orders/me/${request}/cancel`)
+
+  return response.data
+}

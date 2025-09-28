@@ -77,7 +77,7 @@ const queryParams = reactive<PaginatedRequest>({
     category: route.query.category as string,
   },
   page: 0,
-  size: 2, //固定，測試16
+  size: 8,
   sortBy: 'updatedAt',
   sortDirection: SortDirection.DESC,
 })
@@ -186,7 +186,7 @@ watch(queryParams, fetchProductData, { deep: true, immediate: true })
           <div v-else-if="productData.length === 0" class="w-100 d-flex flex-column justify-center align-center ga-1"
             style="min-height: 15rem">
             <v-icon icon="mdi-alert-circle-outline" size="x-large" color="secondary" />
-            <div class="text-subtitle-2 text-secondary">No productData found</div>
+            <div class="text-subtitle-2 text-secondary">No products found</div>
           </div>
           <!-- Result : Success -->
           <v-row v-else>

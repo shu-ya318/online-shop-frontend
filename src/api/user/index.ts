@@ -32,13 +32,13 @@ export const login = async (request: LoginRequest): Promise<LoginResponse> => {
 }
 
 export const refreshToken = async (): Promise<RefreshTokenResponse> => {
-  const response = await api.post<RefreshTokenResponse>('/users/refresh-token')
+  const response = await api.post<RefreshTokenResponse>('/public/users/refresh-token')
 
   return response.data
 }
 
 export const logout = async (): Promise<ResultResponse> => {
-  const response = await api.post<ResultResponse>('/users/logout')
+  const response = await api.post<ResultResponse>('/public/users/logout')
 
   return response.data
 }

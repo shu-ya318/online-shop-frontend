@@ -5,12 +5,24 @@ import { getUserOrders } from '@/api/order'
 
 import { useNotificationStore } from '@/stores/notificationStore'
 
+import { OrderStatus } from '@/types/common/enum'
 import type { OrderResponse, PaginatedOrderRequest } from '@/api/order/interface'
 
 enum Align {
   START = 'start',
   END = 'end',
   CENTER = 'center',
+}
+
+const getStatusColor = (status: OrderStatus) => {
+  switch (status) {
+    case OrderStatus.COMPLETED:
+      return 'success'
+    case OrderStatus.CANCELLED:
+      return 'error'
+    default:
+      return 'warning'
+  }
 }
 
 const headerData = [
@@ -22,9 +34,19 @@ const headerData = [
     value: (order: OrderResponse) => `$ ${order.total}`,
   },
   { title: 'Total Quantity', key: 'totalQuantity', align: Align.START },
-  { title: 'Status', key: 'status', align: Align.START },
+  {
+    title: 'Payment Method',
+    key: 'payment.method',
+    align: Align.START,
+    value: (order: OrderResponse) => order.payment.method.toLowerCase().replace(/_/g, ' '),
+  },
+  {
+    title: 'Order Status',
+    key: 'status',
+    align: Align.START,
+  },
 ]
-console.log('headerData', headerData)
+
 const { showError } = useNotificationStore()
 
 const isLoading = ref(true)
@@ -76,6 +98,11 @@ watch(queryParams, fetchOrders, { deep: true, immediate: true })
     :items-per-page-options="[10, 25, 50, 100]"
     @update:options="onUpdateOptions"
   >
+    <template #[`item.status`]="{ value }">
+      <v-chip size="small" :color="getStatusColor(value)">{{
+        value.toLowerCase().replace(/_/g, ' ')
+      }}</v-chip>
+    </template>
   </v-data-table-server>
 </template>
 

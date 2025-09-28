@@ -39,5 +39,5 @@ export interface OrderResponse {
   shipping: number
   total: number
   totalQuantity: number
-  payments: PaymentSummary[]
+  payment: PaymentSummary
 }

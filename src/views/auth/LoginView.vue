@@ -50,7 +50,6 @@ const onLogin = handleSubmit(async (values) => {
       router.push({ name: 'home' })
     }, 500)
   } catch (error) {
-    console.log(error)
     if (error instanceof Error) {
       showError(error.message)
     } else {

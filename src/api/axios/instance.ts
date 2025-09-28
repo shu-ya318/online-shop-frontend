@@ -170,6 +170,9 @@ const api = {
   put<T>(url: string, data?: object, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
     return service.put(url, data, config) as Promise<AxiosResponse<T>>
   },
+  patch<T>(url: string, data?: object, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+    return service.patch(url, data, config) as Promise<AxiosResponse<T>>
+  },
   delete<T>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
     return service.delete(url, config) as Promise<AxiosResponse<T>>
   },
