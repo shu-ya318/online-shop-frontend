@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { watch, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute, type LocationQuery } from 'vue-router'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { storeToRefs } from 'pinia'
@@ -14,12 +14,11 @@ import { hasDiscount } from '@/utils/hasDiscount'
 import BillingInfo from '@/components/dashboard/order/BillingInfo.vue'
 import CheckoutSummaryCard from '@/components/common/CheckoutSummaryCard.vue'
 
-import { createUserOrder } from '@/api/order'
-import { createPayment } from '@/api/payment'
+import { cancelUserOrderByUuid, createUserOrder } from '@/api/order'
+import { createPayment as createPaymentApi, capturePayment } from '@/api/payment'
 
-import { PaymentMethod } from '@/types/common'
-import type { OrderCreateRequest } from '@/api/order/interface'
-import type { PaymentCreateRequest, PaymentResponse } from '@/api/payment/interface'
+import { PaymentMethod, PaymentStatus } from '@/types/common/enum'
+import type { PaymentResponse } from '@/api/payment/interface'
 
 const Orderschema = z.object({
   orderNotes: z.string().optional(),
@@ -42,6 +41,7 @@ const Orderschema = z.object({
 export type Order = z.infer<typeof Orderschema>
 
 const router = useRouter()
+const route = useRoute()
 
 const userStore = useUserStore()
 const { userInfo } = storeToRefs(userStore)
@@ -91,7 +91,7 @@ const onOrder = handleSubmit(async (values) => {
     }
 
     // Create order
-    const orderRequest: OrderCreateRequest = {
+    const orderRequest = {
       recipientName: values.recipientName,
       recipientPhoneNumber: values.recipientPhoneNumber,
       recipientAddress: values.recipientAddress,
@@ -107,13 +107,13 @@ const onOrder = handleSubmit(async (values) => {
     showSuccess('Order created successfully!Proceeding to payment...')
 
     // Create payment
-    const paymentRequest: PaymentCreateRequest = {
+    const paymentRequest = {
       orderUuid,
       method: values.paymentMethod,
     }
-    const paymentResponse = await createPayment(paymentRequest)
+    const paymentResponse = await createPaymentApi(paymentRequest)
 
-    await processPayment(orderUuid, values.paymentMethod, paymentResponse)
+    await createPayment(orderUuid, values.paymentMethod, paymentResponse)
   } catch (error) {
     if (error instanceof Error) {
       showError(error.message)
@@ -123,10 +123,10 @@ const onOrder = handleSubmit(async (values) => {
   }
 })
 
-const processPayment = async (
+const createPayment = async (
   orderUuid: string,
   paymentMethod: PaymentMethod,
-  paymentResponse: PaymentResponse
+  paymentResponse: PaymentResponse,
 ) => {
   if (paymentMethod === PaymentMethod.CASH_ON_DELIVERY) {
     showSuccess('Order placed successfully with Cash on Delivery!')
@@ -143,9 +143,61 @@ const processPayment = async (
   }
 }
 
+const handlePaypalCallback = async (query: LocationQuery) => {
+  const { paymentId, PayerID: payerId } = query
+
+  try {
+    const captureResponse = await capturePayment({
+      paymentId: paymentId as string,
+      payerId: payerId as string,
+    })
+
+    if (captureResponse.status === PaymentStatus.SUCCESS) {
+      showSuccess('Payment successful!')
+      router.replace({
+        name: 'order-detail',
+        params: { orderUuid: `${captureResponse.orderUuid}` },
+      })
+    }
+  } catch {
+    showError('Payment failed. Please try again!')
+  }
+}
+
+const handlePaypalCancellation = async (query: LocationQuery) => {
+  const { orderUuid } = query
+  if (!orderUuid) return
+
+  try {
+    await cancelUserOrderByUuid(orderUuid as string)
+    showSuccess('Order has been cancelled.')
+  } catch (error) {
+    if (error instanceof Error) {
+      showError(error.message)
+    } else {
+      showError('Failed to cancel order.')
+    }
+  } finally {
+    router.replace({ name: 'order-detail', params: { orderUuid: orderUuid as string } })
+  }
+}
+
 onMounted(() => {
   fetchUserCart()
 })
+
+watch(
+  () => route.query,
+  (query) => {
+    const { status, paymentId, PayerID, orderUuid } = query
+    if (status === PaymentStatus.CANCELLED && orderUuid) {
+      handlePaypalCancellation(query)
+    } else if (paymentId && PayerID) {
+      handlePaypalCallback(query)
+    }
+  },
+  { immediate: true },
+)
 
 watch(
   () => userInfo.value,
@@ -164,7 +216,6 @@ watch(
   { deep: true, immediate: true },
 )
 
-// TODO: 可能修改寫法
 watch(isSameAsUserInfo, (isSame) => {
   if (isSame) {
     setFieldValue('recipientName', username.value)
@@ -187,26 +238,46 @@ watch(isSameAsUserInfo, (isSame) => {
       <v-row>
         <!-- Billing Info -->
         <v-col cols="12" sm="8" md="8" lg="8" xl="8">
-          <billing-info v-model:userEmail="userEmail" v-model:username="username"
-            v-model:userPhoneNumber="userPhoneNumber" v-model:userAddress="userAddress"
-            v-model:isSameAsUserInfo="isSameAsUserInfo" v-model:recipientName="recipientName"
-            v-model:recipientPhoneNumber="recipientPhoneNumber" v-model:recipientAddress="recipientAddress"
-            v-model:orderNotes="orderNotes" />
+          <billing-info
+            v-model:userEmail="userEmail"
+            v-model:username="username"
+            v-model:userPhoneNumber="userPhoneNumber"
+            v-model:userAddress="userAddress"
+            v-model:isSameAsUserInfo="isSameAsUserInfo"
+            v-model:recipientName="recipientName"
+            v-model:recipientPhoneNumber="recipientPhoneNumber"
+            v-model:recipientAddress="recipientAddress"
+            v-model:orderNotes="orderNotes"
+          />
         </v-col>
         <!-- Order Summary -->
         <v-col cols="12" sm="4" md="4" lg="4" xl="4">
           <!-- Loader -->
           <!-- Result : Error -->
           <!-- Result : Success -->
-          <CheckoutSummaryCard title="Order Summary" button-text="Submit order" button-type="submit" @submit="onOrder">
+          <CheckoutSummaryCard
+            title="Order Summary"
+            button-text="Submit order"
+            button-type="submit"
+            @submit="onOrder"
+          >
             <!-- Order Items -->
             <template #items>
               <div v-if="cart">
-                <div v-for="item in cart.items" :key="item.productUuid"
-                  class="d-flex justify-space-between align-center mb-4">
+                <div
+                  v-for="item in cart.items"
+                  :key="item.productUuid"
+                  class="d-flex justify-space-between align-center mb-4"
+                >
                   <div class="d-flex align-center text-body-1 text-primary">
                     <!-- Image -->
-                    <v-img :src="item.imageUrl" :alt="item.productName" width="60" height="60" class="mr-4" />
+                    <v-img
+                      :src="item.imageUrl"
+                      :alt="item.productName"
+                      width="60"
+                      height="60"
+                      class="mr-4"
+                    />
                     <!-- Name and Quantity -->
                     <div>{{ item.productName }} x{{ item.quantity }}</div>
                   </div>
@@ -230,6 +301,16 @@ watch(isSameAsUserInfo, (isSame) => {
                 <v-radio label="Cash on delivery" :value="PaymentMethod.CASH_ON_DELIVERY"></v-radio>
                 <v-radio label="Paypal" :value="PaymentMethod.PAYPAL"></v-radio>
               </v-radio-group>
+              <v-alert
+                v-if="paymentMethod === PaymentMethod.PAYPAL"
+                color="warning"
+                variant="tonal"
+                density="compact"
+                class="mb-5 text-caption"
+              >
+                If the payment is not completed within 1 hour, the order will be cancelled. You will
+                need to add the items to your cart again.
+              </v-alert>
             </template>
           </CheckoutSummaryCard>
         </v-col>

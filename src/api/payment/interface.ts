@@ -23,3 +23,13 @@ export interface PaymentSummary {
   amount: number
   currency: string
 }
+
+export interface PaymentCaptureRequest {
+  paymentId: string
+  payerId: string
+}
+
+export interface PaymentCaptureResponse {
+  status: PaymentStatus
+  orderUuid: string
+}
