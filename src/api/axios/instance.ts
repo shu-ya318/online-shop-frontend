@@ -1,33 +1,10 @@
 import axios from 'axios'
-import JSONbig from 'json-bigint'
 
 import { useUserStore } from '@/stores/userStore'
 
 import { refreshToken } from '@/api/user'
 
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
-
-const JSONbigString = JSONbig({
-  storeAsString: true,
-})
-
-const isValidJsonString = (data: unknown): data is string => {
-  if (typeof data !== 'string') {
-    return false
-  }
-
-  try {
-    JSON.parse(data)
-    return true
-  } catch {
-    return false
-  }
-}
-
-const hasUnsafeIntegers = (jsonString: string): boolean => {
-  const UNSAFE_INTEGER_PATTERN = /:\s*(-?\d{16,})/
-  return UNSAFE_INTEGER_PATTERN.test(jsonString)
-}
 
 const service: AxiosInstance = axios.create({
   baseURL: '/api',
@@ -36,24 +13,6 @@ const service: AxiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
   withCredentials: true,
-  // Use JSONBig only for JSON strings that contain large numbers to prevent precision loss
-  transformResponse: [
-    (data) => {
-      if (isValidJsonString(data)) {
-        if (hasUnsafeIntegers(data)) {
-          try {
-            return JSONbigString.parse(data)
-          } catch {
-            return JSON.parse(data)
-          }
-        } else {
-          return JSON.parse(data)
-        }
-      }
-
-      return data
-    },
-  ],
 })
 
 service.interceptors.request.use(
