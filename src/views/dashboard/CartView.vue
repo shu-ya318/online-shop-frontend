@@ -38,14 +38,21 @@ onMounted(() => {
         <v-skeleton-loader type="table" min-height="100px" />
       </v-skeleton>
       <!-- Result :  Success but not found -->
-      <div v-else-if="!cart || cart.items.length === 0"
+      <div
+        v-else-if="!cart || !cart.items || cart.items.length === 0"
         class="w-100 d-flex flex-column justify-center align-center ga-1 border-sm rounded-lg"
-        style="min-height: 20rem">
+        style="min-height: 20rem"
+      >
         <v-icon icon="mdi-cart-remove" size="x-large" color="secondary" />
         <div class="text-subtitle-2 text-secondary mt-2 mb-6">Your cart is empty</div>
         <div class="justify-center">
-          <v-btn variant="tonal" color="info" class="px-3 text-subtitle-2" @click="onNavigateToProducts">Return to
-            shop</v-btn>
+          <v-btn
+            variant="tonal"
+            color="info"
+            class="px-3 text-subtitle-2"
+            @click="onNavigateToProducts"
+            >Return to shop</v-btn
+          >
         </div>
       </div>
       <!-- Result : Success -->
@@ -57,8 +64,13 @@ onMounted(() => {
           </v-col>
           <!-- Cart total -->
           <v-col cols="12" sm="4" md="4" lg="4" xl="4">
-            <CheckoutSummaryCard title="Cart Total" button-text="Proceed to order" button-type="button"
-              @button-click="proceedToOrder" />
+            <CheckoutSummaryCard
+              :cart="cart"
+              title="Cart Total"
+              button-text="Proceed to order"
+              button-type="button"
+              @button-click="proceedToOrder"
+            />
           </v-col>
         </v-row>
       </v-container>

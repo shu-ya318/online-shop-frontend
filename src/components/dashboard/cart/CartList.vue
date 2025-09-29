@@ -92,9 +92,16 @@ const removeItemFromCart = async (productUuid: string) => {
               :alt="item.productName"
               width="80"
               height="80"
+              contain
               class="mr-4 rounded"
-            ></v-img>
-            <span class="text-body-1 text-primary">{{ item.productName }}</span>
+            >
+              <template #error>
+                <v-row class="fill-height ma-0" align="center" justify="center">
+                  <v-icon icon="mdi-image-remove-outline" size="x-large" color="grey-lighten-1" />
+                </v-row>
+              </template>
+            </v-img>
+            <span class="text-body-1 text-primary">{{ item.productName ?? '--' }}</span>
           </div>
         </v-col>
         <!-- Price -->
@@ -102,11 +109,11 @@ const removeItemFromCart = async (productUuid: string) => {
           <div class="text-body-1 text-primary">
             <template v-if="cartItemHasDiscount(item)">
               <span class="text-decoration-line-through text-grey-darken-1 mr-1">
-                ${{ Math.round(item.price) }}
+                ${{ Math.round(item.price) ?? '--' }}
               </span>
-              <span class="font-weight-bold">${{ Math.round(item.discountPrice) }}</span>
+              <span class="font-weight-bold">${{ Math.round(item.discountPrice) ?? '--' }}</span>
             </template>
-            <template v-else> ${{ Math.round(item.price) }} </template>
+            <template v-else> ${{ Math.round(item.price) ?? '--' }} </template>
           </div>
         </v-col>
         <!-- Quantity -->

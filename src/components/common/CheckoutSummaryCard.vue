@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { storeToRefs } from 'pinia'
-
-import { useCartStore } from '@/stores/cartStore'
+import type { CartResponse as Cart } from '@/api/cart/interface'
 
 const props = defineProps<{
   title: string
   buttonText: string
   buttonType: 'submit' | 'button'
+  cart: Cart
 }>()
 
 const emit = defineEmits(['button-click', 'submit'])
@@ -18,9 +17,6 @@ const handleButtonClick = () => {
     emit('submit')
   }
 }
-
-const cartStore = useCartStore()
-const { cart } = storeToRefs(cartStore)
 </script>
 
 <template>
@@ -34,21 +30,21 @@ const { cart } = storeToRefs(cartStore)
         <!-- Subtotal -->
         <div class="d-flex justify-space-between text-body-2 text-secondary mb-2">
           <span>Subtotal:</span>
-          <span class="text-primary">${{ cart?.subtotal ?? '0' }}</span>
+          <span class="text-primary">${{ cart.subtotal }}</span>
         </div>
         <v-divider color="info" class="my-2"></v-divider>
         <!-- Shipping -->
         <div class="d-flex justify-space-between text-body-2 text-secondary mb-2">
           <span>Shipping:</span>
           <span class="text-primary">
-            {{ cart && cart.shipping > 0 ? `$${cart.shipping}` : 'Free' }}
+            {{ cart.shipping > 0 ? `$${cart.shipping}` : 'Free' }}
           </span>
         </div>
         <v-divider color="info" class="my-2"></v-divider>
         <!-- Total -->
         <div class="d-flex justify-space-between text-subtitle-1 text-secondary">
           <span>Total:</span>
-          <span class="text-primary font-weight-bold">${{ cart?.total ?? '0' }}</span>
+          <span class="text-primary font-weight-bold">${{ cart.total }}</span>
         </div>
       </div>
       <!-- Payment Method -->
