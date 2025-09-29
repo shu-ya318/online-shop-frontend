@@ -16,10 +16,21 @@ const handleOptionChange = (option: QueryOption) => {
 <template>
   <v-container fluid height="2rem" class="d-flex align-center">
     <!-- Select options -->
-    <v-select v-for="(filter, index) in modelValue" :key="index" density="compact" variant="outlined" hide-details
-      clearable :placeholder="filter.placeholder" class="mr-2 custom-placeholder-color" :loading="loading"
-      style="width: 12rem; flex: none" :items="filter.items" v-model="filter.model"
-      @update:model-value="handleOptionChange(filter)"></v-select>
+    <v-select
+      v-for="filter in modelValue"
+      :key="filter.placeholder"
+      density="compact"
+      variant="outlined"
+      hide-details
+      clearable
+      :placeholder="filter.placeholder"
+      class="mr-2 custom-placeholder-color"
+      :loading="loading"
+      style="width: 12rem; flex: none"
+      :items="filter.items"
+      v-model="filter.model"
+      @update:model-value="handleOptionChange(filter)"
+    ></v-select>
   </v-container>
 </template>
 

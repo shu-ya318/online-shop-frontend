@@ -69,7 +69,7 @@ const { showError, showSuccess } = useNotificationStore()
 const userStore = useUserStore()
 const { isAuthenticated } = storeToRefs(userStore)
 
-const { addCartItem } = useCartStore()
+const { addCartItem, isLoading: isAddingToCart } = useCartStore()
 
 const searchTerm = ref('')
 const queryParams = reactive<PaginatedRequest>({
@@ -192,8 +192,12 @@ watch(queryParams, fetchProductData, { deep: true, immediate: true })
           <v-row v-else>
             <v-col v-for="product in productData" :key="product.uuid" :cols="12" :sm="6" :md="4" :lg="3">
               <!-- Card -->
-              <product-card :product="product" @navigate="onNavigateToProductDetail(product.uuid)"
-                @add-to-cart="onAddItemToCart" />
+              <product-card
+                :product="product"
+                :is-loading="isAddingToCart"
+                @navigate="onNavigateToProductDetail(product.uuid)"
+                @add-to-cart="onAddItemToCart"
+              />
             </v-col>
           </v-row>
         </v-row>

@@ -16,13 +16,13 @@ const { exchangeOAuth2Code } = useUserStore()
 
 const { showError, showSuccess } = useNotificationStore()
 
-const isOAuth2CodeLoading = ref(false)
+const isLoading = ref(false)
 
 onMounted(async () => {
   const oauth2Code = route.query.oauth2Code
 
   if (oauth2Code && typeof oauth2Code === 'string') {
-    isOAuth2CodeLoading.value = true
+    isLoading.value = true
 
     try {
       await exchangeOAuth2Code(oauth2Code)
@@ -41,7 +41,7 @@ onMounted(async () => {
       delete query.oauth2Code
       router.replace({ query })
 
-      isOAuth2CodeLoading.value = false
+      isLoading.value = false
     }
   }
 })

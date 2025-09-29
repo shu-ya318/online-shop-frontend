@@ -123,21 +123,16 @@ router.beforeEach(
   ) => {
     const userStore = useUserStore()
     const { isInitialized, isAuthenticated } = storeToRefs(userStore)
-
-    if (!isInitialized.value) {
-      await userStore.initializeAuth()
-    }
+    console.log('router的isInitialized', isInitialized.value)
+    console.log('router的isAuthenticated', isAuthenticated.value)
+    if (!isInitialized.value) await userStore.initializeAuth()
 
     if (!isAuthenticated.value) {
-      if (to.meta?.requiresAuth) {
-        return next({ name: 'login' })
-      }
+      if (to.meta?.requiresAuth) return next({ name: 'login' })
 
       return next()
     } else {
-      if (to.path.startsWith('/auth')) {
-        return next({ name: 'home' })
-      }
+      if (to.path.startsWith('/auth')) return next({ name: 'home' })
 
       return next()
     }

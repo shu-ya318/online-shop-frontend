@@ -19,7 +19,7 @@ const router = useRouter()
 const userStore = useUserStore()
 const { isAuthenticated } = storeToRefs(userStore)
 
-const { addCartItem } = useCartStore()
+const { addCartItem, isLoading: isAddingToCart } = useCartStore()
 
 const { showError, showSuccess } = useNotificationStore()
 
@@ -158,7 +158,7 @@ onMounted(() => {
                   </div>
                   <div class="text-h6 text-primary font-weight-bold">
                     <template v-if="hasDiscount(item)">
-                      ${{ Math.round(item.discountPrice) }}
+                      ${{ Math.round(item.discountPrice) ?? '--' }}
                       <span class="ml-2 text-info text-decoration-line-through">
                         ${{ Math.round(item.price) ?? '--' }}
                       </span>
@@ -172,8 +172,11 @@ onMounted(() => {
                 icon="mdi-cart-outline"
                 variant="text"
                 color="accent"
+                :loading="isAddingToCart"
                 :disabled="
-                  !item.uuid || item.availabilityStatus === AvailabilityStatus.OUT_OF_STOCK
+                  !item.uuid ||
+                  item.availabilityStatus === AvailabilityStatus.OUT_OF_STOCK ||
+                  isAddingToCart
                 "
                 @click.stop="addItemToCart(item.uuid)"
               />

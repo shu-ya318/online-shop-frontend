@@ -24,6 +24,7 @@ const { updateCartItemQuantity, removeCartItem } = useCartStore()
 
 const isOpen = ref(false)
 const selectedItemUuid = ref('')
+const updatingItemUuid = ref<string | null>(null)
 
 const updateItemQuantity = debounce(async (payload: { productUuid: string; quantity: number }) => {
   try {
@@ -35,8 +36,15 @@ const updateItemQuantity = debounce(async (payload: { productUuid: string; quant
     } else {
       showError(String(error))
     }
+  } finally {
+    updatingItemUuid.value = null
   }
 }, 1000)
+
+const handleQuantityChange = (productUuid: string, quantity: number) => {
+  updatingItemUuid.value = productUuid
+  updateItemQuantity({ productUuid, quantity })
+}
 
 const openDialog = (productUuid: string) => {
   selectedItemUuid.value = productUuid
@@ -60,9 +68,6 @@ const removeItemFromCart = async (productUuid: string) => {
     }
   }
 }
-
-
-
 </script>
 
 <template>
@@ -82,7 +87,13 @@ const removeItemFromCart = async (productUuid: string) => {
         <!-- Product -->
         <v-col cols="12" md="4">
           <div class="d-flex align-center">
-            <v-img :src="item.imageUrl" :alt="item.productName" width="80" height="80" class="mr-4 rounded"></v-img>
+            <v-img
+              :src="item.imageUrl"
+              :alt="item.productName"
+              width="80"
+              height="80"
+              class="mr-4 rounded"
+            ></v-img>
             <span class="text-body-1 text-primary">{{ item.productName }}</span>
           </div>
         </v-col>
@@ -100,17 +111,12 @@ const removeItemFromCart = async (productUuid: string) => {
         </v-col>
         <!-- Quantity -->
         <v-col cols="8" md="3">
-          <AddToCartControls :selected-quantity="item.quantity" @on-increment="
-            updateItemQuantity({
-              productUuid: item.productUuid,
-              quantity: item.quantity + 1,
-            })
-            " @on-decrement="
-              updateItemQuantity({
-                productUuid: item.productUuid,
-                quantity: item.quantity - 1,
-              })
-              " />
+          <AddToCartControls
+            :selected-quantity="item.quantity"
+            :is-loading="updatingItemUuid === item.productUuid"
+            @on-increment="handleQuantityChange(item.productUuid, item.quantity + 1)"
+            @on-decrement="handleQuantityChange(item.productUuid, item.quantity - 1)"
+          />
         </v-col>
         <!-- Subtotal -->
         <v-col cols="12" md="2" class="position-relative">
@@ -125,7 +131,11 @@ const removeItemFromCart = async (productUuid: string) => {
         </v-col>
         <!-- Remove button -->
         <v-col cols="12" md="1">
-          <v-btn icon="mdi-trash-can-outline" variant="text" @click="openDialog(item.productUuid)"></v-btn>
+          <v-btn
+            icon="mdi-trash-can-outline"
+            variant="text"
+            @click="openDialog(item.productUuid)"
+          ></v-btn>
           <!-- Warning Dialog -->
           <v-dialog :model-value="isOpen && selectedItemUuid === item.productUuid" width="500">
             <v-card class="py-3 px-4">
@@ -135,7 +145,9 @@ const removeItemFromCart = async (productUuid: string) => {
               </v-card-text>
               <v-card-actions>
                 <v-btn color="info" class="px-2" @click="closeDialog">Cancel</v-btn>
-                <v-btn color="error" class="px-2" @click="removeItemFromCart(item.productUuid)">Remove</v-btn>
+                <v-btn color="error" class="px-2" @click="removeItemFromCart(item.productUuid)"
+                  >Remove</v-btn
+                >
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -145,8 +157,9 @@ const removeItemFromCart = async (productUuid: string) => {
     </template>
     <!-- Return to products page -->
     <v-card-actions class="justify-center">
-      <v-btn variant="tonal" color="info" class="px-4 text-subtitle-2" @click="$emit('navigate')">Return to
-        shop</v-btn>
+      <v-btn variant="tonal" color="info" class="px-4 text-subtitle-2" @click="$emit('navigate')"
+        >Return to shop</v-btn
+      >
     </v-card-actions>
   </v-card>
 </template>
