@@ -40,7 +40,7 @@ defineEmits<{
       <!-- Price -->
       <div class="text-h6 text-primary font-weight-bold">
         <template v-if="hasDiscount">
-          ${{ Math.round(product.discountPrice) }}
+          ${{ Math.round(product.discountPrice) ?? '--' }}
           <span class="ml-2 text-info text-decoration-line-through">
             ${{ Math.round(product.price) ?? '--' }}
           </span>

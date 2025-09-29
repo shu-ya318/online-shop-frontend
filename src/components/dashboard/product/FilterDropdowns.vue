@@ -8,7 +8,7 @@ defineProps<{
 
 const emit = defineEmits(['update:modelValue', 'option-changed'])
 
-const handleOptionChange = (option: QueryOption) => {
+const ChangeOption = (option: QueryOption) => {
   emit('option-changed', option)
 }
 </script>
@@ -29,7 +29,7 @@ const handleOptionChange = (option: QueryOption) => {
       style="width: 12rem; flex: none"
       :items="filter.items"
       v-model="filter.model"
-      @update:model-value="handleOptionChange(filter)"
+      @update:model-value="ChangeOption(filter)"
     ></v-select>
   </v-container>
 </template>
