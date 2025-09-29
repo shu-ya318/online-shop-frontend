@@ -47,7 +47,7 @@ const userStore = useUserStore()
 const { userInfo } = storeToRefs(userStore)
 
 const cartStore = useCartStore()
-const { cart } = storeToRefs(cartStore)
+const { cart, isLoading } = storeToRefs(cartStore)
 const { fetchUserCart } = cartStore
 
 const { showSuccess, showError } = useNotificationStore()
@@ -170,16 +170,20 @@ const handlePaypalCancellation = async (query: LocationQuery) => {
 
   try {
     await cancelUserOrderByUuid(orderUuid as string)
-    showSuccess('Order has been cancelled.')
+    showSuccess('Order has been cancelled!')
   } catch (error) {
     if (error instanceof Error) {
       showError(error.message)
     } else {
-      showError('Failed to cancel order.')
+      showError('Failed to cancel order!')
     }
   } finally {
     router.replace({ name: 'order-detail', params: { orderUuid: orderUuid as string } })
   }
+}
+
+const onNavigateToProducts = () => {
+  router.push({ name: 'products' })
 }
 
 onMounted(() => {
@@ -231,9 +235,6 @@ watch(isSameAsUserInfo, (isSame) => {
 
 <template>
   <v-layout width="70%" max-width="75rem" class="d-flex flex-column mx-auto py-8">
-    <!-- <div class="w-100 d-flex align-center mx-auto mt-8"> -->
-    <!-- <v-container fluid class="pa-0">
-        <v-row no-gutters class="fill-height"> -->
     <vee-form>
       <v-row>
         <!-- Billing Info -->
@@ -253,9 +254,28 @@ watch(isSameAsUserInfo, (isSame) => {
         <!-- Order Summary -->
         <v-col cols="12" sm="4" md="4" lg="4" xl="4">
           <!-- Loader -->
+          <v-skeleton-loader v-if="isLoading" type="card"></v-skeleton-loader>
           <!-- Result : Error -->
+          <v-card
+            v-else-if="!cart"
+            class="d-flex flex-column justify-center align-center ga-1 border-sm rounded-lg pa-6"
+            style="min-height: 20rem"
+          >
+            <v-icon icon="mdi-alert-circle-outline" size="x-large" color="error" />
+            <div class="text-subtitle-2 text-secondary my-4">Failed to load cart data!</div>
+            <v-btn
+              variant="tonal"
+              color="info"
+              class="px-3 text-subtitle-2"
+              @click="onNavigateToProducts"
+            >
+              Return to shop
+            </v-btn>
+          </v-card>
           <!-- Result : Success -->
           <CheckoutSummaryCard
+            v-else
+            :cart="cart"
             title="Order Summary"
             button-text="Submit order"
             button-type="submit"
@@ -316,9 +336,6 @@ watch(isSameAsUserInfo, (isSame) => {
         </v-col>
       </v-row>
     </vee-form>
-    <!-- </v-row>
-    <v-container> -->
-    <!-- </div> -->
   </v-layout>
 </template>
 

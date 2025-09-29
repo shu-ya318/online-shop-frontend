@@ -126,7 +126,6 @@ onMounted(() => {
         </template>
       </div>
     </div>
-    <!-- </div> -->
   </v-container>
 </template>
 
