@@ -25,8 +25,8 @@ const { showError, showSuccess } = useNotificationStore()
 
 const { count } = useResponsiveCount()
 
-const isBestSellerDataLoading = ref(true)
-const isBestSellerDataError = ref(false)
+const isLoading = ref(true)
+const isError = ref(false)
 const bestSellerData = ref<ProductDetailResponse[]>([])
 const pageSize = ref(12)
 const totalPages = ref(0)
@@ -43,7 +43,7 @@ const groupedBestSellerData = computed(() => {
 })
 
 const fetchBestSellerData = async () => {
-  isBestSellerDataError.value = false
+  isError.value = false
 
   try {
     const response = await getProducts({
@@ -56,7 +56,7 @@ const fetchBestSellerData = async () => {
     bestSellerData.value = response.content
     totalPages.value = response.totalElements
   } catch (error) {
-    isBestSellerDataError.value = true
+    isError.value = true
 
     if (error instanceof Error) {
       showError(error.message)
@@ -64,7 +64,7 @@ const fetchBestSellerData = async () => {
       showError(String(error))
     }
   } finally {
-    isBestSellerDataLoading.value = false
+    isLoading.value = false
   }
 }
 
@@ -99,7 +99,7 @@ onMounted(() => {
     </div>
     <div class="mb-2 text-subtitle-1 text-accent text-center">Top 12</div>
     <!-- Loader -->
-    <div v-if="isBestSellerDataLoading" class="w-100">
+    <div v-if="isLoading" class="w-100">
       <v-row>
         <v-col v-for="n in count" :key="n">
           <v-skeleton-loader type="card" />
@@ -107,31 +107,48 @@ onMounted(() => {
       </v-row>
     </div>
     <!-- Result : Error -->
-    <div v-else-if="isBestSellerDataError"
+    <div
+      v-else-if="isError"
       class="w-100 d-flex flex-column justify-center align-center ga-1 border-md border-error rounded-lg"
-      style="min-height: 6rem">
+      style="min-height: 6rem"
+    >
       <v-icon icon="mdi-alert-circle-outline" size="x-large" color="error" />
       <div class="text-body-2 text-error">Fetch best seller products failed</div>
     </div>
     <!-- Result : Success but not found -->
-    <div v-if="!groupedBestSellerData || groupedBestSellerData.length === 0"
+    <div
+      v-else-if="!groupedBestSellerData || groupedBestSellerData.length === 0"
       class="w-100 d-flex flex-column justify-center align-center ga-1 border-md border-accent rounded-lg"
-      style="min-height: 6rem">
+      style="min-height: 6rem"
+    >
       <v-icon icon="mdi-alert-circle-outline" size="x-large" color="info" />
       <div class="text-body-2 text-info">No best seller products found</div>
     </div>
     <!-- Result: Success -->
-    <v-carousel hide-delimiters color="success" height="auto" cycle :show-arrows="false">
+    <v-carousel v-else hide-delimiters color="success" height="auto" cycle :show-arrows="false">
       <!-- Carousel Items -->
       <v-carousel-item v-for="group in groupedBestSellerData" :key="group[0].uuid">
         <v-row>
           <v-col v-for="item in group" :key="item.uuid" cols="12" md="4">
-            <v-card flat class="d-flex align-center justify-space-between fill-height pa-2 border-md border-success">
+            <v-card
+              flat
+              class="d-flex align-center justify-space-between fill-height pa-2 border-md border-success"
+            >
               <div class="d-flex align-center ga-4">
-                <v-img width="3.5rem" height="3.5rem" contain style="flex: none" :src="item.imageUrl">
+                <v-img
+                  width="3.5rem"
+                  height="3.5rem"
+                  contain
+                  style="flex: none"
+                  :src="item.imageUrl"
+                >
                   <template #error>
                     <v-row class="fill-height ma-0" align="center" justify="center">
-                      <v-icon icon="mdi-image-remove-outline" size="x-large" color="grey-lighten-1" />
+                      <v-icon
+                        icon="mdi-image-remove-outline"
+                        size="x-large"
+                        color="grey-lighten-1"
+                      />
                     </v-row>
                   </template>
                 </v-img>
@@ -151,8 +168,15 @@ onMounted(() => {
                 </div>
                 <div class="text-body-2 text-secondary">{{ item.totalSold ?? 0 }}+ sold</div>
               </div>
-              <v-btn icon="mdi-cart-outline" variant="text" color="accent" :disabled="!item.uuid || item.availabilityStatus === AvailabilityStatus.OUT_OF_STOCK
-                " @click.stop="addItemToCart(item.uuid)" />
+              <v-btn
+                icon="mdi-cart-outline"
+                variant="text"
+                color="accent"
+                :disabled="
+                  !item.uuid || item.availabilityStatus === AvailabilityStatus.OUT_OF_STOCK
+                "
+                @click.stop="addItemToCart(item.uuid)"
+              />
             </v-card>
           </v-col>
         </v-row>
