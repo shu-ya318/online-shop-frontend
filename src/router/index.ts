@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { storeToRefs } from 'pinia'
+
 import { useUserStore } from '@/stores/userStore'
 
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
@@ -120,12 +122,13 @@ router.beforeEach(
     next: NavigationGuardNext,
   ) => {
     const userStore = useUserStore()
+    const { isInitialized, isAuthenticated } = storeToRefs(userStore)
 
-    if (!userStore.isInitialized) {
+    if (!isInitialized.value) {
       await userStore.initializeAuth()
     }
 
-    if (!userStore.isAuthenticated) {
+    if (!isAuthenticated.value) {
       if (to.meta?.requiresAuth) {
         return next({ name: 'login' })
       }

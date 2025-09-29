@@ -22,7 +22,7 @@ export const useUserStore = defineStore(
   'user',
   () => {
     // States
-    const token = ref<string | null>(null)
+    const accessToken = ref<string | null>(null)
     const isInitialized = ref(false)
     // const isRefreshing = ref(false)
     // const failedQueue: Array<{
@@ -32,10 +32,11 @@ export const useUserStore = defineStore(
     const userInfo = ref<UserResponse | null>(null)
 
     const isAuthenticated = computed(() => {
-      return !!(token.value && userInfo.value)
+      return !!(accessToken.value && userInfo.value)
     })
 
     // Utils
+
     // const processQueue = (error: unknown, tokenValue: string | null = null) => {
     //   failedQueue.forEach((prom) => {
     //     if (error) {
@@ -48,26 +49,13 @@ export const useUserStore = defineStore(
     //   failedQueue.length = 0
     // }
 
-    const verifyToken = () => {
-      if (!token.value) return false
-
-      try {
-        const decodedToken = jwtDecode<{ exp: number }>(token.value)
-        const currentTime = Math.floor(Date.now() / 1000)
-
-        return decodedToken.exp > currentTime
-      } catch {
-        return false
-      }
-    }
-
     // Actions
-    const setToken = (newToken: string) => {
-      token.value = newToken
+    const setAccessToken = (newAccessToken: string) => {
+      accessToken.value = newAccessToken
     }
 
-    const removeToken = () => {
-      token.value = null
+    const removeAccessToken = () => {
+      accessToken.value = null
     }
 
     const register = async (credentials: RegisterRequest): Promise<ResultResponse> => {
@@ -80,7 +68,7 @@ export const useUserStore = defineStore(
       }
     }
 
-    const fetchUser = async () => {
+    const fetchUserInfo = async () => {
       try {
         const response = await getUser()
         userInfo.value = response
@@ -93,12 +81,13 @@ export const useUserStore = defineStore(
     const exchangeOAuth2Code = async (credentials: string) => {
       try {
         const response = await apiExchangeOAuth2Code(credentials)
+
         if (response.accessToken) {
-          setToken(response.accessToken)
-          await fetchUser()
+          setAccessToken(response.accessToken)
+          await fetchUserInfo()
         }
       } catch (error) {
-        removeToken()
+        removeAccessToken()
         userInfo.value = null
         throw error
       }
@@ -107,12 +96,13 @@ export const useUserStore = defineStore(
     const login = async (credentials: LoginRequest) => {
       try {
         const response = await apiLogin(credentials)
+        console.log('store的accessToken', accessToken.value)
         if (response.accessToken) {
-          setToken(response.accessToken)
-          await fetchUser()
+          setAccessToken(response.accessToken)
+          await fetchUserInfo()
         }
       } catch (error) {
-        removeToken()
+        removeAccessToken()
         userInfo.value = null
         throw error
       }
@@ -124,7 +114,7 @@ export const useUserStore = defineStore(
 
         return response
       } finally {
-        removeToken()
+        removeAccessToken()
         userInfo.value = null
       }
     }
@@ -140,7 +130,7 @@ export const useUserStore = defineStore(
 
     //   try {
     //     const { accessToken } = await apiRefreshToken()
-    //     setToken(accessToken)
+    //     setAccessToken(accessToken)
     //     processQueue(null, accessToken)
 
     //     return accessToken
@@ -154,13 +144,27 @@ export const useUserStore = defineStore(
     //   }
     // }
 
+    const verifyAccessToken = () => {
+      if (!accessToken.value) return false
+
+      try {
+        const decodedToken = jwtDecode<{ exp: number }>(accessToken.value)
+        const currentTime = Math.floor(Date.now() / 1000)
+
+        return decodedToken.exp > currentTime
+      } catch {
+        return false
+      }
+    }
+
     const initializeAuth = async () => {
       if (isInitialized.value) return
 
-      const isTokenValid = verifyToken()
+      const isTokenValid = verifyAccessToken()
+
       if (isTokenValid) {
         try {
-          await fetchUser()
+          await fetchUserInfo()
         } catch {
           logout()
         }
@@ -172,14 +176,15 @@ export const useUserStore = defineStore(
     return {
       // States
       isInitialized,
-      token,
+      accessToken,
       userInfo,
       isAuthenticated,
       // Utilities
-      verifyToken,
+      verifyAccessToken,
       // Actions
+      setAccessToken,
       register,
-      fetchUser,
+      fetchUserInfo,
       login,
       exchangeOAuth2Code,
       logout,
@@ -190,7 +195,7 @@ export const useUserStore = defineStore(
   {
     persist: {
       storage: localStorage,
-      pick: ['token'],
+      pick: ['accessToken'],
     },
   },
 )
