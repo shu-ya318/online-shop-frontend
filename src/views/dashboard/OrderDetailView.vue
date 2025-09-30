@@ -111,7 +111,6 @@ onMounted(() => {
       <!-- Subtitle -->
       <div class="text-h6 text-primary mb-2">Order Summary</div>
       <!-- Info -->
-      <!-- <div class="text-body-2 text-secondary ga-2"> -->
       <div
         v-for="(value, key) in orderDetailInfo"
         :key="key"

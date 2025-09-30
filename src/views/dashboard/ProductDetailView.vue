@@ -185,10 +185,7 @@ const addItemToCart = async (productUuid: string) => {
                     <v-chip size="small">{{ value }}</v-chip>
                   </template>
                   <template v-else-if="key === 'Stock Status'">
-                    <v-chip
-                      size="small"
-                      :color="value === AvailabilityStatus.IN_STOCK ? 'success' : 'error'"
-                    >
+                    <v-chip size="small" :color="value === 'Available' ? 'success' : 'error'">
                       {{ value }}
                     </v-chip>
                   </template>

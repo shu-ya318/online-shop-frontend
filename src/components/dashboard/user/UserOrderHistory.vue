@@ -86,7 +86,6 @@ watch(queryParams, fetchOrders, { deep: true, immediate: true })
 </script>
 
 <template>
-  <!-- Loader -->
   <v-data-table-server
     class="w-100"
     style="max-width: 75rem"

@@ -10,14 +10,13 @@ const router = useRouter()
 
 const userStore = useUserStore()
 const { userInfo } = storeToRefs(userStore)
+const { logout } = useUserStore()
 
 const { showSuccess, showError } = useNotificationStore()
 
 defineEmits<{
   (event: 'toggle-sidebar'): void
 }>()
-
-const { logout } = useUserStore()
 
 const onLogout = async () => {
   try {

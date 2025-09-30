@@ -34,9 +34,12 @@ onMounted(() => {
     <!-- Cart items -->
     <div class="w-100 d-flex align-center mx-auto mt-8">
       <!-- Loader -->
-      <v-skeleton v-if="isLoading">
-        <v-skeleton-loader type="table" min-height="100px" />
-      </v-skeleton>
+      <v-skeleton-loader
+        v-if="isLoading"
+        type="table"
+        min-height="100px"
+        class="w-100"
+      ></v-skeleton-loader>
       <!-- Result :  Success but not found -->
       <div
         v-else-if="!cart || !cart.items || cart.items.length === 0"

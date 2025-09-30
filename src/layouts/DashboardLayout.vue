@@ -15,6 +15,7 @@ const sidebarRef = ref<InstanceType<typeof AppSidebar> | null>(null)
 
 const toggleSidebar = () => {
   if (!sidebarRef.value) return
+
   sidebarRef.value.toggle()
 }
 </script>
