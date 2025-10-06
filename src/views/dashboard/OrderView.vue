@@ -52,7 +52,13 @@ const { fetchUserCart } = cartStore
 
 const { showSuccess, showError } = useNotificationStore()
 
-const { handleSubmit, defineField, resetForm, setFieldValue } = useForm<Order>({
+const {
+  handleSubmit,
+  defineField,
+  resetForm,
+  setFieldValue,
+  isSubmitting,
+} = useForm<Order>({
   initialValues: {
     orderNotes: '',
     // User info
@@ -235,7 +241,7 @@ watch(isSameAsUserInfo, (isSame) => {
 
 <template>
   <v-layout width="70%" max-width="75rem" class="d-flex flex-column mx-auto py-8">
-    <vee-form>
+    <form @submit="onOrder">
       <v-row>
         <!-- Billing Info -->
         <v-col cols="12" sm="8" md="8" lg="8" xl="8">
@@ -277,9 +283,6 @@ watch(isSameAsUserInfo, (isSame) => {
             v-else
             :cart="cart"
             title="Order Summary"
-            button-text="Submit order"
-            button-type="submit"
-            @submit="onOrder"
           >
             <!-- Order Items -->
             <template #items>
@@ -332,10 +335,21 @@ watch(isSameAsUserInfo, (isSame) => {
                 need to add the items to your cart again.
               </v-alert>
             </template>
+            <!-- Submit button -->
+            <template #button>
+              <v-btn
+                color="success"
+                :loading="isLoading"
+                :disabled="isSubmitting"
+                :block="true"
+                type="submit"
+                >Submit order</v-btn
+              >
+            </template>
           </CheckoutSummaryCard>
         </v-col>
       </v-row>
-    </vee-form>
+    </form>
   </v-layout>
 </template>
 

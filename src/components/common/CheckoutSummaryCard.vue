@@ -1,22 +1,10 @@
 <script setup lang="ts">
 import type { CartResponse as Cart } from '@/api/cart/interface'
 
-const props = defineProps<{
+defineProps<{
   title: string
-  buttonText: string
-  buttonType: 'submit' | 'button'
   cart: Cart
 }>()
-
-const emit = defineEmits(['button-click', 'submit'])
-
-const handleButtonClick = () => {
-  if (props.buttonType === 'button') {
-    emit('button-click')
-  } else if (props.buttonType === 'submit') {
-    emit('submit')
-  }
-}
 </script>
 
 <template>
@@ -52,9 +40,7 @@ const handleButtonClick = () => {
     </v-card-text>
     <!-- Button -->
     <v-card-actions>
-      <v-btn color="success" :block="true" :type="buttonType" @click="handleButtonClick">
-        {{ buttonText }}
-      </v-btn>
+      <slot name="button"></slot>
     </v-card-actions>
   </v-card>
 </template>
