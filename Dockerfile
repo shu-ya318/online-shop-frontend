@@ -1,6 +1,6 @@
 # ===== Stage 1:  Build the Vue.js app =====
 
-FROM node:22-alpine as build-stage
+FROM node:22-alpine AS build-stage
 
 WORKDIR /app
 
@@ -14,7 +14,7 @@ RUN npm run build
 
 # ===== Stage 2: Serve the app with Nginx =====
 
-FROM nginx:stable-alpine as production-stage
+FROM nginx:stable-alpine AS production-stage
 
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 
