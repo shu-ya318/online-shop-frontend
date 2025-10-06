@@ -2,14 +2,13 @@
 
 This is a modern, responsive e-commerce frontend built with Vue 3, TypeScript, and Pinia. It features a complete user flow including authentication, product browsing and searching, shopping cart management, order tracking, payment , and user profile settings.
 
-Website: <>
-
 - Test account : test@gmail.com<br/>
 - Test password : 12345678
 
-<img src="public/images/onlineShop.png" alt="Home Page">
-
 ## Highlight Features
+
+### Home Page
+<img src="public/images/home.png" alt="Home Page">
 
 ### Register Page
 <img src="public/images/register.png" alt="Register Page">
@@ -18,10 +17,11 @@ Website: <>
 <img src="public/images/login.png" alt="Login Page">
 
 ### User Page
-<img src="public/images/user.png" alt="User Page">
+<img src="public/images/userSettingProfile.png" alt="User Setting Page Profile">
 
-### Home Page
-<img src="public/images/home.png" alt="Home Page">
+<img src="public/images/userSettingPassword.png" alt="User Setting Page Password">
+
+<img src="public/images/userOrder.png" alt="User Order Page">
 
 ### Products Page
 <img src="public/images/products.png" alt="Products Page">
@@ -33,10 +33,9 @@ Website: <>
 <img src="public/images/cart.png" alt="Cart Page">
 
 ### Order Page
-<img src="public/images/order.png" alt="Order Page">
+<img src="public/images/order1.png" alt="Order Page">
 
-### Payment Page
-<img src="public/images/payment.png" alt="Payment Page">
+<img src="public/images/order2.png" alt="Order Page">
 
 ### Order Detail Page
 <img src="public/images/orderDetail.png" alt="Order Detail Page">
@@ -83,7 +82,7 @@ npm install
    Create a `.env.development` file in the root of the project and add the following content. This file is ignored by Git.
 
    ```env
-   VITE_API_BASE_URL=http://localhost:8081
+   VITE_API_BASE_URL=http://localhost:8080
    ```
 
 ### Development
