@@ -96,7 +96,7 @@ export const useUserStore = defineStore(
     const login = async (credentials: LoginRequest) => {
       try {
         const response = await apiLogin(credentials)
-        console.log('store的accessToken', accessToken.value)
+
         if (response.accessToken) {
           setAccessToken(response.accessToken)
           await fetchUserInfo()

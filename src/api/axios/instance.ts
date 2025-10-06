@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { storeToRefs } from 'pinia'
+import qs from 'qs'
 
 import { useUserStore } from '@/stores/userStore'
 
@@ -15,6 +16,11 @@ const service: AxiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
   withCredentials: true,
+  paramsSerializer: {
+    serialize: (params) => {
+      return qs.stringify(params, { arrayFormat: 'brackets' })
+    },
+  },
 })
 
 // Request interceptor
@@ -22,7 +28,11 @@ service.interceptors.request.use(
   (config) => {
     const userStore = useUserStore()
     const { accessToken } = storeToRefs(userStore)
-    console.log('axios的accessToken', accessToken.value)
+    console.log(
+      `[AXIOS] Request: ${config.method?.toUpperCase()} ${config.url}`,
+      config.params ? { params: config.params } : '',
+      config.data ? { data: config.data } : '',
+    )
     if (accessToken.value) config.headers.Authorization = `Bearer ${accessToken.value}`
 
     return config

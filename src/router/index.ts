@@ -123,8 +123,6 @@ router.beforeEach(
   ) => {
     const userStore = useUserStore()
     const { isInitialized, isAuthenticated } = storeToRefs(userStore)
-    console.log('router的isInitialized', isInitialized.value)
-    console.log('router的isAuthenticated', isAuthenticated.value)
     if (!isInitialized.value) await userStore.initializeAuth()
 
     if (!isAuthenticated.value) {

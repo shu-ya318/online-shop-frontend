@@ -183,14 +183,24 @@ watch(queryParams, fetchProductData, { deep: true, immediate: true })
             </v-row>
           </div>
           <!-- Result :  Success but not found -->
-          <div v-else-if="productData.length === 0" class="w-100 d-flex flex-column justify-center align-center ga-1"
-            style="min-height: 15rem">
+          <div
+            v-else-if="productData.length === 0"
+            class="w-100 d-flex flex-column justify-center align-center ga-1"
+            style="min-height: 15rem"
+          >
             <v-icon icon="mdi-alert-circle-outline" size="x-large" color="secondary" />
             <div class="text-subtitle-2 text-secondary">No products found</div>
           </div>
           <!-- Result : Success -->
           <v-row v-else>
-            <v-col v-for="product in productData" :key="product.uuid" :cols="12" :sm="6" :md="4" :lg="3">
+            <v-col
+              v-for="product in productData"
+              :key="product.uuid"
+              :cols="12"
+              :sm="6"
+              :md="4"
+              :lg="3"
+            >
               <!-- Card -->
               <product-card
                 :product="product"
@@ -203,9 +213,18 @@ watch(queryParams, fetchProductData, { deep: true, immediate: true })
         </v-row>
       </v-container>
       <!-- Pagination -->
-      <v-pagination v-if="totalPages > 1" rounded="circle" color="accent" active-color="success" total-visible="6"
-        :length="totalPages" :loading="isLoading" :disabled="isLoading" v-model="currentDisplayPage"
-        @update:model-value="onPageChange" />
+      <v-pagination
+        v-if="totalPages > 1"
+        rounded="circle"
+        color="accent"
+        active-color="success"
+        total-visible="6"
+        :length="totalPages"
+        :loading="isLoading"
+        :disabled="isLoading"
+        v-model="currentDisplayPage"
+        @update:model-value="onPageChange"
+      />
     </v-container>
   </v-layout>
 </template>
