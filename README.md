@@ -64,20 +64,20 @@ This is a modern, responsive e-commerce frontend built with Vue 3, TypeScript, a
 
 ### Installation
 
-1. Clone the repository:
+1. **Clone the Repository**
 
 ```bash
 git clone https://github.com/shu-ya318/online-shop-frontend.git
 cd online-shop-frontend
 ```
 
-2. Install dependencies:
+2. **Install dependencies**
 
 ```bash
 npm install
 ```
 
-3. Configure environment variables
+3. **Configure Environment Variables**
 
    Create a `.env.development` file in the root of the project and add the following content. This file is ignored by Git.
 
@@ -115,21 +115,7 @@ npm run preview
 
 ### Containerization (Docker)
 
-1.  Build the Docker image:
-
-    ```bash
-    docker build -t online-shop-frontend .
-    ```
-
-2.  Run the Docker container:
-
-    ```bash
-    docker run -d -p 5173:5173 --name online-shop-frontend-container online-shop-frontend
-    ```
-
-    This will start an Nginx server on port 5173. The application will be accessible at `http://localhost:5173`.
-
-    **Note:** The Nginx configuration is set up to proxy API requests to a backend service. For this to work in a Docker environment, the frontend and backend containers should be on the same Docker network. It is recommended to use Docker Compose to orchestrate multi-container applications.
+This project is designed to be managed and deployed using Docker Compose from a parent directory. Please refer to the `docker-compose.yml` file in the parent directory for instructions on building and running the services.
 
 ### Testing
 

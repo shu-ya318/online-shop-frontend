@@ -23,8 +23,8 @@ type Login = z.infer<typeof LoginSchema>
 
 const { handleSubmit, defineField, errors, isSubmitting } = useForm<Login>({
   initialValues: {
-    email: '',
-    password: '',
+    email: 'test@gmail.com',
+    password: '12345678',
   },
   validationSchema: toTypedSchema(LoginSchema),
 })
