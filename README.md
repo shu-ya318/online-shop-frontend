@@ -1,9 +1,8 @@
-# Online Shop Frontend
+# Online Shop - Frontend
 
-This is a modern, responsive e-commerce frontend built with Vue 3, TypeScript, and Pinia. It features a complete user flow including authentication, product browsing and searching, shopping cart management, order tracking, payment , and user profile settings.
-
-- Test account : test@gmail.com<br/>
-- Test password : 12345678
+**Demo Account:**
+- Email: `test@gmail.com`
+- Password: `12345678`
 
 ## Highlight Features
 
@@ -40,6 +39,7 @@ This is a modern, responsive e-commerce frontend built with Vue 3, TypeScript, a
 ### Order Detail Page
 <img src="public/images/orderDetail.png" alt="Order Detail Page">
 
+---
 
 ## Technology Stack
 
@@ -58,24 +58,23 @@ This is a modern, responsive e-commerce frontend built with Vue 3, TypeScript, a
 ## Getting Start
 
 ### Prerequisites
-
-- Node.js ^20.19.0 || >=22.12.0
-- npm ^10.0.0
+- Node.js `^20.19.0` or `>=22.12.0`
+- npm `^10.0.0`
 
 ### Installation
 
 1. **Clone the Repository**
 
-```bash
-git clone https://github.com/shu-ya318/online-shop-frontend.git
-cd online-shop-frontend
-```
+    ```bash
+    git clone https://github.com/shu-ya318/online-shop-frontend.git
+    cd online-shop-frontend
+    ```
 
 2. **Install dependencies**
 
-```bash
-npm install
-```
+    ```bash
+    npm install
+    ```
 
 3. **Configure Environment Variables**
 
@@ -85,6 +84,9 @@ npm install
    VITE_API_BASE_URL=http://localhost:8080
    ```
 
+    > **Note:** Replace `8080` with the port number your backend server is running on.
+
+
 ### Development
 
 Start the development server:
@@ -93,37 +95,29 @@ Start the development server:
 npm run dev
 ```
 
-### Building
+> **Note:** The application will be available at `http://localhost:5173` (or the port shown in terminal).
 
-Production build:
+### Deployment
 
-```bash
-npm run build
-```
+1. **Build for Production**
 
-Build only (skip type checking):
+    ```bash
+    npm run build
+    ```
 
-```bash
-npm run build-only
-```
+    > **Note:** The built files will be output to the `dist/` directory.
 
-Preview build results:
+2. **Deploy Static Files**
 
-```bash
-npm run preview
-```
+    The `dist/` directory can be served by any static file server:
+    - Nginx
+    - Apache  
+    - Caddy
+    - CDN/hosting services
 
-### Containerization (Docker)
+3. **Containerization (Docker)**
 
-This project is designed to be managed and deployed using Docker Compose from a parent directory. Please refer to the `docker-compose.yml` file in the parent directory for instructions on building and running the services.
-
-### Testing
-
-Run unit tests:
-
-```bash
-npm run test:unit
-```
+    This project can also be deployed using Docker Compose from the parent directory. Please refer to the `docker-compose.yml` file in the parent directory for containerized deployment instructions.
 
 ### Code Quality
 
@@ -256,9 +250,3 @@ online-shop-frontend/
 ├── vite.config.ts
 └── vitest.config.ts
 ```
-
-## Contact
-
-- **Email**: shuyaHsieh318@gmail.com
-- **Cake**: https://www.cake.me/me/shuyahsieh
-- **Linkedin**: https://www.linkedin.com/in/%E6%B7%91%E9%9B%85-%E8%AC%9D-9906772b1/
