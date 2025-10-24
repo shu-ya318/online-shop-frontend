@@ -60,7 +60,7 @@ const onLogin = handleSubmit(async (values) => {
 
 const onLoginWithGoogle = () => {
   isLoading.value = true
-  window.location.href = `http://localhost:8080/onlineShop/oauth2/authorization/google`
+  window.location.href = `/onlineShop/oauth2/authorization/google`
 }
 </script>
 

@@ -10,7 +10,7 @@ import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 
 // Initialize axios instance
 const service: AxiosInstance = axios.create({
-  baseURL: '/api',
+  baseURL: '/onlineShop',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -28,11 +28,7 @@ service.interceptors.request.use(
   (config) => {
     const userStore = useUserStore()
     const { accessToken } = storeToRefs(userStore)
-    console.log(
-      `[AXIOS] Request: ${config.method?.toUpperCase()} ${config.url}`,
-      config.params ? { params: config.params } : '',
-      config.data ? { data: config.data } : '',
-    )
+
     if (accessToken.value) config.headers.Authorization = `Bearer ${accessToken.value}`
 
     return config
