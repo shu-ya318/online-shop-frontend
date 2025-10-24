@@ -1,5 +1,7 @@
 # Online Shop - Frontend
 
+This is a e-commerce frontend built with Vue 3, TypeScript, and Pinia. It features a complete user flow including authentication, product browsing and searching, shopping cart management, order tracking, payment , and user profile settings.
+
 **Demo Account:**
 - Email: `test@gmail.com`
 - Password: `12345678`
@@ -84,7 +86,7 @@
    VITE_API_BASE_URL=http://localhost:8080
    ```
 
-    > **Note:** Replace `8080` with the port number your backend server is running on.
+    > **Note:** You can change the port number (e.g., `http://localhost:9090`) to match your backend server configuration.
 
 
 ### Development
@@ -118,6 +120,22 @@ npm run dev
 3. **Containerization (Docker)**
 
     This project can also be deployed using Docker Compose from the parent directory. Please refer to the `docker-compose.yml` file in the parent directory for containerized deployment instructions.
+
+    For standalone Docker deployment:
+
+    ```bash
+    # Build Docker image
+    docker build -t online-shop-frontend:latest .
+    
+    # Run container
+    docker run -d -p 80:80 \
+      --name online-shop-frontend \
+      online-shop-frontend:latest
+    ```
+
+    The application will be accessible at `http://localhost:80/`
+
+    > **Note:** You can change the port mapping (e.g., `-p 3000:80`) to expose the application on a different host port.
 
 ### Code Quality
 
