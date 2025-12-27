@@ -1,3 +1,8 @@
+export enum SortDirection {
+  ASC = 'asc',
+  DESC = 'desc',
+}
+
 // Product
 export enum AvailabilityStatus {
   IN_STOCK = 'IN_STOCK',
@@ -9,11 +14,6 @@ export enum Category {
   FRUITS = 'fruits',
   PROTEIN = 'protein',
   GRAINS = 'grains',
-}
-
-export enum SortDirection {
-  ASC = 'asc',
-  DESC = 'desc',
 }
 
 // Order
