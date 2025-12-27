@@ -1,53 +1,63 @@
 import api from '@/api/axios/instance'
 
+import type { SuccessResponse } from '@/api/common/interface'
 import type {
   RegisterRequest,
   LoginRequest,
-  LoginResponse,
   UserResponse,
   UserProfileUpdateRequest,
   UserPasswordUpdateRequest,
-  RefreshTokenResponse,
-  ResultResponse,
 } from './interface'
 
-export const register = async (request: RegisterRequest): Promise<ResultResponse> => {
-  const response = await api.post<ResultResponse>('/public/users/register', request)
+/*
+ * POST method
+ */
+
+export const register = async (request: RegisterRequest): Promise<SuccessResponse> => {
+  const response = await api.post<SuccessResponse>('/public/users/register', request)
 
   return response.data
 }
 
-export const exchangeOAuth2Code = async (request: string): Promise<LoginResponse> => {
-  const response = await api.post<LoginResponse>('/public/users/oauth2/exchange-code', {
-    oauth2Code: request,
+export const login = async (request: LoginRequest): Promise<string> => {
+  const response = await api.post<string>('/public/users/login', request)
+
+  return response.data
+}
+
+export const exchangeOauth2Code = async (oauth2Code: string): Promise<string> => {
+  const response = await api.post<string>('/public/users/oauth2/exchange-code', {
+    oauth2Code,
   })
 
   return response.data
 }
 
-export const login = async (request: LoginRequest): Promise<LoginResponse> => {
-  const response = await api.post<LoginResponse>('/public/users/login', request)
+export const refreshTokens = async (): Promise<string> => {
+  const response = await api.post<string>('/public/users/refresh-tokens')
 
   return response.data
 }
 
-export const refreshToken = async (): Promise<RefreshTokenResponse> => {
-  const response = await api.post<RefreshTokenResponse>('/public/users/refresh-token')
+export const logout = async (): Promise<SuccessResponse> => {
+  const response = await api.post<SuccessResponse>('/public/users/logout')
 
   return response.data
 }
 
-export const logout = async (): Promise<ResultResponse> => {
-  const response = await api.post<ResultResponse>('/public/users/logout')
-
-  return response.data
-}
+/*
+ * GET method
+ */
 
 export const getUser = async (): Promise<UserResponse> => {
   const response = await api.get<UserResponse>('/users/me')
 
   return response.data
 }
+
+/*
+ * PUT method
+ */
 
 export const updateUserProfile = async (
   request: UserProfileUpdateRequest,
@@ -59,8 +69,8 @@ export const updateUserProfile = async (
 
 export const updateUserPassword = async (
   request: UserPasswordUpdateRequest,
-): Promise<ResultResponse> => {
-  const response = await api.put<ResultResponse>('/users/me/password', request)
+): Promise<SuccessResponse> => {
+  const response = await api.put<SuccessResponse>('/users/me/password', request)
 
   return response.data
 }

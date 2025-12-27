@@ -4,7 +4,7 @@ import qs from 'qs'
 
 import { useUserStore } from '@/stores/userStore'
 
-import { refreshToken } from '@/api/user'
+import { refreshTokens } from '@/api/user'
 
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 
@@ -57,7 +57,7 @@ const processQueue = (error: unknown, token: string | null = null) => {
 const publicUrls = [
   '/public/users/register',
   '/public/users/login',
-  '/public/users/refresh-token',
+  '/public/users/refresh-tokens',
   '/public/users/oauth2/exchange-code',
   '/public/users/logout',
 ]
@@ -70,7 +70,6 @@ service.interceptors.response.use(
     const originalRequest = error.config
 
     // Token refresh handling
-    if (error.response?.status === 401 && !publicUrls.includes(originalRequest.url)) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject })
@@ -89,10 +88,11 @@ service.interceptors.response.use(
       const userStore = useUserStore()
 
       try {
-        const response = await refreshToken()
-        userStore.setAccessToken(response.accessToken)
-        originalRequest.headers.Authorization = `Bearer ${response.accessToken}`
-        processQueue(null, response.accessToken)
+        const accessToken = await refreshTokens()
+        userStore.setAccessToken(accessToken)
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`
+        processQueue(null, accessToken)
+        
         return service(originalRequest)
       } catch (refreshError) {
         processQueue(refreshError, null)
@@ -101,7 +101,6 @@ service.interceptors.response.use(
       } finally {
         isRefreshing = false
       }
-    }
 
     // Error handling
     if (error.response && error.response.data && error.response.data.message) {

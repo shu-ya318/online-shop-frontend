@@ -12,14 +12,6 @@ export interface LoginRequest {
   password: string
 }
 
-export interface LoginResponse {
-  accessToken: string
-}
-
-export interface RefreshTokenResponse {
-  accessToken: string
-}
-
 export interface UserResponse {
   uuid: string
   email: string
@@ -39,8 +31,4 @@ export interface UserProfileUpdateRequest {
 export interface UserPasswordUpdateRequest {
   oldPassword: string
   newPassword: string
-}
-
-export interface ResultResponse {
-  message: string
 }
