@@ -12,7 +12,7 @@ const router = useRouter()
 
 const cartStore = useCartStore()
 const { isLoading, cart } = storeToRefs(cartStore)
-const { fetchUserCart } = cartStore
+const { getUserCart } = cartStore
 
 const onNavigateToProducts = () => {
   router.push({ name: 'products' })
@@ -23,7 +23,7 @@ const proceedToOrder = () => {
 }
 
 onMounted(() => {
-  fetchUserCart()
+  getUserCart()
 })
 </script>
 

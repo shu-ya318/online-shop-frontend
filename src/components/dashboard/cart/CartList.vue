@@ -20,15 +20,15 @@ defineEmits<{
 
 const { showError, showSuccess } = useNotificationStore()
 
-const { updateCartItemQuantity, removeCartItem } = useCartStore()
+const { updateUserCartItemQtyByUuid, removeUserCartItemByUuid } = useCartStore()
 
 const isOpen = ref(false)
-const selectedItemUuid = ref('')
-const updatingItemUuid = ref<string | null>(null)
+const selectedCartItemUuid = ref('')
+const updatingCartItemUuid = ref<string | null>(null)
 
-const updateItemQuantity = debounce(async (payload: { productUuid: string; quantity: number }) => {
+const updateItemQty = debounce(async (payload: { cartItemUuid: string; quantity: number }) => {
   try {
-    await updateCartItemQuantity(payload)
+    await updateUserCartItemQtyByUuid(payload.cartItemUuid, payload.quantity)
     showSuccess('Update quantity successfully!')
   } catch (error) {
     if (error instanceof Error) {
@@ -37,28 +37,28 @@ const updateItemQuantity = debounce(async (payload: { productUuid: string; quant
       showError(String(error))
     }
   } finally {
-    updatingItemUuid.value = null
+    updatingCartItemUuid.value = null
   }
 }, 1000)
 
-const handleQuantityChange = (productUuid: string, quantity: number) => {
-  updatingItemUuid.value = productUuid
-  updateItemQuantity({ productUuid, quantity })
+const ChangeCartItemQty = (cartItemUuid: string, quantity: number) => {
+  updatingCartItemUuid.value = cartItemUuid
+  updateItemQty({ cartItemUuid, quantity })
 }
 
-const openDialog = (productUuid: string) => {
-  selectedItemUuid.value = productUuid
+const openDialog = (cartItemUuid: string) => {
+  selectedCartItemUuid.value = cartItemUuid
   isOpen.value = true
 }
 
 const closeDialog = () => {
   isOpen.value = false
-  selectedItemUuid.value = ''
+  selectedCartItemUuid.value = ''
 }
 
-const removeItemFromCart = async (productUuid: string) => {
+const removeItemFromCart = async (cartItemUuid: string) => {
   try {
-    await removeCartItem(productUuid)
+    await removeUserCartItemByUuid(cartItemUuid)
     showSuccess('Remove item successfully!')
   } catch (error) {
     if (error instanceof Error) {
@@ -82,7 +82,7 @@ const removeItemFromCart = async (productUuid: string) => {
     </v-row>
     <v-divider color="info"></v-divider>
     <!-- Items -->
-    <template v-for="(item, index) in items" :key="item.productUuid">
+    <template v-for="(item, index) in items" :key="item.cartItemUuid">
       <v-row align="center" class="pa-4">
         <!-- Product -->
         <v-col cols="12" md="4">
@@ -120,9 +120,9 @@ const removeItemFromCart = async (productUuid: string) => {
         <v-col cols="8" md="3">
           <AddToCartControls
             :selected-quantity="item.quantity"
-            :is-loading="updatingItemUuid === item.productUuid"
-            @on-increment="handleQuantityChange(item.productUuid, item.quantity + 1)"
-            @on-decrement="handleQuantityChange(item.productUuid, item.quantity - 1)"
+            :is-loading="updatingCartItemUuid === item.cartItemUuid"
+            @on-increment="ChangeCartItemQty(item.cartItemUuid, item.quantity + 1)"
+            @on-decrement="ChangeCartItemQty(item.cartItemUuid, item.quantity - 1)"
           />
         </v-col>
         <!-- Subtotal -->
@@ -141,10 +141,10 @@ const removeItemFromCart = async (productUuid: string) => {
           <v-btn
             icon="mdi-trash-can-outline"
             variant="text"
-            @click="openDialog(item.productUuid)"
+            @click="openDialog(item.cartItemUuid)"
           ></v-btn>
           <!-- Warning Dialog -->
-          <v-dialog :model-value="isOpen && selectedItemUuid === item.productUuid" width="500">
+          <v-dialog :model-value="isOpen && selectedCartItemUuid === item.cartItemUuid" width="500">
             <v-card class="py-3 px-4">
               <v-card-title class="py-1">Remove Item</v-card-title>
               <v-card-text class="pt-1 pb-5">
@@ -152,7 +152,7 @@ const removeItemFromCart = async (productUuid: string) => {
               </v-card-text>
               <v-card-actions>
                 <v-btn color="info" class="px-2" @click="closeDialog">Cancel</v-btn>
-                <v-btn color="error" class="px-2" @click="removeItemFromCart(item.productUuid)"
+                <v-btn color="error" class="px-2" @click="removeItemFromCart(item.cartItemUuid)"
                   >Remove</v-btn
                 >
               </v-card-actions>

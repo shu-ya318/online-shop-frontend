@@ -11,15 +11,15 @@ import { hasDiscount } from '@/utils/hasDiscount'
 
 import { getProducts } from '@/api/product'
 
-import { AvailabilityStatus, SortDirection } from '@/types/common/enum'
-import type { ProductDetailResponse } from '@/api/product/interface'
+import { AvailabilityStatus, SortDirection } from '@/types/enum'
+import type { ProductResponse } from '@/api/product/interface'
 
 const router = useRouter()
 
 const userStore = useUserStore()
 const { isAuthenticated } = storeToRefs(userStore)
 
-const { addCartItem, isLoading: isAddingToCart } = useCartStore()
+const { addUserCartItem, isLoading: isAddingToCart } = useCartStore()
 
 const { showError, showSuccess } = useNotificationStore()
 
@@ -27,7 +27,7 @@ const { count } = useResponsiveCount()
 
 const isLoading = ref(true)
 const isError = ref(false)
-const bestSellerData = ref<ProductDetailResponse[]>([])
+const bestSellerData = ref<ProductResponse[]>([])
 const pageSize = ref(12)
 const totalPages = ref(0)
 
@@ -42,7 +42,7 @@ const groupedBestSellerData = computed(() => {
   )
 })
 
-const fetchBestSellerData = async () => {
+const getBestSellerData = async () => {
   isError.value = false
 
   try {
@@ -51,7 +51,6 @@ const fetchBestSellerData = async () => {
       size: pageSize.value,
       sortBy: 'totalSold',
       sortDirection: SortDirection.DESC,
-      filter: {},
     })
     bestSellerData.value = response.content
     totalPages.value = response.totalElements
@@ -75,7 +74,7 @@ const addItemToCart = async (productUuid: string) => {
   }
 
   try {
-    await addCartItem({ productUuid, quantity: 1 })
+    await addUserCartItem({ productUuid, quantity: 1 })
     showSuccess('Add to cart successfully!')
   } catch (error) {
     if (error instanceof Error) {
@@ -87,7 +86,7 @@ const addItemToCart = async (productUuid: string) => {
 }
 
 onMounted(() => {
-  fetchBestSellerData()
+  getBestSellerData()
 })
 </script>
 
@@ -113,7 +112,7 @@ onMounted(() => {
       style="min-height: 6rem"
     >
       <v-icon icon="mdi-alert-circle-outline" size="x-large" color="error" />
-      <div class="text-body-2 text-error">Fetch best seller products failed</div>
+      <div class="text-body-2 text-error">Get best seller products failed</div>
     </div>
     <!-- Result : Success but not found -->
     <div

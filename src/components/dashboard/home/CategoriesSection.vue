@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 
-import { Category } from '@/types/common/enum'
+import { Category } from '@/types/enum'
 
 import vegetablesImage from '@/assets/images/vegetables.png'
 import fruitsImage from '@/assets/images/fruits.png'

@@ -2,27 +2,23 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
 import {
-  addCartItem as apiAddCartItem,
-  getUserCart,
-  updateCartItemQuantity as apiUpdateCartItemQuantity,
-  removeCartItem as apiRemoveCartItem,
+  addUserCartItem as apiAddUserCartItem,
+  getUserCart as apiGetUserCart,
+  updateUserCartItemQtyByUuid as apiUpdateUserCartItemQtyByUuid,
+  removeUserCartItemByUuid as apiRemoveUserCartItemByUuid,
 } from '@/api/cart'
 
-import type {
-  CartAddItemRequest,
-  CartResponse,
-  CartItemQuantityUpdateRequest,
-} from '@/api/cart/interface'
+import type { CartItemAddRequest, CartResponse } from '@/api/cart/interface'
 
 export const useCartStore = defineStore('cart', () => {
   const isLoading = ref(false)
   const cart = ref<CartResponse | null>(null)
 
-  const fetchUserCart = async (): Promise<void> => {
+  const getUserCart = async (): Promise<void> => {
     isLoading.value = true
 
     try {
-      const response = await getUserCart()
+      const response = await apiGetUserCart()
       cart.value = response
     } catch (error) {
       cart.value = null
@@ -32,11 +28,11 @@ export const useCartStore = defineStore('cart', () => {
     }
   }
 
-  const addCartItem = async (request: CartAddItemRequest): Promise<void> => {
+  const addUserCartItem = async (request: CartItemAddRequest): Promise<void> => {
     isLoading.value = true
 
     try {
-      const response = await apiAddCartItem(request)
+      const response = await apiAddUserCartItem(request)
       cart.value = response
     } catch (error) {
       throw error
@@ -45,11 +41,11 @@ export const useCartStore = defineStore('cart', () => {
     }
   }
 
-  const updateCartItemQuantity = async (request: CartItemQuantityUpdateRequest): Promise<void> => {
+  const updateUserCartItemQtyByUuid = async (cartItemUuid: string, quantity: number): Promise<void> => {
     isLoading.value = true
 
     try {
-      const response = await apiUpdateCartItemQuantity(request)
+      const response = await apiUpdateUserCartItemQtyByUuid(cartItemUuid, quantity)
       cart.value = response
     } catch (error) {
       throw error
@@ -58,11 +54,11 @@ export const useCartStore = defineStore('cart', () => {
     }
   }
 
-  const removeCartItem = async (productUuid: string): Promise<void> => {
+  const removeUserCartItemByUuid = async (cartItemUuid: string): Promise<void> => {
     isLoading.value = true
 
     try {
-      const response = await apiRemoveCartItem(productUuid)
+      const response = await apiRemoveUserCartItemByUuid(cartItemUuid)
       cart.value = response
     } catch (error) {
       throw error
@@ -76,9 +72,9 @@ export const useCartStore = defineStore('cart', () => {
     isLoading,
     cart,
     // actions
-    fetchUserCart,
-    addCartItem,
-    updateCartItemQuantity,
-    removeCartItem,
+    getUserCart,
+    addUserCartItem,
+    updateUserCartItemQtyByUuid,
+    removeUserCartItemByUuid,
   }
 })

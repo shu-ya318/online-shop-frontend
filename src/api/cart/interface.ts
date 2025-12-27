@@ -1,9 +1,10 @@
-export interface CartAddItemRequest {
+export interface CartItemAddRequest {
   productUuid: string
   quantity: number
 }
 
 export interface CartItem {
+  cartItemUuid: string
   productUuid: string
   productName: string
   price: number
@@ -21,9 +22,4 @@ export interface CartResponse {
   shipping: number
   total: number
   totalQuantity: number
-}
-
-export interface CartItemQuantityUpdateRequest {
-  productUuid: string
-  quantity: number
 }
