@@ -12,7 +12,7 @@ import CategoriesSection from '@/components/dashboard/home/CategoriesSection.vue
 const router = useRouter()
 const route = useRoute()
 
-const { exchangeOAuth2Code } = useUserStore()
+const { exchangeOauth2Code } = useUserStore()
 
 const { showError, showSuccess } = useNotificationStore()
 
@@ -25,7 +25,7 @@ onMounted(async () => {
     isLoading.value = true
 
     try {
-      await exchangeOAuth2Code(oauth2Code)
+      await exchangeOauth2Code(oauth2Code)
       showSuccess('Login success!')
       setTimeout(() => {
         router.push({ name: 'home' })

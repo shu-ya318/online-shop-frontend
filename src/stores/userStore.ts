@@ -5,17 +5,17 @@ import { jwtDecode } from 'jwt-decode'
 import {
   register as apiRegister,
   login as apiLogin,
-  exchangeOAuth2Code as apiExchangeOAuth2Code,
+  exchangeOauth2Code as apiExchangeOauth2Code,
   logout as apiLogout,
-  getUser,
+  getUser as apiGetUser,
   // refreshToken as apiRefreshToken,
 } from '@/api/user'
 
+import type { SuccessResponse } from '@/api/common/interface'
 import type {
   RegisterRequest,
   LoginRequest,
   UserResponse,
-  ResultResponse,
 } from '@/api/user/interface'
 
 export const useUserStore = defineStore(
@@ -58,9 +58,9 @@ export const useUserStore = defineStore(
       accessToken.value = null
     }
 
-    const register = async (credentials: RegisterRequest): Promise<ResultResponse> => {
+    const register = async (request: RegisterRequest): Promise<SuccessResponse> => {
       try {
-        const response = await apiRegister(credentials)
+        const response = await apiRegister(request)
 
         return response
       } catch (error) {
@@ -68,9 +68,9 @@ export const useUserStore = defineStore(
       }
     }
 
-    const fetchUserInfo = async () => {
+    const getUserInfo = async () => {
       try {
-        const response = await getUser()
+        const response = await apiGetUser()
         userInfo.value = response
       } catch (error) {
         userInfo.value = null
@@ -78,13 +78,13 @@ export const useUserStore = defineStore(
       }
     }
 
-    const exchangeOAuth2Code = async (credentials: string) => {
+    const exchangeOauth2Code = async (oauth2Code: string) => {
       try {
-        const response = await apiExchangeOAuth2Code(credentials)
+        const accessToken = await apiExchangeOauth2Code(oauth2Code)
 
-        if (response.accessToken) {
-          setAccessToken(response.accessToken)
-          await fetchUserInfo()
+        if (accessToken) {
+          setAccessToken(accessToken)
+          await getUserInfo()
         }
       } catch (error) {
         removeAccessToken()
@@ -93,13 +93,13 @@ export const useUserStore = defineStore(
       }
     }
 
-    const login = async (credentials: LoginRequest) => {
+    const login = async (request: LoginRequest) => {
       try {
-        const response = await apiLogin(credentials)
+        const accessToken = await apiLogin(request)
 
-        if (response.accessToken) {
-          setAccessToken(response.accessToken)
-          await fetchUserInfo()
+        if (accessToken) {
+          setAccessToken(accessToken)
+          await getUserInfo()
         }
       } catch (error) {
         removeAccessToken()
@@ -108,7 +108,7 @@ export const useUserStore = defineStore(
       }
     }
 
-    const logout = async (): Promise<ResultResponse> => {
+    const logout = async (): Promise<SuccessResponse> => {
       try {
         const response = await apiLogout()
 
@@ -160,13 +160,11 @@ export const useUserStore = defineStore(
     const initializeAuth = async () => {
       if (isInitialized.value) return
 
-      const isTokenValid = verifyAccessToken()
-
-      if (isTokenValid) {
+      if (accessToken.value) {
         try {
-          await fetchUserInfo()
+          await getUserInfo()
         } catch {
-          logout()
+          await logout()
         }
       }
 
@@ -184,9 +182,9 @@ export const useUserStore = defineStore(
       // Actions
       setAccessToken,
       register,
-      fetchUserInfo,
+      getUserInfo,
       login,
-      exchangeOAuth2Code,
+      exchangeOauth2Code,
       logout,
       // refreshToken,
       initializeAuth,
