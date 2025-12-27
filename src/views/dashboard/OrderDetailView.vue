@@ -6,7 +6,7 @@ import { useNotificationStore } from '@/stores/notificationStore'
 
 import { getUserOrderByUuid } from '@/api/order'
 
-import { OrderStatus } from '@/types/common/enum'
+import { OrderStatus } from '@/types/enum'
 import type { OrderResponse } from '@/api/order/interface'
 
 const { showError } = useNotificationStore()
@@ -39,7 +39,7 @@ const orderDetailInfo = computed(() => {
   }
 })
 
-const fetchUserOrderDetail = async (values: string) => {
+const getUserOrderDetail = async (values: string) => {
   if (!values) {
     showError('Order uuid is missing')
     return
@@ -64,7 +64,7 @@ const onNavigateToProducts = () => {
 }
 
 onMounted(() => {
-  fetchUserOrderDetail(route.params.orderUuid as string)
+  getUserOrderDetail(route.params.orderUuid as string)
 })
 </script>
 

@@ -5,8 +5,9 @@ import { getUserOrders } from '@/api/order'
 
 import { useNotificationStore } from '@/stores/notificationStore'
 
-import { OrderStatus } from '@/types/common/enum'
-import type { OrderResponse, PaginatedOrderRequest } from '@/api/order/interface'
+import { OrderStatus } from '@/types/enum'
+import type { PaginatedRequest } from '@/api/common/interface'
+import type { OrderResponse } from '@/api/order/interface'
 
 enum Align {
   START = 'start',
@@ -50,7 +51,7 @@ const headerData = [
 const { showError } = useNotificationStore()
 
 const isLoading = ref(true)
-const queryParams = reactive<PaginatedOrderRequest>({
+const queryParams = reactive<PaginatedRequest>({
   page: 0,
   size: 10,
 })
@@ -58,7 +59,7 @@ const orderData = ref<OrderResponse[]>([])
 const totalPages = ref(0)
 const totalOrderData = ref(0)
 
-const fetchOrders = async () => {
+const getOrders = async () => {
   isLoading.value = true
 
   try {
@@ -82,7 +83,7 @@ const onUpdateOptions = ({ page, itemsPerPage }: { page: number; itemsPerPage: n
   queryParams.size = itemsPerPage === -1 ? totalOrderData.value : itemsPerPage
 }
 
-watch(queryParams, fetchOrders, { deep: true, immediate: true })
+watch(queryParams, getOrders, { deep: true, immediate: true })
 </script>
 
 <template>

@@ -15,9 +15,9 @@ import BillingInfo from '@/components/dashboard/order/BillingInfo.vue'
 import CheckoutSummaryCard from '@/components/common/CheckoutSummaryCard.vue'
 
 import { cancelUserOrderByUuid, createUserOrder } from '@/api/order'
-import { createPayment as createPaymentApi, capturePayment } from '@/api/payment'
+import { createUserPayment as createPaymentApi, captureUserPayment } from '@/api/payment'
 
-import { PaymentMethod, PaymentStatus } from '@/types/common/enum'
+import { PaymentMethod, PaymentStatus } from '@/types/enum'
 import type { PaymentResponse } from '@/api/payment/interface'
 
 const Orderschema = z.object({
@@ -48,7 +48,7 @@ const { userInfo } = storeToRefs(userStore)
 
 const cartStore = useCartStore()
 const { cart, isLoading } = storeToRefs(cartStore)
-const { fetchUserCart } = cartStore
+const { getUserCart } = cartStore
 
 const { showSuccess, showError } = useNotificationStore()
 
@@ -119,7 +119,7 @@ const onOrder = handleSubmit(async (values) => {
     }
     const paymentResponse = await createPaymentApi(paymentRequest)
 
-    await createPayment(orderUuid, values.paymentMethod, paymentResponse)
+    await createUserPayment(orderUuid, values.paymentMethod, paymentResponse)
   } catch (error) {
     if (error instanceof Error) {
       showError(error.message)
@@ -129,7 +129,7 @@ const onOrder = handleSubmit(async (values) => {
   }
 })
 
-const createPayment = async (
+const createUserPayment = async (
   orderUuid: string,
   paymentMethod: PaymentMethod,
   paymentResponse: PaymentResponse,
@@ -153,7 +153,7 @@ const handlePaypalCallback = async (query: LocationQuery) => {
   const { paymentId, PayerID: payerId } = query
 
   try {
-    const captureResponse = await capturePayment({
+    const captureResponse = await captureUserPayment({
       paymentId: paymentId as string,
       payerId: payerId as string,
     })
@@ -193,7 +193,7 @@ const onNavigateToProducts = () => {
 }
 
 onMounted(() => {
-  fetchUserCart()
+  getUserCart()
 })
 
 watch(
