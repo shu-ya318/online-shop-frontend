@@ -12,8 +12,8 @@ import AddToCartControls from '@/components/common/AddToCartControls.vue'
 
 import { getProductByUuid } from '@/api/product'
 
-import { AvailabilityStatus } from '@/types/common/enum'
-import type { ProductDetailResponse } from '@/api/product/interface'
+import { AvailabilityStatus } from '@/types/enum'
+import type { ProductResponse } from '@/api/product/interface'
 
 const { showError, showSuccess } = useNotificationStore()
 
@@ -23,10 +23,10 @@ const router = useRouter()
 const userStore = useUserStore()
 const { isAuthenticated } = storeToRefs(userStore)
 
-const { addCartItem, isLoading: isAddingToCart } = useCartStore()
+const { addUserCartItem, isLoading: isAddingToCart } = useCartStore()
 
 const isLoading = ref(true)
-const productDetail = ref<ProductDetailResponse | null>(null)
+const productDetail = ref<ProductResponse | null>(null)
 
 const selectedQuantity = ref(1)
 
@@ -45,7 +45,7 @@ const productSpecifications = computed(() => {
   }
 })
 
-const fetchProductDetail = async (values: string) => {
+const getProductDetail = async (values: string) => {
   if (!values) {
     showError('Product uuid is missing')
     return
@@ -66,7 +66,7 @@ const fetchProductDetail = async (values: string) => {
 }
 
 onMounted(() => {
-  fetchProductDetail(route.params.productUuid as string)
+  getProductDetail(route.params.productUuid as string)
 })
 
 const IncreaseQuantity = () => {
@@ -88,7 +88,7 @@ const addItemToCart = async (productUuid: string) => {
   }
 
   try {
-    await addCartItem({ productUuid, quantity: selectedQuantity.value })
+    await addUserCartItem({ productUuid, quantity: selectedQuantity.value })
     showSuccess('Add to cart successfully!')
   } catch (error) {
     if (error instanceof Error) {

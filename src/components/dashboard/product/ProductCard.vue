@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { hasDiscount as productHasDiscount } from '@/utils/hasDiscount'
-import { AvailabilityStatus } from '@/types/common/enum'
+import { AvailabilityStatus } from '@/types/enum'
 
-import type { ProductDetailResponse } from '@/api/product/interface'
+import type { ProductResponse } from '@/api/product/interface'
 
 const props = defineProps<{
-  product: ProductDetailResponse
+  product: ProductResponse
   isError?: boolean
   isLoading?: boolean
 }>()

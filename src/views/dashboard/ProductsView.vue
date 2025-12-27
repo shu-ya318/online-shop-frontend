@@ -14,10 +14,10 @@ import ProductCard from '@/components/dashboard/product/ProductCard.vue'
 
 import { getProducts } from '@/api/product'
 
-import { SortDirection } from '@/types/common/enum'
-import type { Category } from '@/types/common/enum'
-import type { ProductDetailResponse } from '@/api/product/interface'
-import type { PaginatedRequest } from '@/types/common/interface'
+import { SortDirection } from '@/types/enum'
+import type { Category } from '@/types/enum'
+import type { FilteredPaginatedRequest } from '@/api/common/interface'
+import type { ProductResponse } from '@/api/product/interface'
 
 enum QueryOptionType {
   SORT = 'sort',
@@ -69,13 +69,11 @@ const { showError, showSuccess } = useNotificationStore()
 const userStore = useUserStore()
 const { isAuthenticated } = storeToRefs(userStore)
 
-const { addCartItem, isLoading: isAddingToCart } = useCartStore()
+const { addUserCartItem, isLoading: isAddingToCart } = useCartStore()
 
 const searchTerm = ref('')
-const queryParams = reactive<PaginatedRequest>({
-  filter: {
-    category: route.query.category as string,
-  },
+const queryParams = reactive<FilteredPaginatedRequest>({
+  category: route.query.category as Category,
   page: 0,
   size: 8,
   sortBy: 'updatedAt',
@@ -83,13 +81,13 @@ const queryParams = reactive<PaginatedRequest>({
 })
 
 const isLoading = ref(true)
-const productData = ref<ProductDetailResponse[]>([])
+const productData = ref<ProductResponse[]>([])
 const totalPages = ref(0)
 const totalProductData = ref(0)
 
 const currentDisplayPage = ref(1)
 
-const fetchProductData = async () => {
+const getProductData = async () => {
   try {
     const response = await getProducts(queryParams)
     productData.value = response.content
@@ -107,7 +105,7 @@ const fetchProductData = async () => {
 }
 
 const onSearch = () => {
-  queryParams.filter.keyword = searchTerm.value
+  queryParams.keyword = searchTerm.value
   queryParams.page = 0
   currentDisplayPage.value = 1
 
@@ -116,7 +114,7 @@ const onSearch = () => {
 
 const onSelectOption = (queryOption: QueryOption) => {
   if (queryOption.type === QueryOptionType.FILTER) {
-    queryParams.filter.category = queryOption.model as Category
+    queryParams.category = queryOption.model as Category
   } else if (queryOption.type === QueryOptionType.SORT) {
     if (!queryOption.model) return
 
@@ -147,7 +145,7 @@ const onAddItemToCart = async (productUuid: string) => {
   }
 
   try {
-    await addCartItem({ productUuid, quantity: 1 })
+    await addUserCartItem({ productUuid, quantity: 1 })
     showSuccess('Add to cart successfully!')
   } catch (error) {
     if (error instanceof Error) {
@@ -158,7 +156,7 @@ const onAddItemToCart = async (productUuid: string) => {
   }
 }
 
-watch(queryParams, fetchProductData, { deep: true, immediate: true })
+watch(queryParams, getProductData, { deep: true, immediate: true })
 </script>
 
 <template>
