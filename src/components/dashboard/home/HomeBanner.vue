@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { useDisplay } from 'vuetify'
 
 import bannerImage from '@/assets/images/banner.png'
 
 const router = useRouter()
+const { xs } = useDisplay()
 
 const onNavigateToProducts = () => {
   router.push({ name: 'products' })
@@ -18,7 +20,7 @@ const onNavigateToProducts = () => {
     style="background-color: #edf2ee"
   >
     <!-- Solgan -->
-    <v-container width="40%" class="d-flex flex-column ga-10">
+    <v-container :width="xs ? '100%' : '40%'" class="d-flex flex-column ga-10">
       <div class="text-h3 text-primary font-weight-bold">Fresh Food</div>
       <div class="text-subtitle-1 text-primary">
         Sale up to <span class="text-warning">30% OFF</span>
@@ -34,7 +36,7 @@ const onNavigateToProducts = () => {
       </v-btn>
     </v-container>
     <!-- Image -->
-    <v-img width="50%" height="100%" contain :src="bannerImage">
+    <v-img v-if="!xs" width="50%" height="100%" contain :src="bannerImage">
       <template v-slot:placeholder>
         <div class="d-flex align-center justify-center fill-height">
           <v-progress-circular indeterminate color="grey-lighten-4"></v-progress-circular>
