@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { storeToRefs } from 'pinia'
@@ -13,10 +14,12 @@ import FormInput from '@/components/common/FormInput.vue'
 
 import { updateUserProfile, updateUserPassword } from '@/api/user'
 
+const router = useRouter()
 const { showSuccess, showError } = useNotificationStore()
 
 const userStore = useUserStore()
 const { userInfo } = storeToRefs(userStore)
+const { logout } = useUserStore()
 
 const isProfileUpdating = ref(false)
 const isPasswordUpdating = ref(false)
@@ -132,6 +135,10 @@ const UpdatePassword = async (values: Password) => {
   try {
     const response = await updateUserPassword(values)
     showSuccess(response.message)
+  
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    await logout()
+    router.push({ name: 'login' })
   } catch (error) {
     if (error instanceof Error) {
       showError(error.message)
