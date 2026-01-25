@@ -14,7 +14,7 @@ import ProductCard from '@/components/dashboard/product/ProductCard.vue'
 
 import { getProducts } from '@/api/product'
 
-import { SortDirection } from '@/types/enum'
+import { SortBy, SortDirection } from '@/types/enum'
 import type { Category } from '@/types/enum'
 import type { FilteredPaginatedRequest } from '@/api/common/interface'
 import type { ProductResponse } from '@/api/product/interface'
@@ -59,7 +59,6 @@ const queryOptions = ref<QueryOption[]>([
 ])
 
 const router = useRouter()
-
 const route = useRoute()
 
 const { count } = useResponsiveCount()
@@ -76,7 +75,7 @@ const queryParams = reactive<FilteredPaginatedRequest>({
   category: route.query.category as Category,
   page: 0,
   size: 8,
-  sortBy: 'updatedAt',
+  sortBy: SortBy.UPDATED_AT,
   sortDirection: SortDirection.DESC,
 })
 
@@ -119,7 +118,7 @@ const onSelectOption = (queryOption: QueryOption) => {
     if (!queryOption.model) return
 
     const [field, direction] = queryOption.model.split(',')
-    queryParams.sortBy = field
+    queryParams.sortBy = field as SortBy
     queryParams.sortDirection = direction as SortDirection
   }
 

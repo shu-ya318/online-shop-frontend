@@ -1,4 +1,4 @@
-import type { SortDirection } from '@/types/enum'
+import type { SortBy, SortDirection } from '@/types/enum'
 
 // Paginated
 export interface PaginatedRequest {
@@ -9,7 +9,7 @@ export interface PaginatedRequest {
 export interface FilteredPaginatedRequest extends PaginatedRequest {
     keyword?: string
     category?: string
-    sortBy: string
+    sortBy: SortBy
     sortDirection: SortDirection
 }
 

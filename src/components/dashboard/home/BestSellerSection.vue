@@ -11,7 +11,7 @@ import { hasDiscount } from '@/utils/hasDiscount'
 
 import { getProducts } from '@/api/product'
 
-import { AvailabilityStatus, SortDirection } from '@/types/enum'
+import { AvailabilityStatus, SortBy, SortDirection } from '@/types/enum'
 import type { ProductResponse } from '@/api/product/interface'
 
 const router = useRouter()
@@ -49,7 +49,7 @@ const getBestSellerData = async () => {
     const response = await getProducts({
       page: 0,
       size: pageSize.value,
-      sortBy: 'totalSold',
+      sortBy: SortBy.TOTAL_SOLD,
       sortDirection: SortDirection.DESC,
     })
     bestSellerData.value = response.content
