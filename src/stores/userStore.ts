@@ -161,6 +161,13 @@ export const useUserStore = defineStore(
       if (isInitialized.value) return
 
       if (accessToken.value) {
+        if (!verifyAccessToken()) {
+          removeAccessToken()
+          userInfo.value = null
+          isInitialized.value = true
+          return
+        }
+
         try {
           await getUserInfo()
         } catch {
