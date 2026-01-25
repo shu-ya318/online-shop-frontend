@@ -87,23 +87,31 @@ watch(queryParams, getOrders, { deep: true, immediate: true })
 </script>
 
 <template>
-  <v-data-table-server
-    class="w-100"
-    style="max-width: 75rem"
-    item-value="orderUuid"
-    :headers="headerData"
-    :items-length="totalOrderData"
-    :loading="isLoading"
-    :items="orderData"
-    :items-per-page-options="[10, 25, 50, 100]"
-    @update:options="onUpdateOptions"
-  >
-    <template #[`item.status`]="{ value }">
-      <v-chip size="small" :color="getStatusColor(value)">{{
-        value.toLowerCase().replace(/_/g, ' ')
-      }}</v-chip>
-    </template>
-  </v-data-table-server>
+  <v-card width="100%" max-width="75rem" class="border-sm border-info mx-auto mb-8">
+    <v-container class="d-flex flex-column justify-center pa-0">
+      <v-card-title class="border-b-sm border-info text-h6 text-left" style="padding: 1rem 1.5rem">
+        Order History
+      </v-card-title>
+      <v-card-text class="pa-0">
+        <v-data-table-server
+          class="w-100"
+          item-value="orderUuid"
+          :headers="headerData"
+          :items-length="totalOrderData"
+          :loading="isLoading"
+          :items="orderData"
+          :items-per-page-options="[10, 25, 50, 100]"
+          @update:options="onUpdateOptions"
+        >
+          <template #[`item.status`]="{ value }">
+            <v-chip size="small" :color="getStatusColor(value)">{{
+              value.toLowerCase().replace(/_/g, ' ')
+            }}</v-chip>
+          </template>
+        </v-data-table-server>
+      </v-card-text>
+    </v-container>
+  </v-card>
 </template>
 
 <style scoped></style>

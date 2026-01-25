@@ -11,7 +11,7 @@ const navigationTab = ref('setting')
   <v-container>
     <v-card color="background" class="px-6">
       <!-- Navigation Tabs -->
-      <v-tabs color="success" class="my-4" v-model="navigationTab">
+      <v-tabs color="success" class="w-100 d-flex align-center mx-auto my-4" v-model="navigationTab" style="max-width: 75rem">
         <v-tab value="setting"> Setting </v-tab>
         <v-tab value="order"> Order History </v-tab>
       </v-tabs>
