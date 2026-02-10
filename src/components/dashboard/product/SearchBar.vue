@@ -3,7 +3,7 @@ import { computed } from 'vue'
 
 const props = defineProps<{
   modelValue: string
-  loading?: boolean
+  loading: boolean
 }>()
 
 const emit = defineEmits<{
@@ -18,8 +18,11 @@ const searchTerm = computed({
 </script>
 
 <template>
-  <v-container fluid height="3rem" class="pa-0">
-    <div class="w-100 h-100 d-flex align-center mx-auto" style="max-width: 30rem">
+  <v-container height="auto" class="py-0">
+    <div
+      class="w-100 d-flex align-center mx-auto"
+      :style="{ maxWidth: $vuetify.display.xs ? 'none' : '30rem', height: '3rem' }"
+    >
       <!-- Input -->
       <v-text-field
         v-model="searchTerm"

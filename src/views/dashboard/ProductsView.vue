@@ -159,7 +159,11 @@ watch(queryParams, getProductData, { deep: true, immediate: true })
 </script>
 
 <template>
-  <v-layout width="70%" max-width="75rem" class="d-flex flex-column pt-8 ga-10">
+  <v-container
+    fluid
+    class="d-flex flex-column pt-8 ga-10 pa-0 mx-auto"
+    :style="{ width: $vuetify.display.xs ? '100%' : '70%', maxWidth: '75rem' }"
+  >
     <search-bar v-model="searchTerm" :loading="isLoading" @submit="onSearch" />
     <filter-dropdowns v-model="queryOptions" @option-changed="onSelectOption" />
     <!-- Result -->
@@ -223,7 +227,7 @@ watch(queryParams, getProductData, { deep: true, immediate: true })
         @update:model-value="onPageChange"
       />
     </v-container>
-  </v-layout>
+  </v-container>
 </template>
 
 <style scoped></style>

@@ -3,7 +3,6 @@ import type { QueryOption } from '@/views/dashboard/ProductsView.vue'
 
 defineProps<{
   modelValue: QueryOption[]
-  loading?: boolean
 }>()
 
 const emit = defineEmits(['update:modelValue', 'option-changed'])
@@ -14,7 +13,7 @@ const ChangeOption = (option: QueryOption) => {
 </script>
 
 <template>
-  <v-container fluid height="2rem" class="d-flex align-center">
+  <v-container class="d-flex flex-column flex-md-row align-md-center ga-2 py-0 px-4 px-md-0">
     <!-- Select options -->
     <v-select
       v-for="filter in modelValue"
@@ -24,9 +23,8 @@ const ChangeOption = (option: QueryOption) => {
       hide-details
       clearable
       :placeholder="filter.placeholder"
-      class="mr-2 custom-placeholder-color"
-      :loading="loading"
-      style="width: 12rem; flex: none"
+      class="custom-placeholder-color"
+      :style="{ width: $vuetify.display.mdAndUp ? '12rem' : '100%', flex: 'none' }"
       :items="filter.items"
       v-model="filter.model"
       @update:model-value="ChangeOption(filter)"
