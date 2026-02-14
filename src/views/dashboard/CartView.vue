@@ -54,19 +54,20 @@ onMounted(() => {
             color="info"
             class="px-3 text-subtitle-2"
             @click="onNavigateToProducts"
-            >Return to shop</v-btn
           >
+            Return to shop
+          </v-btn>
         </div>
       </div>
       <!-- Result : Success -->
-      <v-container v-else fluid class="pa-0">
+      <v-container v-else fluid class="pa-0 px-12">
         <v-row no-gutters class="fill-height">
           <!-- Cart items -->
-          <v-col cols="12" sm="8" md="8" lg="8" xl="8">
+          <v-col cols="12" md="8" lg="8" xl="8">
             <CartList :items="cart.items" @navigate="onNavigateToProducts" />
           </v-col>
           <!-- Cart total -->
-          <v-col cols="12" sm="4" md="4" lg="4" xl="4">
+          <v-col cols="12" md="4" lg="4" xl="4">
             <CheckoutSummaryCard
               :cart="cart"
               title="Cart Total"
