@@ -240,7 +240,7 @@ watch(isSameAsUserInfo, (isSame) => {
 </script>
 
 <template>
-  <v-layout width="70%" max-width="75rem" class="d-flex flex-column mx-auto py-8">
+  <v-layout width="100%" max-width="75rem" class="d-flex flex-column mx-auto py-8 px-4 px-md-8">
     <form @submit="onOrder">
       <v-row>
         <!-- Billing Info -->
