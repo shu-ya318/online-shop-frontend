@@ -75,11 +75,11 @@ onMounted(() => {
               button-type="button"
               @button-click="proceedToOrder"
             >
-            <template #button>
-              <v-btn color="success" :block="true" @click="proceedToOrder">
-                Proceed to order
-              </v-btn>
-            </template>
+              <template #button>
+                <v-btn color="success" :block="true" @click="proceedToOrder">
+                  Proceed to order
+                </v-btn>
+              </template>
             </CheckoutSummaryCard>
           </v-col>
         </v-row>

@@ -118,7 +118,7 @@ onMounted(() => {
       >
         {{ key }}:
         <template v-if="key === 'Order Status'">
-          <v-chip size="small" color="warning">{{ value }}</v-chip>
+          <v-chip size="small" :color="isCancelled ? 'error' : 'warning'">{{ value }}</v-chip>
         </template>
         <template v-else>
           <span class="text-secondary ml-2">{{ value }}</span>

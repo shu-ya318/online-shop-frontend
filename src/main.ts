@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { createVuetify } from 'vuetify'
 import 'vuetify/styles'
 import { vuetifyConfig } from './stylesheets/theme'

@@ -12,6 +12,11 @@ export interface LoginRequest {
   password: string
 }
 
+export interface TokenResponse {
+  accessToken: string
+  refreshToken: string
+}
+
 export interface UserResponse {
   uuid: string
   email: string

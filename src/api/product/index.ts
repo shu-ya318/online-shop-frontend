@@ -8,10 +8,7 @@ import type { ProductResponse } from './interface'
  */
 
 export const getProducts = async (request: FilteredPaginatedRequest) => {
-  const response = await api.get<PaginatedResponse<ProductResponse>>(
-    '/public/products',
-    request,
-  )
+  const response = await api.get<PaginatedResponse<ProductResponse>>('/public/products', request)
 
   return response.data
 }

@@ -28,7 +28,7 @@ export const getUserCart = async (): Promise<CartResponse> => {
 
 export const updateUserCartItemQtyByUuid = async (
   cartItemUuid: string,
-  quantity: number
+  quantity: number,
 ): Promise<CartResponse> => {
   const response = await api.put<CartResponse>(`/carts/me/items/${cartItemUuid}`, { quantity })
 

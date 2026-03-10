@@ -41,7 +41,10 @@ export const useCartStore = defineStore('cart', () => {
     }
   }
 
-  const updateUserCartItemQtyByUuid = async (cartItemUuid: string, quantity: number): Promise<void> => {
+  const updateUserCartItemQtyByUuid = async (
+    cartItemUuid: string,
+    quantity: number,
+  ): Promise<void> => {
     isLoading.value = true
 
     try {

@@ -6,7 +6,11 @@ import { useUserStore } from '@/stores/userStore'
 
 import { refreshTokens } from '@/api/user'
 
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios'
+
+interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean
+}
 
 // Initialize axios instance
 const service: AxiosInstance = axios.create({
@@ -39,7 +43,7 @@ service.interceptors.request.use(
 // Response interceptor
 let isRefreshing = false
 const failedQueue: Array<{
-  resolve: (value: unknown) => void
+  resolve: (value: string) => void
   reject: (reason?: unknown) => void
 }> = []
 
@@ -48,7 +52,7 @@ const processQueue = (error: unknown, token: string | null = null) => {
     if (error) {
       prom.reject(error)
     } else {
-      prom.resolve(token)
+      prom.resolve(token as string)
     }
   })
   failedQueue.length = 0
@@ -66,16 +70,28 @@ service.interceptors.response.use(
   // Success
   (response) => response,
   // Failed
-  async (error) => {
-    const originalRequest = error.config
+  async (error: AxiosError<{ message?: string }>) => {
+    const originalRequest = error.config as CustomAxiosRequestConfig
+
+    if (!originalRequest) {
+      return Promise.reject(error)
+    }
+
+    const isPublicUrl = publicUrls.some((url) => {
+      if (!originalRequest.url) return false
+      return originalRequest.url.includes(url) || originalRequest.url.includes(url.substring(1))
+    })
 
     // Token refresh handling
+    if (error.response?.status === 401 && !originalRequest._retry && !isPublicUrl) {
+      originalRequest._retry = true
+
       if (isRefreshing) {
-        return new Promise((resolve, reject) => {
+        return new Promise<string>((resolve, reject) => {
           failedQueue.push({ resolve, reject })
         })
           .then((token) => {
-            originalRequest.headers['Authorization'] = 'Bearer ' + token
+            originalRequest.headers.Authorization = `Bearer ${token}`
             return service(originalRequest)
           })
           .catch((err) => {
@@ -92,7 +108,7 @@ service.interceptors.response.use(
         userStore.setAccessToken(accessToken)
         originalRequest.headers.Authorization = `Bearer ${accessToken}`
         processQueue(null, accessToken)
-        
+
         return service(originalRequest)
       } catch (refreshError) {
         processQueue(refreshError, null)
@@ -101,6 +117,7 @@ service.interceptors.response.use(
       } finally {
         isRefreshing = false
       }
+    }
 
     // Error handling
     if (error.response && error.response.data && error.response.data.message) {

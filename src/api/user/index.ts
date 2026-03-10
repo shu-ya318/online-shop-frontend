@@ -7,6 +7,7 @@ import type {
   UserResponse,
   UserProfileUpdateRequest,
   UserPasswordUpdateRequest,
+  TokenResponse,
 } from './interface'
 
 /*
@@ -20,23 +21,23 @@ export const register = async (request: RegisterRequest): Promise<SuccessRespons
 }
 
 export const login = async (request: LoginRequest): Promise<string> => {
-  const response = await api.post<string>('/public/users/login', request)
+  const response = await api.post<TokenResponse>('/public/users/login', request)
 
-  return response.data
+  return response.data.accessToken
 }
 
 export const exchangeOauth2Code = async (oauth2Code: string): Promise<string> => {
-  const response = await api.post<string>('/public/users/oauth2/exchange-code', {
+  const response = await api.post<TokenResponse>('/public/users/oauth2/exchange-code', {
     oauth2Code,
   })
 
-  return response.data
+  return response.data.accessToken
 }
 
 export const refreshTokens = async (): Promise<string> => {
-  const response = await api.post<string>('/public/users/refresh-tokens')
+  const response = await api.post<TokenResponse>('/public/users/refresh-tokens')
 
-  return response.data
+  return response.data.accessToken
 }
 
 export const logout = async (): Promise<SuccessResponse> => {

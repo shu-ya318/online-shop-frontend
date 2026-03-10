@@ -6,8 +6,8 @@ withDefaults(
   }>(),
   {
     selectedQuantity: 1,
-    isLoading: false
-  }
+    isLoading: false,
+  },
 )
 
 defineEmits<{

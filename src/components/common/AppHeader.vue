@@ -22,8 +22,8 @@ const onLogout = async () => {
   try {
     const response = await logout()
     showSuccess(response.message)
-    
-    await new Promise(resolve => setTimeout(resolve, 1500))
+
+    await new Promise((resolve) => setTimeout(resolve, 1500))
     router.push({ name: 'home' })
   } catch (error) {
     if (error instanceof Error) {

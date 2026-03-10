@@ -11,7 +11,9 @@ import type {
  * POST method
  */
 
-export const createUserPayment = async (request: PaymentCreateRequest): Promise<PaymentResponse> => {
+export const createUserPayment = async (
+  request: PaymentCreateRequest,
+): Promise<PaymentResponse> => {
   const response = await api.post<PaymentResponse>('/payments/me', request)
 
   return response.data

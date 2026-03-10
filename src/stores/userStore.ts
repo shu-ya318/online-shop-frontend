@@ -12,11 +12,7 @@ import {
 } from '@/api/user'
 
 import type { SuccessResponse } from '@/api/common/interface'
-import type {
-  RegisterRequest,
-  LoginRequest,
-  UserResponse,
-} from '@/api/user/interface'
+import type { RegisterRequest, LoginRequest, UserResponse } from '@/api/user/interface'
 
 export const useUserStore = defineStore(
   'user',

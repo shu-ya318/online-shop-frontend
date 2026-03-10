@@ -82,68 +82,74 @@ const removeItemFromCart = async (cartItemUuid: string) => {
     </v-row>
     <v-divider color="info" class="d-none d-lg-block"></v-divider>
     <!-- Items -->
-    <template v-for="(item, index) in items" :key="item.cartItemUuid"> 
-      <!-- Layout -->     
+    <template v-for="(item, index) in items" :key="item.cartItemUuid">
+      <!-- Layout -->
       <v-row class="pa-4 d-flex d-lg-none" align="start">
         <!-- Image Content (Left) -->
         <v-col cols="auto">
-             <v-img
-              :src="item.imageUrl"
-              :alt="item.productName"
-              width="120"
-              height="120"
-              cover
-              class="rounded bg-grey-lighten-4"
-            >
-              <template #error>
-                <v-row class="fill-height ma-0" align="center" justify="center">
-                  <v-icon icon="mdi-image-remove-outline" size="large" color="grey-lighten-1" />
-                </v-row>
-              </template>
-            </v-img>
+          <v-img
+            :src="item.imageUrl"
+            :alt="item.productName"
+            width="120"
+            height="120"
+            cover
+            class="rounded bg-grey-lighten-4"
+          >
+            <template #error>
+              <v-row class="fill-height ma-0" align="center" justify="center">
+                <v-icon icon="mdi-image-remove-outline" size="large" color="grey-lighten-1" />
+              </v-row>
+            </template>
+          </v-img>
         </v-col>
         <!-- Info Content (Right) -->
         <v-col class="d-flex flex-column">
-             <div class="d-flex justify-space-between align-start mb-2">
-                 <span class="text-body-1 font-weight-bold text-primary mr-2 text-truncate">{{ item.productName ?? '--' }}</span>
-                 <v-btn
-                    icon="mdi-trash-can-outline"
-                    variant="text"
-                    size="small"
-                    color="grey"
-                    @click="openDialog(item.cartItemUuid)"
-                  ></v-btn>
-             </div>
+          <div class="d-flex justify-space-between align-start mb-2">
+            <span class="text-body-1 font-weight-bold text-primary mr-2 text-truncate">{{
+              item.productName ?? '--'
+            }}</span>
+            <v-btn
+              icon="mdi-trash-can-outline"
+              variant="text"
+              size="small"
+              color="grey"
+              @click="openDialog(item.cartItemUuid)"
+            ></v-btn>
+          </div>
 
-             <!-- Price -->
-             <div class="mb-4">
-               <template v-if="cartItemHasDiscount(item)">
-                  <span class="text-decoration-line-through text-caption text-grey mr-2">
-                    ${{ Math.round(item.price) ?? '--' }}
-                  </span>
-                  <span class="text-body-2 font-weight-bold text-primary">${{ Math.round(item.discountPrice) ?? '--' }}</span>
-               </template>
-               <template v-else>
-                  <span class="text-body-2 font-weight-bold text-primary">${{ Math.round(item.price) ?? '--' }}</span>
-               </template>
-             </div>
+          <!-- Price -->
+          <div class="mb-4">
+            <template v-if="cartItemHasDiscount(item)">
+              <span class="text-decoration-line-through text-caption text-grey mr-2">
+                ${{ Math.round(item.price) ?? '--' }}
+              </span>
+              <span class="text-body-2 font-weight-bold text-primary"
+                >${{ Math.round(item.discountPrice) ?? '--' }}</span
+              >
+            </template>
+            <template v-else>
+              <span class="text-body-2 font-weight-bold text-primary"
+                >${{ Math.round(item.price) ?? '--' }}</span
+              >
+            </template>
+          </div>
 
-             <!-- Quantity and Subtotal -->
-             <div class="d-flex align-center justify-space-between mt-auto">
-                 <AddToCartControls
-                    :selected-quantity="item.quantity"
-                    :is-loading="updatingCartItemUuid === item.cartItemUuid"
-                    @on-increment="ChangeCartItemQty(item.cartItemUuid, item.quantity + 1)"
-                    @on-decrement="ChangeCartItemQty(item.cartItemUuid, item.quantity - 1)"
-                  />
-                  <div class="text-subtitle-1 font-weight-bold text-primary">
-                    ${{
-                      cartItemHasDiscount(item)
-                        ? Math.round(item.discountPrice) * item.quantity
-                        : Math.round(item.price) * item.quantity
-                    }}
-                  </div>
-             </div>
+          <!-- Quantity and Subtotal -->
+          <div class="d-flex align-center justify-space-between mt-auto">
+            <AddToCartControls
+              :selected-quantity="item.quantity"
+              :is-loading="updatingCartItemUuid === item.cartItemUuid"
+              @on-increment="ChangeCartItemQty(item.cartItemUuid, item.quantity + 1)"
+              @on-decrement="ChangeCartItemQty(item.cartItemUuid, item.quantity - 1)"
+            />
+            <div class="text-subtitle-1 font-weight-bold text-primary">
+              ${{
+                cartItemHasDiscount(item)
+                  ? Math.round(item.discountPrice) * item.quantity
+                  : Math.round(item.price) * item.quantity
+              }}
+            </div>
+          </div>
         </v-col>
       </v-row>
       <!-- Desktop Layout -->

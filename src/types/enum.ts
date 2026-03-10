@@ -1,7 +1,7 @@
 // Sort
 export enum SortBy {
   TOTAL_SOLD = 'totalSold',
-  UPDATED_AT = 'updatedAt'
+  UPDATED_AT = 'updatedAt',
 }
 
 export enum SortDirection {

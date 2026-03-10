@@ -22,7 +22,13 @@ defineEmits(['submit'])
           <!-- Inputs -->
           <slot name="form-inputs"></slot>
           <!-- Submit button -->
-          <v-btn type="submit" color="success" :block="true" :loading="loading" :disabled="disabled">
+          <v-btn
+            type="submit"
+            color="success"
+            :block="true"
+            :loading="loading"
+            :disabled="disabled"
+          >
             {{ buttonText }}
           </v-btn>
         </vee-form>

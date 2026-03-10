@@ -52,13 +52,7 @@ const { getUserCart } = cartStore
 
 const { showSuccess, showError } = useNotificationStore()
 
-const {
-  handleSubmit,
-  defineField,
-  resetForm,
-  setFieldValue,
-  isSubmitting,
-} = useForm<Order>({
+const { handleSubmit, defineField, resetForm, setFieldValue, isSubmitting } = useForm<Order>({
   initialValues: {
     orderNotes: '',
     // User info
@@ -176,7 +170,7 @@ const handlePaypalCancellation = async (query: LocationQuery) => {
 
   try {
     await cancelUserOrderByUuid(orderUuid as string)
-    showSuccess('Order has been cancelled!')
+    showError('Order has been cancelled!')
   } catch (error) {
     if (error instanceof Error) {
       showError(error.message)
@@ -279,11 +273,7 @@ watch(isSameAsUserInfo, (isSame) => {
             </v-btn>
           </v-card>
           <!-- Result : Success -->
-          <CheckoutSummaryCard
-            v-else
-            :cart="cart"
-            title="Order Summary"
-          >
+          <CheckoutSummaryCard v-else :cart="cart" title="Order Summary">
             <!-- Order Items -->
             <template #items>
               <div v-if="cart">
