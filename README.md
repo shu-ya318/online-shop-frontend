@@ -46,7 +46,7 @@ This is a e-commerce frontend built with Vue 3, TypeScript, and Pinia. It featur
 ## Technology Stack
 
 - **Framework**: Vue 3.5.18
-- **State Management**: Pinia 3.0.3
+- **State Management**: Pinia 3.0.3 + Persistedstate 4.5.0
 - **Language**: TypeScript 5.8.0
 - **Routing**: Vue Router 4.5.1
 - **HTTP Client**: Axios 1.11.0
@@ -55,9 +55,9 @@ This is a e-commerce frontend built with Vue 3, TypeScript, and Pinia. It featur
 - **Testing**: Vitest 3.2.4
 - **Code Quality**: ESLint 9.31.0 + Prettier 3.6.2
 - **Build Tool**: Vite 7.0.6
-- **Containerization**: Docker + Ngnix
+- **Containerization**: Docker + Nginx
 
-## Getting Start
+## Getting Started
 
 ### Prerequisites
 - Node.js `^20.19.0` or `>=22.12.0`
@@ -75,7 +75,7 @@ This is a e-commerce frontend built with Vue 3, TypeScript, and Pinia. It featur
 2. **Install dependencies**
 
     ```bash
-    npm install
+    npm ci
     ```
 
 3. **Configure Environment Variables**
@@ -163,6 +163,7 @@ npm run format
 online-shop-frontend/
 ├── .env.development  # (Create this file locally, gitignored)
 ├── Dockerfile
+├── .dockerignore
 ├── nginx.conf
 ├── public/
 ├── src/
@@ -172,6 +173,8 @@ online-shop-frontend/
 │   │   │   └── instance.ts
 │   │   ├── cart/
 │   │   │   ├── index.ts
+│   │   │   └── interface.ts
+│   │   ├── common/
 │   │   │   └── interface.ts
 │   │   ├── order/
 │   │   │   ├── index.ts
@@ -231,9 +234,7 @@ online-shop-frontend/
 │   ├── stylesheets/
 │   │   └── theme.ts
 │   ├── types/
-│   │   └── common/
-│   │       ├── enum.ts
-│   │       └── interface.ts
+│   │   └── enum.ts
 │   ├── utils/
 │   │   └── hasDiscount.ts
 │   ├── views/
